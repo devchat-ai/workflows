@@ -1,3 +1,5 @@
-When writing Python code, include type hints where appropriate and maintain compliance with PEP-8 guidelines:
+When writing Python code, maintain compliance with PEP-8 guidelines:
+- Include type hints where appropriate.
 - Provide docstrings for classes and functions.
 - Specify an encoding when opening documents. E.g., `open(file_path, encoding="utf-8")`.
+- Follow other best practices in PEP-8.
