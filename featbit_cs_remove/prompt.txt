@@ -60,6 +60,6 @@ In the given code, eliminate the feature flags tied to the key `f-f`, while pres
 
 assistant:
 
-```csharp public class Pmpt{public bool P(FbClient c){return F.RNN1();}}```",
+```csharp public class Pmpt{public bool P(FbClient c){return F.RNN();}}```",
 
 user:

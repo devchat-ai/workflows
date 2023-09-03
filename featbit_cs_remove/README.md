@@ -16,3 +16,7 @@ Remove feature flag f33 and related code when it return `on`
 ```
 Remove feature flag "f33" and related code if it returns "on"
 ```
+
+```
+In the given code, eliminate the feature flags tied to the key `f33`, while preserving the code associated with the `on` return value. Also, maintain any other code not related to these feature flags. Ignore the defaultValue. Provide just the code, excluding any descriptions.
+```

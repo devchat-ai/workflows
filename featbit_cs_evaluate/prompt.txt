@@ -190,18 +190,27 @@ Console.WriteLine(
 ```
 
 
-Image the FeatBit sdk has been initialized and injected in constructor, please help me to generate the code c# code  only for evaluating the feature flags with feature flag with key `{{feature-flag-key}}`, and if it returns `true`, then execute a fake todo code
+Image the FeatBit sdk has been initialized and injected in constructor, when we ask to generate the evaluation code, you shouldn't generate code of initilization and dependency injection. 
 
-Output Example:
+For exmaple, 
+
+User: 
+
+Generate feature flag code with key "example" and return "true"
+
+Asssistance:
 
 ```csharp
  string flagKey = "example";
 var user = FbUser.Builder("anonymous").Build();
 var boolVariation = _fbClient.BoolVariation(flagKey, user, defaultValue: false);
 
-// Check the feature flag value and execute "fake todo" code if it's true
 if (boolVariation)
 {
      // todo;
 }
 ```
+
+
+User:
+
