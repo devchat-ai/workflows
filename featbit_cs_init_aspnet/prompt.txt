@@ -1,0 +1,192 @@
+## Introduction
+
+This is the .NET Server-Side SDK for the 100% open-source feature flags management. The FeatBit Server-Side SDK for .NET is designed primarily for use in multi-user systems such as web servers and
+applications. It is not intended for use in desktop and embedded systems applications.
+
+### Quick Start
+
+The following code demonstrates basic usage of FeatBit.ServerSdk.
+
+```cs
+using FeatBit.Sdk.Server;
+using FeatBit.Sdk.Server.Model;
+using FeatBit.Sdk.Server.Options;
+
+// setup SDK options
+var options = new FbOptionsBuilder("<replace-with-your-env-secret>")
+    .Event(new Uri("<replace-with-your-event-url>"))
+    .Steaming(new Uri("<replace-with-your-streaming-url>"))
+    .Build();
+
+// Creates a new client instance that connects to FeatBit with the custom option.
+var client = new FbClient(options);
+if (!client.Initialized)
+{
+    Console.WriteLine("FbClient failed to initialize. All Variation calls will use fallback value.");
+}
+else
+{
+    Console.WriteLine("FbClient successfully initialized!");
+}
+
+// flag to be evaluated
+const string flagKey = "game-runner";
+
+// create a user
+var user = FbUser.Builder("anonymous").Build();
+
+// evaluate a boolean flag for a given user
+var boolVariation = client.BoolVariation(flagKey, user, defaultValue: false);
+Console.WriteLine($"flag '{flagKey}' returns {boolVariation} for user {user.Key}");
+
+// evaluate a boolean flag for a given user with evaluation detail
+var boolVariationDetail = client.BoolVariationDetail(flagKey, user, defaultValue: false);
+Console.WriteLine(
+    $"flag '{flagKey}' returns {boolVariationDetail.Value} for user {user.Key}. " +
+    $"Reason Kind: {boolVariationDetail.Kind}, Reason Description: {boolVariationDetail.Reason}"
+);
+
+// close the client to ensure that all insights are sent out before the app exits
+await client.CloseAsync();
+```
+
+## SDK
+
+### FbClient
+
+The FbClient is the heart of the SDK which providing access to FeatBit server. Applications should instantiate a **single instance** for the lifetime of the application.
+
+#### FbClient Using Default Options
+
+```csharp
+using FeatBit.Sdk.Server;
+
+// Creates a new client instance that connects to FeatBit with the default option.
+var client = new FbClient("<replace-with-your-env-secret>");
+```
+
+#### FbClient Using Custom Options
+
+```csharp
+using FeatBit.Sdk.Server;
+using FeatBit.Sdk.Server.Options;
+using Microsoft.Extensions.Logging;
+
+var consoleLoggerFactory = LoggerFactory.Create(x => x.AddConsole());
+
+var options = new FbOptionsBuilder("<replace-with-your-env-secret>")
+    .Steaming(new Uri("ws://localhost:5100"))
+    .Event(new Uri("http://localhost:5100"))
+    .StartWaitTime(TimeSpan.FromSeconds(3))
+    .LoggerFactory(consoleLoggerFactory)
+    .Build();
+
+// Creates a new client instance that connects to FeatBit with the custom option.
+var client = new FbClient(options);
+```
+
+#### Dependency Injection
+
+We can register the FeatBit services using standard conventions.
+
+> **Note**
+> The `AddFeatBit` extension method will block the current thread for a maximum duration specified in `FbOptions.StartWaitTime`.
+
+```csharp
+using FeatBit.Sdk.Server.DependencyInjection;
+
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+
+// add FeatBit service
+builder.Services.AddFeatBit(options =>
+{
+    options.EnvSecret = "<replace-with-your-env-secret>";
+    options.StartWaitTime = TimeSpan.FromSeconds(3);
+});
+
+var app = builder.Build();
+app.Run();
+```
+
+Then the `IFbClient` interface can be obtained through dependency injection.
+
+```csharp
+public class HomeController : ControllerBase
+{
+    private readonly IFbClient _fbClient;
+
+    public HomeController(IFbClient fbClient)
+    {
+        _fbClient = fbClient;
+    }
+}
+```
+
+### FbUser
+
+FbUser defines the attributes of a user for whom you are evaluating feature flags. FbUser has two built-in
+attributes: `key` and `name`. The only mandatory attribute of a FbUser is the key, which must uniquely identify each
+user.
+
+Besides these built-in properties, you can define any additional attributes associated with the user
+using `Custom(string key, string value)` method on `IFbUserBuilder`. Both built-in attributes and custom attributes can
+be referenced in targeting rules, and are included in analytics data.
+
+There is only one method for building FbUser.
+
+```csharp
+var bob = FbUser.Builder("a-unique-key-of-user")
+    .Name("bob")
+    .Custom("age", "15")
+    .Custom("country", "FR")
+    .Build();
+```
+
+### Evaluating flags
+
+By using the feature flag data it has already received, the SDK **locally calculates** the value of a feature flag for a
+given user.
+
+There is a `Variation` method that returns a flag value, and a `VariationDetail` method that returns an object
+describing how the value was determined for each type.
+
+- BoolVariation/BoolVariationDetail
+- StringVariation/StringVariationDetail
+- DoubleVariation/DoubleVariationDetail
+- FloatVariation/FloatVariationDetail
+- IntVariation/IntVariationDetail
+- JsonVariation/JsonVariationDetail (in consideration)
+
+> **Note**
+> Since the current version does not have native support for retrieving JSON variations, you can utilize the `StringVariation` method as an alternative to obtain the JSON string.
+
+Variation calls take the feature flag key, a FbUser, and a default value. If any error makes it impossible to
+evaluate the flag (for instance, the feature flag key does not match any existing flag), default value is returned.
+
+```csharp
+using FeatBit.Sdk.Server;
+using FeatBit.Sdk.Server.Model;
+
+// Creates a new client instance that connects to FeatBit with the default option.
+var client = new FbClient("<replace-with-your-env-secret>");
+
+// The flag key to be evaluated
+const string flagKey = "game-runner";
+
+// The user
+var user = FbUser.Builder("anonymous").Build();
+
+// Evaluate a boolean flag for a given user
+var boolVariation = client.BoolVariation(flagKey, user, defaultValue: false);
+Console.WriteLine($"flag '{flagKey}' returns {boolVariation} for user {user.Key}");
+
+// evaluate a boolean flag for a given user with evaluation detail
+var boolVariationDetail = client.BoolVariationDetail(flagKey, user, defaultValue: false);
+Console.WriteLine(
+    $"flag '{flagKey}' returns {boolVariationDetail.Value} for user {user.Key}. " +
+    $"Reason Kind: {boolVariationDetail.Kind}, Reason Description: {boolVariationDetail.Reason}"
+);
+```
+
+Please help me to init my featbit sdk in asp.net app
