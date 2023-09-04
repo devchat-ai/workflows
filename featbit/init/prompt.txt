@@ -1,9 +1,4 @@
-## Introduction
-
-This is the .NET Server-Side SDK for the 100% open-source feature flags management. The FeatBit Server-Side SDK for .NET is designed primarily for use in multi-user systems such as web servers and
-applications. It is not intended for use in desktop and embedded systems applications.
-
-### Quick Start
+This is FeatBit's .NET sdk tutorial. FeatBit is a feature flag service.
 
 The following code demonstrates basic usage of FeatBit.ServerSdk.
 
@@ -50,11 +45,7 @@ Console.WriteLine(
 await client.CloseAsync();
 ```
 
-## SDK
-
-### FbClient
-
-The FbClient is the heart of the SDK which providing access to FeatBit server. Applications should instantiate a **single instance** for the lifetime of the application.
+The `FbClient` is the heart of the SDK which providing access to FeatBit server. 
 
 #### FbClient Using Default Options
 
@@ -88,9 +79,6 @@ var client = new FbClient(options);
 #### Dependency Injection
 
 We can register the FeatBit services using standard conventions.
-
-> **Note**
-> The `AddFeatBit` extension method will block the current thread for a maximum duration specified in `FbOptions.StartWaitTime`.
 
 ```csharp
 using FeatBit.Sdk.Server.DependencyInjection;
@@ -158,9 +146,6 @@ describing how the value was determined for each type.
 - IntVariation/IntVariationDetail
 - JsonVariation/JsonVariationDetail (in consideration)
 
-> **Note**
-> Since the current version does not have native support for retrieving JSON variations, you can utilize the `StringVariation` method as an alternative to obtain the JSON string.
-
 Variation calls take the feature flag key, a FbUser, and a default value. If any error makes it impossible to
 evaluate the flag (for instance, the feature flag key does not match any existing flag), default value is returned.
 
@@ -189,4 +174,4 @@ Console.WriteLine(
 );
 ```
 
-Please help me to init FeatBit sdk in my c# console app
+Please help me to init my featbit sdk in asp.net app

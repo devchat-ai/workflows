@@ -2,9 +2,7 @@ Hello Assistant, as a developer, I need your assistance in cleaning up the code 
 
 user:
 
-```csharp 
-
-using FeatBit.Sdk.Server;using FeatBit.Sdk.Server.Model;using FeatBit.Sdk.Server.Options;(new Pmpt()).P(); public class Pmpt{public void P(){var o=new FbOptionsBuilder().Offline(true).Build();var c=new FbClient(o);var u=FbUser.Builder("anonymous").Build();var f1=c.BoolVariation("f1k",u,defaultValue:false);if(f1==true){var b=c.StringVariation("f2",u,defaultValue:"on");if(b=="on"){F.R1();F.R2();}}else if(f1==false)F.RN();else F.RN();}}``` 
+```csharp using FeatBit.Sdk.Server;using FeatBit.Sdk.Server.Model;using FeatBit.Sdk.Server.Options;(new Pmpt()).P(); public class Pmpt{public void P(){var o=new FbOptionsBuilder().Offline(true).Build();var c=new FbClient(o);var u=FbUser.Builder("anonymous").Build();var f1=c.BoolVariation("f1k",u,defaultValue:false);if(f1==true){var b=c.StringVariation("f2",u,defaultValue:"on");if(b=="on"){F.R1();F.R2();}}else if(f1==false)F.RN();else F.RN();}}``` 
 
 In the given code, eliminate the feature flags tied to the key `f1k`, while preserving the code associated with the `true` return value. Also, maintain any other code not related to these feature flags. Ignore the defaultValue. Provide just the code, excluding any descriptions.
 
