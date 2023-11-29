@@ -1,8 +1,9 @@
 
 import requests
+import os
 from functools import wraps
 
-BASE_SERVER_URL = 'http://localhost:3000'
+BASE_SERVER_URL = os.environ.get('DEVCHAT_IDE_SERVICE_URL', 'http://localhost:3000')
 
 def rpc_call(f):
     @wraps(f)
