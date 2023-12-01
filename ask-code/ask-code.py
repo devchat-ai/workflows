@@ -9,35 +9,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..' , 'libs'))
 from ide_services import get_lsp_brige_port
 
 
-def output_message(output):
-    out_data = f"""\n<<Start>>\n{output}\n<<End>>\n"""
-    print(out_data)
-    
-def output_result(output):
-    result = {"result": f"{output}"}
-    out_data = f"""\n<<Start>>\n{json.dumps(result)}\n<<End>>\n"""
-    print(out_data)
-    
-def request(data):
-    output_message(data)
-    
-    lines = []
-    while True:
-        try:
-            line = input()
-            if line.strip() == '<<End>>':
-                break
-            elif line.strip() == '<<Start>>':
-                continue
-            lines.append(line)
-        except EOFError:
-            pass
-
-    replay_message = '\n'.join(lines)
-    replay_object = json.loads(replay_message)
-    return replay_object
-        
-
 def query(question, lsp_brige_port):
     root_path = os.getcwd()
     
