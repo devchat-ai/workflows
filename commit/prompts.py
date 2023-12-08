@@ -13,8 +13,8 @@ Objective: **Create concise summaries for each modified file based on the provid
 **Response Format:**
 ```json
 {
-  \"filename1\": \"Summary of the changes made in filename1\",
-  \"filename2\": \"Summary of the changes made in filename2\",
+  \"filename1 with path\": \"Summary of the changes made in filename1\",
+  \"filename2 with path\": \"Summary of the changes made in filename2\",
   ...
 }
 ```
