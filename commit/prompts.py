@@ -40,7 +40,7 @@ Objective: **Create concise summaries for each modified file based on the provid
 Based on the provided diff changes and any additional user input, please generate a JSON object containing summaries for each modified file.
 """
 prompt_summary_for_files_llm_config = {
-	"model": "gpt-3.5-turbo-16k"
+	"model": "gpt-3.5-turbo-1106"
 }
 # ask summaries for missed files
 # missed files => {__MISSED_FILES__}
@@ -92,7 +92,7 @@ Objective: **Categorize the modified files from a diff into groups based on thei
 Based on the provided diff content, group the files accordingly and assign an appropriate importance level to each group, following the instructions and constraints.
 """
 prompt_group_files_llm_config = {
-	"model": "gpt-3.5-turbo-16k"
+	"model": "gpt-3.5-turbo-1106"
 }
 # re-group files based missed files
 # missed files => {__MISSED_FILES__}
@@ -143,7 +143,7 @@ Closes #IssueNumber
 Please use the above structure to generate a commit message that meets the specified criteria.
 """
 prompt_commit_message_by_diff_user_input_llm_config = {
-	"model": "gpt-3.5-turbo-16k"
+	"model": "gpt-3.5-turbo-1106"
 }
 
 # generate commit message based file summary and user_input
