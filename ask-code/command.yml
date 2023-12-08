@@ -1,0 +1,4 @@
+description: Ask questions about the current project's codebase, which requires proactive acquisition of additional context information to answer.
+input: required
+steps:
+  - run: $command_python $command_path/ask-code.py query "$input"
