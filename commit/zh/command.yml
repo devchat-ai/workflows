@@ -1,0 +1,5 @@
+description: commit changes with commit message in chinese.
+hint: to close Issue #issue_number
+input: optional
+steps:
+  - run: $command_python $command_path/../commit.py "$input" "chinese"
