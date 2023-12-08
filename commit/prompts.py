@@ -21,6 +21,7 @@ Objective: **Create concise summaries for each modified file based on the provid
 
 **Constraints:**
 - Ensure that the summaries are accurate and reflect the changes made.
+- Ensure that the summary is concise and does not exceed 200 characters.
 - The response must be in JSON format, with filenames as keys and summaries as values.
 - Do not include any additional text or output outside of the JSON format.
 - The keys in the JSON object should correspond to real filenames present in the diff changes.
