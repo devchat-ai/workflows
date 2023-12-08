@@ -1,0 +1,27 @@
+name: Dev CI
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  lint-and-test:
+    name: Run lint and test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: "3.11.4"
+    - name: install workflows-command dependencies
+      run: |
+        pip install -r requirements.txt
+    - name: install dev dependencies
+      run: |
+        pip install -r requirements-dev.txt
+    - name: run check
+      run: |
+        ruff check .
+        ruff format . --check
