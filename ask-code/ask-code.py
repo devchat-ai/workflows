@@ -1,12 +1,11 @@
 import os
 import sys
-import json
 from chat.ask_codebase.chains.smart_qa import SmartQA
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
 
-from ide_services import get_lsp_brige_port
+from ide_services import get_lsp_brige_port  # noqa: E402
 
 
 def query(question, lsp_brige_port):
@@ -26,9 +25,8 @@ def query(question, lsp_brige_port):
 
     # Print the answer
     print(answer[0])
-    print(
-        f"***/ask-code has costed approximately ${int(float(answer[2]['token_usage']['total_cost'])/0.7*10000)/10000} USD for this question.***"
-    )
+    cost = int(float(answer[2].get("token_usage", {}).get("total_cost", 0)) / 0.7 * 10000) / 10000
+    print(f"***/ask-code has costed approximately ${cost} USD for this question.***")
 
 
 def main():

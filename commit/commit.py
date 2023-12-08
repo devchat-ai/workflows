@@ -21,8 +21,8 @@ from prompts import (
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
 
-from ui_utils import ui_checkbox_select, ui_text_edit, CheckboxOption
-from llm_api import chat_completion_no_stream, chat_completion_no_stream_return_json
+from ui_utils import ui_checkbox_select, ui_text_edit, CheckboxOption  # noqa: E402
+from llm_api import chat_completion_no_stream, chat_completion_no_stream_return_json  # noqa: E402
 
 
 language = ""
@@ -144,7 +144,8 @@ def gpt_file_group(diff, diff_files):
         diff_files (List[str]): 文件列表。
 
     Returns:
-        List[Dict]: 文件分组结果，每个分组是一个字典，包含"name"和"files"两个键值对，分别表示分组名称和该分组下的文件列表。
+        List[Dict]: 文件分组结果，每个分组是一个字典，包含"name"和"files"两个键值对，
+                    分别表示分组名称和该分组下的文件列表。
     """
     prompt = PROMPT_GROUP_FILES.replace("{__DIFF__}", f"{diff}")
     messages = [{"role": "user", "content": prompt}]
@@ -269,7 +270,9 @@ def get_marked_files(modified_files, staged_files, file_summaries):
         modified_files (List[str]): 用户已修改文件列表
         staged_files (List[str]): 用户已staged文件列表
         file_summaries (Dict[str, str]): 文件摘要信息，key为文件名，value为摘要信息
-        file_groups (List[Dict[str, Any]]): 文件分组信息，每个元素是一个字典，包含两个key值分别为 "importance_level" 和 "files"，分别表示文件的重要程度和该重要程度下的文件列表
+        file_groups (List[Dict[str, Any]]): 文件分组信息，每个元素是一个字典，
+            包含两个key值分别为 "importance_level" 和 "files"，
+            分别表示文件的重要程度和该重要程度下的文件列表
 
     Returns:
         List[str]: 用户选中的文件列表

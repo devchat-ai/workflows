@@ -24,16 +24,20 @@ def ui_checkbox_select(title: str, options: List[CheckboxOption]) -> List[str]:
     """
     _NT = "\n"
     groups = list({option._group: 1 for option in options if option._group}.keys())
-    check_option_message = (
-        lambda option: f"> [{'x' if option._checked else ''}]({option._id}) {option._text}"
-    )
-    check_option_group_message = (
-        lambda group: f"{group}:{_NT}{_NT.join([check_option_message(option) for option in options if option._group==group])}"
-    )
+
+    def _check_option_message(option):
+        return f"> [{'x' if option._checked else ''}]({option._id}) {option._text}"
+
+    def _check_option_group_message(group):
+        s = _NT.join(
+            [_check_option_message(option) for option in options if option._group == group]
+        )
+        return f"{group}:{_NT}{s}"
+
     ui_message = f"""
 ```chatmark type=form
 {title}
-{_NT.join([check_option_group_message(group) for group in groups])}
+{_NT.join([_check_option_group_message(group) for group in groups])}
 ```
     """
     # print(ui_message)

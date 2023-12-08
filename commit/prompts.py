@@ -1,3 +1,5 @@
+# ruff: noqa
+
 # summary changes for files based diff
 # diff => {__DIFF__}
 PROMPT_SUMMARY_FOR_FILES = """ 

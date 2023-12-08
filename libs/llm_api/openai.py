@@ -17,7 +17,7 @@ def _try_remove_markdown_block_flag(content):
 
     if match:
         # 如果匹配成功，则提取出markdown块的内容并返回
-        language = match.group(1)
+        _ = match.group(1)  # language
         markdown_content = match.group(2)
         return markdown_content.strip()
     else:
@@ -65,7 +65,8 @@ def chat_completion_no_stream(messages, llm_config, error_out: bool = True) -> s
 
 def chat_completion_no_stream_return_json(messages, llm_config, error_out: bool = True):
     """
-    尝试三次从聊天完成API获取结果，并返回JSON对象。如果无法解析JSON，将尝试三次，直到出现错误或达到最大尝试次数。
+    尝试三次从聊天完成API获取结果，并返回JSON对象。
+    如果无法解析JSON，将尝试三次，直到出现错误或达到最大尝试次数。
 
     Args:
         messages (List[str]): 用户输入的消息列表。
@@ -73,7 +74,8 @@ def chat_completion_no_stream_return_json(messages, llm_config, error_out: bool 
         error_out (bool, optional): 如果为True，则如果出现错误将打印错误消息并返回None。默认为True。
 
     Returns:
-        Dict[str, Any]: 从聊天完成API获取的JSON对象。如果无法解析JSON或达到最大尝试次数，则返回None。
+        Dict[str, Any]: 从聊天完成API获取的JSON对象。
+            如果无法解析JSON或达到最大尝试次数，则返回None。
     """
     for _1 in range(3):
         response = chat_completion_no_stream(messages, llm_config)

@@ -19,8 +19,11 @@ def ui_radio_select(title: str, options: List[RadioOption]) -> str | None:
         > - (replace) Replace the current code.
         ```
     """
-    option_line = lambda option: f"> - ({option._id}) {option._text}"
-    options_lines = "\n".join([option_line(option) for option in options])
+
+    def _option_line(option):
+        return f"> - ({option._id}) {option._text}"
+
+    options_lines = "\n".join([_option_line(option) for option in options])
     ui_message = f"""
 ```chatmark type=form
 {title}
