@@ -3,6 +3,7 @@ import time
 
 import yaml
 
+
 def output_message(output):
     out_data = f"""\n{output}\n"""
     print(out_data, flush=True)
@@ -21,17 +22,17 @@ def parse_response_from_ui(response):
     if len(lines) <= 2:
         return {}
 
-    data = yaml.safe_load('\n'.join(lines[1:-1]))
+    data = yaml.safe_load("\n".join(lines[1:-1]))
     return data
 
 
 def pipe_interaction_mock(output: str):
     output_message(output)
     # read response.txt in same dir with current script file
-    response_file = os.path.join(os.path.dirname(__file__), 'response.txt')
-    
+    response_file = os.path.join(os.path.dirname(__file__), "response.txt")
+
     # clear content in response_file
-    with open(response_file, 'w+', encoding="utf8"):
+    with open(response_file, "w+", encoding="utf8"):
         pass
 
     while True:
@@ -51,14 +52,14 @@ def pipe_interaction(output: str):
     while True:
         try:
             line = input()
-            if line.strip().startswith('```yaml'):
+            if line.strip().startswith("```yaml"):
                 lines = []
-            elif line.strip() == '```':
+            elif line.strip() == "```":
                 lines.append(line)
                 break
             lines.append(line)
         except EOFError:
             pass
 
-    replay_message = '\n'.join(lines)
+    replay_message = "\n".join(lines)
     return parse_response_from_ui(replay_message)

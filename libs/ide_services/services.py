@@ -1,9 +1,9 @@
-
 import requests
 import os
 from functools import wraps
 
-BASE_SERVER_URL = os.environ.get('DEVCHAT_IDE_SERVICE_URL', 'http://localhost:3000')
+BASE_SERVER_URL = os.environ.get("DEVCHAT_IDE_SERVICE_URL", "http://localhost:3000")
+
 
 def rpc_call(f):
     @wraps(f)
@@ -13,7 +13,7 @@ def rpc_call(f):
 
         data = dict(zip(f.__code__.co_varnames, args))
         data.update(kwargs)
-        headers = {'Content-Type': 'application/json'}
+        headers = {"Content-Type": "application/json"}
 
         response = requests.post(url, json=data, headers=headers)
 
@@ -21,9 +21,9 @@ def rpc_call(f):
             raise Exception(f"Server error: {response.status_code}")
 
         response_data = response.json()
-        if 'error' in response_data:
+        if "error" in response_data:
             raise Exception(f"Server returned an error: {response_data['error']}")
-        return response_data['result']
+        return response_data["result"]
 
     return wrapper
 

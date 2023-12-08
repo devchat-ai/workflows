@@ -4,7 +4,7 @@ from .iobase import pipe_interaction
 
 
 class CheckboxOption:
-    def __init__(self, id, text, group: str=None, checked: bool=False):
+    def __init__(self, id, text, group: str = None, checked: bool = False):
         # it will show as: [] (id): text
         self._id = id
         self._text = text
@@ -24,8 +24,12 @@ def ui_checkbox_select(title: str, options: List[CheckboxOption]) -> List[str]:
     """
     _NT = "\n"
     groups = list({option._group: 1 for option in options if option._group}.keys())
-    check_option_message = lambda option: f"> [{'x' if option._checked else ''}]({option._id}) {option._text}"
-    check_option_group_message = lambda group: f"{group}:{_NT}{_NT.join([check_option_message(option) for option in options if option._group==group])}"
+    check_option_message = (
+        lambda option: f"> [{'x' if option._checked else ''}]({option._id}) {option._text}"
+    )
+    check_option_group_message = (
+        lambda group: f"{group}:{_NT}{_NT.join([check_option_message(option) for option in options if option._group==group])}"
+    )
     ui_message = f"""
 ```chatmark type=form
 {title}
@@ -35,6 +39,10 @@ def ui_checkbox_select(title: str, options: List[CheckboxOption]) -> List[str]:
     # print(ui_message)
     # return [option._id for option in options]
     response = pipe_interaction(ui_message)
-    
-    selected_options = [key for key, value in response.items() if value=='checked' and key in [option._id for option in options]]
+
+    selected_options = [
+        key
+        for key, value in response.items()
+        if value == "checked" and key in [option._id for option in options]
+    ]
     return selected_options

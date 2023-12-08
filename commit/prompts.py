@@ -1,5 +1,3 @@
-
-
 # summary changes for files based diff
 # diff => {__DIFF__}
 PROMPT_SUMMARY_FOR_FILES = """ 
@@ -39,9 +37,7 @@ Objective: **Create concise summaries for each modified file based on the provid
 
 Based on the provided diff changes and any additional user input, please generate a JSON object containing summaries for each modified file.
 """
-prompt_summary_for_files_llm_config = {
-	"model": "gpt-3.5-turbo-1106"
-}
+prompt_summary_for_files_llm_config = {"model": "gpt-3.5-turbo-1106"}
 # ask summaries for missed files
 # missed files => {__MISSED_FILES__}
 PROMPT_SUMMARY_FOR_FILES_RETRY = """
@@ -91,9 +87,7 @@ Objective: **Categorize the modified files from a diff into groups based on thei
 
 Based on the provided diff content, group the files accordingly and assign an appropriate importance level to each group, following the instructions and constraints.
 """
-prompt_group_files_llm_config = {
-	"model": "gpt-3.5-turbo-1106"
-}
+prompt_group_files_llm_config = {"model": "gpt-3.5-turbo-1106"}
 # re-group files based missed files
 # missed files => {__MISSED_FILES__}
 PROMPT_GROUP_FILES_RETRY = """
@@ -142,9 +136,7 @@ Closes #IssueNumber
 
 Please use the above structure to generate a commit message that meets the specified criteria.
 """
-prompt_commit_message_by_diff_user_input_llm_config = {
-	"model": "gpt-3.5-turbo-1106"
-}
+prompt_commit_message_by_diff_user_input_llm_config = {"model": "gpt-3.5-turbo-1106"}
 
 # generate commit message based file summary and user_input
 # file_summary => {__FILE_SUMMARY__}
@@ -186,6 +178,4 @@ Closes #IssueNumber
 
 Please create a commit message following the above guidelines based on the provided file summary and user input.
 """
-prompt_commit_message_by_summary_user_input_llm_config = {
-	"model": "gpt-4-1106-preview"
-}
+prompt_commit_message_by_summary_user_input_llm_config = {"model": "gpt-4-1106-preview"}
