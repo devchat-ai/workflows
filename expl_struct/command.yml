@@ -1,0 +1,5 @@
+description: Explain the structure of the repository.
+hint: Help me understand the structure of this repo
+input: optional
+steps:
+  - run: $command_python $command_path/main.py "$input"
