@@ -1,16 +1,24 @@
 from typing import Optional
 import os
-import sys
 import click
 
 from chat.ask_codebase.assistants.directory_structure.repo_explainer import (
     RepoStructureExplainer,
 )
-from chat.util.openai_util import collect_usage
+
+Languages = {
+    "en": "English",
+    "zh": "Chinese",
+}
 
 
 @click.command()
 @click.argument("objective", required=False, default=None)
+@click.option(
+    "-lang",
+    "--language",
+    type=click.Choice(list(Languages.keys()), case_sensitive=False),
+)
 def main(objective: Optional[str], language: str):
     if not objective:
         objective = "Help me understand the structure of this repo."
@@ -18,7 +26,7 @@ def main(objective: Optional[str], language: str):
     chat_lang = Languages.get(language, None)
     repo_path = os.getcwd()
 
-    e = RepoStructureExplainer(root_path=repo_path)
+    e = RepoStructureExplainer(root_path=repo_path, chat_language=chat_lang)
 
     print("\n\n```Step\n# Analyzing codebase...\n", flush=True)
     answer = e.analyze(user_query=objective)
