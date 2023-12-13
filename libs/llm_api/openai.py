@@ -1,4 +1,5 @@
 import re
+import os
 import sys
 import json
 
@@ -38,28 +39,46 @@ def chat_completion_no_stream(messages, llm_config, error_out: bool = True) -> s
         如果成功获取到聊天机器人的回复，返回一个字符串类型的回复消息。如果连接失败，则返回None。
 
     """
-    connection_error = ""
-    for _1 in range(3):
+    for try_times in range(3):
         try:
-            response = openai.ChatCompletion.create(messages=messages, **llm_config, stream=False)
+            client = openai.OpenAI(
+                api_key=os.environ.get("OPENAI_API_KEY", None),
+                base_url=os.environ.get("OPENAI_API_BASE", None)
+            )
 
-            response_dict = json.loads(str(response))
-            if "choices" not in response_dict:
+            llm_config['stream'] = True
+            llm_config['timeout'] = 8
+            response = client.chat.completions.create(
+                messages=messages,
+                **llm_config
+            )
+            
+            response_result = {'content': None, 'function_name': None, 'parameters': ""}
+            for chunk in response: # pylint: disable=E1133
+                chunk = chunk.dict()
+                delta = chunk["choices"][0]["delta"]
+                if 'tool_calls' in delta and delta['tool_calls']:
+                    tool_call = delta['tool_calls'][0]['function']
+                    if tool_call.get('name', None):
+                        response_result["function_name"] = tool_call["name"].replace('---', '.')
+                    if tool_call.get("arguments", None):
+                        response_result["parameters"] += tool_call["arguments"]
+                if delta.get('content', None):
+                    if response_result["content"]:
+                        response_result["content"] += delta["content"]
+                    else:
+                        response_result["content"] = delta["content"]
+            return response_result
+        except (openai.APIConnectionError, openai.APITimeoutError) as err:
+            if try_times >= 2:
                 if error_out:
-                    print("Response Error:", response_dict, file=sys.stderr, flush=True)
+                    print("Exception:", err, file=sys.stderr, flush=True)
                 return None
-            respose_message = response_dict["choices"][0]["message"]
-            # print("=> llm response:", respose_message, end="\n\n")
-            return respose_message
-        except ConnectionError as err:
-            connection_error = err
             continue
-        except Exception as err:
+        except openai.APIError as err:
             if error_out:
                 print("Exception:", err, file=sys.stderr, flush=True)
             return None
-    if error_out:
-        print("Connect Error:", connection_error, file=sys.stderr, flush=True)
     return None
 
 
@@ -87,8 +106,12 @@ def chat_completion_no_stream_return_json(messages, llm_config, error_out: bool 
             response_content = _try_remove_markdown_block_flag(response["content"])
             response_obj = json.loads(response_content)
             return response_obj
-        except Exception:
+        except json.JSONDecodeError:
             continue
+        except Exception as err:
+            if error_out:
+                print('Exception: ', err, file=sys.stderr, flush=True)
+            return None
     if error_out:
         print("Not valid json response:", response["content"], file=sys.stderr, flush=True)
     return None
