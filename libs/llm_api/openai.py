@@ -43,27 +43,24 @@ def chat_completion_no_stream(messages, llm_config, error_out: bool = True) -> s
         try:
             client = openai.OpenAI(
                 api_key=os.environ.get("OPENAI_API_KEY", None),
-                base_url=os.environ.get("OPENAI_API_BASE", None)
+                base_url=os.environ.get("OPENAI_API_BASE", None),
             )
 
-            llm_config['stream'] = True
-            llm_config['timeout'] = 8
-            response = client.chat.completions.create(
-                messages=messages,
-                **llm_config
-            )
-            
-            response_result = {'content': None, 'function_name': None, 'parameters': ""}
-            for chunk in response: # pylint: disable=E1133
+            llm_config["stream"] = True
+            llm_config["timeout"] = 8
+            response = client.chat.completions.create(messages=messages, **llm_config)
+
+            response_result = {"content": None, "function_name": None, "parameters": ""}
+            for chunk in response:  # pylint: disable=E1133
                 chunk = chunk.dict()
                 delta = chunk["choices"][0]["delta"]
-                if 'tool_calls' in delta and delta['tool_calls']:
-                    tool_call = delta['tool_calls'][0]['function']
-                    if tool_call.get('name', None):
-                        response_result["function_name"] = tool_call["name"].replace('---', '.')
+                if "tool_calls" in delta and delta["tool_calls"]:
+                    tool_call = delta["tool_calls"][0]["function"]
+                    if tool_call.get("name", None):
+                        response_result["function_name"] = tool_call["name"]
                     if tool_call.get("arguments", None):
                         response_result["parameters"] += tool_call["arguments"]
-                if delta.get('content', None):
+                if delta.get("content", None):
                     if response_result["content"]:
                         response_result["content"] += delta["content"]
                     else:
@@ -110,7 +107,7 @@ def chat_completion_no_stream_return_json(messages, llm_config, error_out: bool 
             continue
         except Exception as err:
             if error_out:
-                print('Exception: ', err, file=sys.stderr, flush=True)
+                print("Exception: ", err, file=sys.stderr, flush=True)
             return None
     if error_out:
         print("Not valid json response:", response["content"], file=sys.stderr, flush=True)
