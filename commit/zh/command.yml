@@ -2,4 +2,4 @@ description: 提交当前代码修改.
 hint: to close Issue #issue_number
 input: optional
 steps:
-  - run: $command_python $command_path/../commit.py "$input" "chinese"
+  - run: $devchat_python $command_path/../commit.py "$input" "chinese"
