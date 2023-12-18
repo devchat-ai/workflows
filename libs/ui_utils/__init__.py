@@ -17,5 +17,5 @@ __all__ = [
     "make_checkbox_control",
     "make_radio_control",
     "make_editor_control",
-    "ui_group"
+    "ui_group",
 ]

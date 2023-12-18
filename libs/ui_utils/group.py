@@ -16,13 +16,16 @@ def ui_group(ui_message: List[Tuple]) -> Tuple:
         ]
     """
     ui_message = "\n".join([m[1] for m in ui_message])
-    with open('tmp.txt', 'w+', encoding="utf8") as file:
-        file.write(ui_message)
     response = pipe_interaction(ui_message)
-    return tuple([
-        editor_answer(response, m[2]) if m[0] == "editor" else
-        checkbox_answer(response, m[2]) if m[0] == "checkbox" else
-        radio_answer(response, m[2]) if m[0] == "radio" else
-        None
-        for m in ui_message
-    ])
+    return tuple(
+        [
+            editor_answer(response, m[2])
+            if m[0] == "editor"
+            else checkbox_answer(response, m[2])
+            if m[0] == "checkbox"
+            else radio_answer(response, m[2])
+            if m[0] == "radio"
+            else None
+            for m in ui_message
+        ]
+    )

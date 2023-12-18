@@ -19,7 +19,7 @@ def make_radio_control(title: str, options: List[RadioOption]) -> (str, str, Lis
 {title}
 {options_lines}
 """
-    return ('radio', ui_message, [option._id for option in options])
+    return ("radio", ui_message, [option._id for option in options])
 
 
 def radio_answer(response: dict, ids: List[str]) -> str | None:

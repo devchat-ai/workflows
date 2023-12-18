@@ -29,7 +29,7 @@ def make_checkbox_control(title: str, options: List[CheckboxOption]) -> (str, st
 {title}
 {_NT.join([_check_option_group_message(group) for group in groups])}
     """
-    return ('checkbox', ui_message, [option._id for option in options])
+    return ("checkbox", ui_message, [option._id for option in options])
 
 
 def checkbox_answer(response: dict, ids: List[str]) -> List[str]:

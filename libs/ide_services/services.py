@@ -1,6 +1,5 @@
 import requests
 import os
-import json
 from functools import wraps
 
 BASE_SERVER_URL = os.environ.get("DEVCHAT_IDE_SERVICE_URL", "http://localhost:3000")
@@ -33,13 +32,16 @@ def rpc_call(f):
 def get_lsp_brige_port():
     pass
 
+
 @rpc_call
 def install_python_env(command_name: str, requirements_file: str) -> str:
     pass
 
+
 @rpc_call
 def update_slash_commands():
     pass
+
 
 @rpc_call
 def open_folder(folder: str):

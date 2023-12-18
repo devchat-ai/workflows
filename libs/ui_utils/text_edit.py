@@ -15,7 +15,7 @@ def make_editor_control(editor_id: str, title: str, text: str) -> (str, str, str
 > | ({editor_id})
 > {text}
 """
-    return ('editor', ui_message, editor_id)
+    return ("editor", ui_message, editor_id)
 
 
 def editor_answer(response: dict, editor_id: str) -> str | None:
@@ -43,4 +43,3 @@ def ui_text_edit(title: str, text: str) -> str | None:
     ui_message = f"""```chatmark type=form\n{ui_message}\n```\n"""
     response = pipe_interaction(ui_message)
     return editor_answer(response, editor_id)
-    
