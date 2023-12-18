@@ -14,7 +14,7 @@ def ui_group(ui_message: List[Tuple]) -> Tuple:
             ("checkbox", "checkbox ui message", ["id1", "id2"]),
             ("radio", "radio ui message", ["id1", "id2"]),
         ]
-        
+
     items in ui_message are created by functions like:make_checkbox_control
     """
     ui_message = "\n".join([m[1] for m in ui_message])
