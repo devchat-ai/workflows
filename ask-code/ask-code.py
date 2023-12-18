@@ -24,9 +24,31 @@ def query(question, lsp_brige_port):
     )
 
     # Print the answer
+    # key is model name, value is (prompt_token_price, completion_token_price)
+    prices = {
+        "gpt-4": (0.03, 0.06),
+        "gpt-4-32k": (0.06, 0.12),
+        "gpt-3.5-turbo": (0.0015, 0.002),
+        "gpt-3.5-turbo-16k": (0.003, 0.004),
+        "claude-2": (0.01102, 0.03268),
+        "starchat-alpha": (0.0004, 0.0004),
+        "CodeLlama-34b-Instruct": (0.0008, 0.0008),
+        "llama-2-70b-chat": (0.001, 0.001),
+        "gpt-3.5-turbo-1106": (0.001, 0.002),
+        "gpt-4-1106-preview": (0.01, 0.03),
+        "gpt-4-1106-vision-preview": (0.01, 0.03),
+        # if model not in above list, use this price
+        "others": (0.001, 0.002),
+    }
     print(answer[0])
-    cost = int(float(answer[2].get("token_usage", {}).get("total_cost", 0)) / 0.7 * 10000) / 10000
-    print(f"***/ask-code has costed approximately ${cost} USD for this question.***")
+    spent_money = 0.0
+    token_usages = answer[2].get("usages", [])
+    for token_usage in token_usages:
+        price = prices.get(token_usage.model, prices["others"])
+        spent_money += (price[0] * token_usage.prompt_tokens) / 1000 + (
+            price[1] * token_usage.completion_tokens
+        ) / 1000
+    print(f"***/ask-code has costed approximately ${spent_money/0.7} USD for this question.***")
 
 
 def main():
