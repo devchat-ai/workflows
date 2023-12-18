@@ -36,16 +36,16 @@ Answer in JSON format:
 """
 
 
-# MODEL = "gpt-3.5-turbo-1106"
-MODEL = "gpt-4-1106-preview"
+MODEL = "gpt-3.5-turbo-1106"
+# MODEL = "gpt-4-1106-preview"
 
 
 def propose_test(
     repo_root: str,
     user_prompt: str,
     function_name: str,
+    function_content: str,
     file_path: str,
-    function_content: Optional[str] = None,
 ) -> List[str]:
     """Propose test cases for a specified function based on a user prompt
 
@@ -54,14 +54,10 @@ def propose_test(
         function_name (str): The name of the function to generate test cases for.
         file_path (str): The absolute path to the file containing the target function for which
                          test cases will be generated.
-    
+
     Returns:
         List[str]: A list of test case descriptions.
     """
-
-    if not function_content:
-        # TODO: Extract the source code of the function from the file
-        function_content = retrieve_file_content(file_path, repo_root)
 
     encoding: tiktoken.Encoding = tiktoken.encoding_for_model(MODEL)
     token_budget = 16000 * 0.9
@@ -76,8 +72,6 @@ def propose_test(
     tokens = len(encoding.encode(user_msg))
     if tokens > token_budget:
         return f"Token budget exceeded while generating test cases. ({tokens}/{token_budget})"
-
-    # print(f"\n\nuser_msg: \n\n{user_msg}", flush=True)
 
     response = create_chat_completion(
         model=MODEL,
@@ -95,5 +89,5 @@ def propose_test(
         description = case.get("description", None)
         if description:
             descriptions.append(description)
-    
+
     return descriptions

@@ -15,6 +15,18 @@
 ```
 "help me write test cases for propose_tests function" -fn propose_tests -fp chat/ask_codebase/assistants/propose_tests.py
 ```
+
+```
+"help me write test cases for split_str function" -fn split_str -fp chat/ask_codebase/tools/token_util.py
+
+"help me write test cases for split_str function" -fn split_str -fp chat/ask_codebase/tools/token_util.py -sln 6 -eln 10
+
+"help me write test cases for split_str function" -fn split_str -fp chat/ask_codebase/tools/token_util.py -sln 6 -eln 11
+```
+
+```
+"help me write test cases for split_str function" -fn verify_token_list -fp chat/ask_codebase/tools/token_util.py -sln 13 -eln 33
+```
 ```
 "help me write test cases for propose_tests function" -fn propose_tests -fp /Users/kagami/Projects/merico/chat/chat/ask_codebase/assistants/propose_tests.py
 ```

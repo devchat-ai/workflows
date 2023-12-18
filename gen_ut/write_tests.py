@@ -45,18 +45,11 @@ Test Case 2. <original test case 2 description>
 def write_tests(
     root_path: str,
     function_name: str,
+    function_content: str,
     file_path: str,
     test_cases: List[str],
     reference_files: Optional[List[str]] = None,
 ) -> str:
-    resolved_file_path = str(Path(root_path) / file_path)
-
-    if os.path.exists(resolved_file_path):
-        # TODO: extract the function from the file
-        function_str = retrieve_file_content(resolved_file_path, root_path)
-    else:
-        return f"File not found: {resolved_file_path}"
-
     encoding: tiktoken.Encoding = tiktoken.encoding_for_model(MODEL)
 
     # cost saving
@@ -80,7 +73,7 @@ def write_tests(
     user_msg = WRITE_TESTS_PROMPT.format(
         function_name=function_name,
         file_path=file_path,
-        function_str=function_str,
+        function_str=function_content,
         test_cases_str=test_cases_str,
         reference_tests_str=reference_tests_str,
     )
