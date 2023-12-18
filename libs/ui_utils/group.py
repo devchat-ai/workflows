@@ -14,18 +14,21 @@ def ui_group(ui_message: List[Tuple]) -> Tuple:
             ("checkbox", "checkbox ui message", ["id1", "id2"]),
             ("radio", "radio ui message", ["id1", "id2"]),
         ]
+        
+    items in ui_message are created by functions like:make_checkbox_control
     """
     ui_message = "\n".join([m[1] for m in ui_message])
     response = pipe_interaction(ui_message)
-    return tuple(
-        [
-            editor_answer(response, m[2])
-            if m[0] == "editor"
-            else checkbox_answer(response, m[2])
-            if m[0] == "checkbox"
-            else radio_answer(response, m[2])
-            if m[0] == "radio"
-            else None
-            for m in ui_message
-        ]
-    )
+
+    results = []
+    for m in ui_message:
+        if m[0] == "editor":
+            result = editor_answer(response, m[2])
+        elif m[0] == "checkbox":
+            result = checkbox_answer(response, m[2])
+        elif m[0] == "radio":
+            result = radio_answer(response, m[2])
+        else:
+            result = None
+        results.append(result)
+    return tuple(results)
