@@ -1,7 +1,6 @@
 import os
 import sys
 from chat.ask_codebase.chains.smart_qa import SmartQA
-from chat.util.openai_util import ChatCompletionUsage
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
