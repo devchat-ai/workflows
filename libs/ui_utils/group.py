@@ -17,8 +17,10 @@ def ui_group(ui_message: List[Tuple]) -> Tuple:
 
     items in ui_message are created by functions like:make_checkbox_control
     """
-    ui_message = "\n".join([m[1] for m in ui_message])
-    response = pipe_interaction(ui_message)
+    ui_message_str = "\n".join([m[1] for m in ui_message])
+
+    ui_message_str = f"""```chatmark type=form\n{ui_message_str}\n```\n"""
+    response = pipe_interaction(ui_message_str)
 
     results = []
     for m in ui_message:
