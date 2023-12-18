@@ -52,7 +52,6 @@ def pipe_interaction(output: str):
     while True:
         try:
             line = input()
-            print("--> input:", line)
             if line.strip().startswith("```yaml"):
                 lines = []
             elif line.strip() == "```":
