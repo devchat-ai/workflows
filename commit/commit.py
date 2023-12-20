@@ -75,9 +75,9 @@ def get_modified_files():
             # check wether filename is a directory
             if os.path.isdir(filename):
                 continue
-            modified_files.append(strip_file_name(filename))
+            modified_files.append(os.path.normpath(strip_file_name(filename)))
             if status == "M " or status == "A ":
-                staged_files.append(strip_file_name(filename))
+                staged_files.append(os.path.normpath(strip_file_name(filename)))
     return modified_files, staged_files
 
 
@@ -399,6 +399,7 @@ def display_commit_message_and_commit(commit_message):
 def main():
     global language
     try:
+        print("Start commit workflow ...", end="\n\n", flush=True)
         # Ensure enough command line arguments are provided
         if len(sys.argv) < 3:
             print("Usage: python script.py <user_input> <language>")

@@ -67,9 +67,9 @@ def chat_completion_no_stream(messages, llm_config, error_out: bool = True) -> s
                         response_result["content"] = delta["content"]
             return response_result
         except (openai.APIConnectionError, openai.APITimeoutError) as err:
+            if error_out:
+                print("Exception:", err, file=sys.stderr, flush=True)
             if try_times >= 2:
-                if error_out:
-                    print("Exception:", err, file=sys.stderr, flush=True)
                 return None
             continue
         except openai.APIError as err:
