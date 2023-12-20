@@ -199,7 +199,7 @@ def get_file_summaries(modified_files, staged_files, user_input):
 
     if len(total_diff_decoded) > 15000:
         print("Current diff length:", len(total_diff_decoded), flush=True)
-        return {}, []
+        return {}
 
     # 在prompt中明确处置AI模型的输出格式需求
     normpath_summaries = gpt_file_summary(total_diff_decoded, modified_files, user_input)
