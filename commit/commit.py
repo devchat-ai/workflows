@@ -1,8 +1,16 @@
+# flake8: noqa: E402
 import os
 import sys
 import json
 import subprocess
 from typing import List
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
+sys.path.append(os.path.dirname(__file__))
+
+from ui_utils import ui_checkbox_select, ui_text_edit, CheckboxOption  # noqa: E402
+from llm_api import chat_completion_no_stream, chat_completion_no_stream_return_json  # noqa: E402
 
 from prompts import (
     PROMPT_SUMMARY_FOR_FILES,
@@ -16,13 +24,6 @@ from prompts import (
     prompt_commit_message_by_diff_user_input_llm_config,
     prompt_commit_message_by_summary_user_input_llm_config,
 )
-
-
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
-
-from ui_utils import ui_checkbox_select, ui_text_edit, CheckboxOption  # noqa: E402
-from llm_api import chat_completion_no_stream, chat_completion_no_stream_return_json  # noqa: E402
 
 
 language = ""
