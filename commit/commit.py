@@ -407,6 +407,9 @@ def main():
         language = sys.argv[2]
 
         modified_files, staged_files = get_modified_files()
+        if len(modified_files) == 0:
+            print("No files to commit.", file=sys.stderr, flush=True)
+            sys.exit(-1)
         file_summaries = get_file_summaries(modified_files, staged_files, user_input)
         selected_files = get_marked_files(modified_files, staged_files, file_summaries)
         if not selected_files:
