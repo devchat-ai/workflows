@@ -11,6 +11,7 @@ sys.path.append(os.path.dirname(__file__))
 
 from ui_utils import ui_checkbox_select, ui_text_edit, CheckboxOption  # noqa: E402
 from llm_api import chat_completion_no_stream, chat_completion_no_stream_return_json  # noqa: E402
+from ide_services.services import log_info
 
 from prompts import (
     PROMPT_SUMMARY_FOR_FILES,
@@ -75,9 +76,9 @@ def get_modified_files():
             # check wether filename is a directory
             if os.path.isdir(filename):
                 continue
-            modified_files.append(strip_file_name(filename))
+            modified_files.append(os.path.normpath(strip_file_name(filename)))
             if status == "M " or status == "A ":
-                staged_files.append(strip_file_name(filename))
+                staged_files.append(os.path.normpath(strip_file_name(filename)))
     return modified_files, staged_files
 
 
@@ -396,16 +397,39 @@ def display_commit_message_and_commit(commit_message):
     subprocess.check_output(["git", "commit", "-m", new_commit_message])
 
 
+def check_git_installed():
+    try:
+        subprocess.run(
+            ["git", "--version"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True,
+        )
+        return True
+    except subprocess.CalledProcessError:
+        print("Git is not installed on your system.", file=sys.stderr, flush=True)
+    except FileNotFoundError:
+        print("Git is not installed on your system.", file=sys.stderr, flush=True)
+    except Exception:
+        print("Git is not installed on your system.", file=sys.stderr, flush=True)
+    return False
+
+
 def main():
     global language
     try:
+        log_info("Start commit workflow ...")
         # Ensure enough command line arguments are provided
         if len(sys.argv) < 3:
-            print("Usage: python script.py <user_input> <language>")
-            return
+            print("Usage: python script.py <user_input> <language>", file=sys.stderr, flush=True)
+            sys.exit(-1)
 
         user_input = sys.argv[1]
         language = sys.argv[2]
+
+        if not check_git_installed():
+            sys.exit(-1)
 
         modified_files, staged_files = get_modified_files()
         if len(modified_files) == 0:
@@ -431,7 +455,6 @@ def main():
             )
 
         display_commit_message_and_commit(commit_message["content"])
-        print("""\n```progress\n\nDone\n\n```""")
         sys.exit(0)
     except Exception as err:
         print("Exception:", err, file=sys.stderr, flush=True)

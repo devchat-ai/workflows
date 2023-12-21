@@ -1,9 +1,14 @@
+# flake8: noqa: E402
 import re
 import os
 import sys
 import json
 
 import openai
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
+from ide_services.services import log_warn
 
 
 def _try_remove_markdown_block_flag(content):
@@ -67,9 +72,8 @@ def chat_completion_no_stream(messages, llm_config, error_out: bool = True) -> s
                         response_result["content"] = delta["content"]
             return response_result
         except (openai.APIConnectionError, openai.APITimeoutError) as err:
+            log_warn(f"Exception: {err}")
             if try_times >= 2:
-                if error_out:
-                    print("Exception:", err, file=sys.stderr, flush=True)
                 return None
             continue
         except openai.APIError as err:
@@ -104,6 +108,7 @@ def chat_completion_no_stream_return_json(messages, llm_config, error_out: bool 
             response_obj = json.loads(response_content)
             return response_obj
         except json.JSONDecodeError:
+            log_warn(f"JSONDecodeError: {response['content']}")
             continue
         except Exception as err:
             if error_out:
