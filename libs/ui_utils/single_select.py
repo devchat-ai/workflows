@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from .iobase import pipe_interaction
 
@@ -22,12 +22,12 @@ def make_radio_control(title: str, options: List[RadioOption]) -> (str, str, Lis
     return ("radio", ui_message, [option._id for option in options])
 
 
-def radio_answer(response: dict, ids: List[str]) -> str | None:
+def radio_answer(response: dict, ids: List[str]) -> Optional[str]:
     selected_options = [key for key, value in response.items() if value == "checked" and key in ids]
     return selected_options[0] if selected_options else None
 
 
-def ui_radio_select(title: str, options: List[RadioOption]) -> str | None:
+def ui_radio_select(title: str, options: List[RadioOption]) -> Optional[str]:
     """
     ```chatmark type=form
         How would you like to make the change?

@@ -1,3 +1,4 @@
+from typing import Optional
 from .iobase import pipe_interaction
 
 
@@ -18,13 +19,13 @@ def make_editor_control(editor_id: str, title: str, text: str) -> (str, str, str
     return ("editor", ui_message, editor_id)
 
 
-def editor_answer(response: dict, editor_id: str) -> str | None:
+def editor_answer(response: dict, editor_id: str) -> Optional[str]:
     if editor_id in response:
         return response[editor_id]
     return None
 
 
-def ui_text_edit(title: str, text: str) -> str | None:
+def ui_text_edit(title: str, text: str) -> Optional[str]:
     """
     ```chatmark type=form
     I've drafted a commit message for you as below. Feel free to modify it.
