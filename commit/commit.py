@@ -455,7 +455,6 @@ def main():
             )
 
         display_commit_message_and_commit(commit_message["content"])
-        print("""\n```progress\n\nDone\n\n```""")
         sys.exit(0)
     except Exception as err:
         print("Exception:", err, file=sys.stderr, flush=True)
