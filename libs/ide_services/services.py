@@ -10,7 +10,7 @@ def rpc_call(f):
     def wrapper(*args, **kwargs):
         if os.environ.get("DEVCHAT_IDE_SERVICE_URL", "") == "":
             # maybe in a test, user don't want to mock services functions
-            pass
+            return
 
         try:
             function_name = f.__name__
