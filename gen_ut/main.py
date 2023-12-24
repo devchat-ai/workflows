@@ -13,7 +13,9 @@ from i18n import TUILanguage, get_translation
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 # sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
 
-from ui_utils import ui_checkbox_select, ui_text_edit, CheckboxOption
+from ui_utils import ui_checkbox_select, ui_text_edit, CheckboxOption  # noqa: E402
+from ide_services import ide_language  # noqa: E402
+
 
 from pprint import pprint
 import time
@@ -56,7 +58,8 @@ def main(
     end_line: Optional[int],  # 0-based, inclusive
 ):
     repo_root = os.getcwd()
-    tui_lang = TUILanguage.from_str("zh")
+    tui_lang = TUILanguage.from_str(ide_language())
+    # tui_lang = TUILanguage.from_str("zh")
     _i = get_translation(tui_lang)
 
     print("\n\n$$$$$$$$$$$\n\n")
@@ -66,7 +69,9 @@ def main(
     print(f"file_path: {file_path}\n\n")
     print(f"start_line: {start_line}\n\n")
     print(f"end_line: {end_line}\n\n")
-    print(f"tui_lang: {tui_lang}, {tui_lang.language_code}, { tui_lang.chat_language}\n\n")
+    print(
+        f"tui_lang: {tui_lang}, {tui_lang.language_code}, { tui_lang.chat_language}\n\n"
+    )
     print(_i("hello"))
     print("\n\n$$$$$$$$$$$\n\n", flush=True)
 
@@ -94,7 +99,6 @@ def main(
     ref_files = find_reference_tests(repo_root, func_name, file_path)
     print(_i("Complete analyzing.\n```"), flush=True)
 
-
     case_id_to_option: Dict[str, CheckboxOption] = {
         f"case_{i}": CheckboxOption(
             id=f"case_{i}", text=desc, group=_i("proposed cases"), checked=False
@@ -110,12 +114,10 @@ def main(
 
     selected_cases = [case_id_to_option[id]._text for id in selected_ids]
 
-
     ref_file = ref_files[0] if ref_files else ""
     new_ref_file = ui_text_edit(_i("Edit reference test file"), ref_file)
 
     time.sleep(3)
-
 
     write_and_print_tests(
         root_path=repo_root,
@@ -124,10 +126,10 @@ def main(
         file_path=file_path,
         test_cases=selected_cases,
         reference_files=[new_ref_file] if new_ref_file else None,
+        chat_language=tui_lang.chat_language,
         stream=True,
     )
 
 
 if __name__ == "__main__":
     main()
-

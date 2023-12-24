@@ -32,7 +32,7 @@ Here's the list of test case descriptions:
 
 {test_cases_str}
 
-Answer in the following format:
+Answer in the following format in {chat_language}:
 
 Test Case 1. <original test case 1 description>
 
@@ -50,6 +50,7 @@ def _mk_write_tests_msg(
     function_content: str,
     file_path: str,
     test_cases: List[str],
+    chat_language: str,
     reference_files: Optional[List[str]] = None,
 ) -> Optional[str]:
     encoding: tiktoken.Encoding = tiktoken.encoding_for_model(MODEL)
@@ -77,6 +78,7 @@ def _mk_write_tests_msg(
         file_path=file_path,
         function_str=function_content,
         test_cases_str=test_cases_str,
+        chat_language=chat_language,
         reference_tests_str=reference_tests_str,
     )
 
@@ -105,6 +107,7 @@ def write_and_print_tests(
     file_path: str,
     test_cases: List[str],
     reference_files: Optional[List[str]] = None,
+    chat_language: str = "English",
     stream: Optional[bool] = False,
 ) -> str | None:
     user_msg = _mk_write_tests_msg(
@@ -114,6 +117,7 @@ def write_and_print_tests(
         file_path=file_path,
         test_cases=test_cases,
         reference_files=reference_files,
+        chat_language=chat_language,
     )
     if not user_msg:
         # TODO: how ot handle token budget exceeded
