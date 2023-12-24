@@ -56,8 +56,12 @@ def main(
 ):
     repo_root = os.getcwd()
     tui_lang = TUILanguage.from_str(ide_language())
-    tui_lang = TUILanguage.from_str("zh")
+    # tui_lang = TUILanguage.from_str("zh")
     _i = get_translation(tui_lang)
+
+    # Use relative path in inner logic
+    if os.path.isabs(file_path):
+        file_path = os.path.relpath(file_path, repo_root)
 
     print("\n\n$$$$$$$$$$$\n\n")
     print(f"repo_root: {repo_root}\n\n")
@@ -105,6 +109,7 @@ def main(
         _i("Select test cases to generate"), list(case_id_to_option.values())
     )
 
+    # tmp sleep to show some issues in demo
     time.sleep(1)
 
     selected_cases = [case_id_to_option[id]._text for id in selected_ids]
@@ -112,6 +117,7 @@ def main(
     ref_file = ref_files[0] if ref_files else ""
     new_ref_file = ui_text_edit(_i("Edit reference test file"), ref_file)
 
+    # tmp sleep to show some issues in demo
     time.sleep(1)
 
     write_and_print_tests(

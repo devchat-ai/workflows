@@ -7,9 +7,7 @@ from chat.ask_codebase.tools.file_list_util import verify_file_list
 from prompts import FIND_REFERENCE_PROMPT
 
 
-def find_reference_tests(
-    root_path: str, function_name: str, file_path: str
-) -> List[str]:
+def find_reference_tests(root_path: str, function_name: str, file_path: str) -> List[str]:
     """Find reference tests for a specified function
 
     Args:
@@ -24,7 +22,8 @@ def find_reference_tests(
     """
     finder = RelevantFileFinder(root_path=root_path)
     objective = FIND_REFERENCE_PROMPT.format(
-        function_name=function_name, file_path=file_path
+        function_name=function_name,
+        file_path=file_path,
     )
 
     test_paths = finder.analyze(objective)

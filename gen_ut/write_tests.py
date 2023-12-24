@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import List, Optional
 
 import tiktoken
@@ -32,9 +31,7 @@ def _mk_write_tests_msg(
     if reference_files:
         reference_tests_str = ""
         for i, fp in enumerate(reference_files, 1):
-            reference_test_content = retrieve_file_content(
-                str(Path(root_path) / fp), root_path
-            )
+            reference_test_content = retrieve_file_content(fp, root_path)
             reference_tests_str += f"{i}. {fp}\n\n"
             reference_tests_str += f"```{reference_test_content}```\n"
     else:
@@ -66,7 +63,7 @@ def write_and_print_tests(
     test_cases: List[str],
     reference_files: Optional[List[str]] = None,
     chat_language: str = "English",
-) -> str | None:
+) -> None:
     user_msg = _mk_write_tests_msg(
         root_path=root_path,
         function_name=function_name,

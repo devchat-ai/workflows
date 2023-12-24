@@ -47,6 +47,7 @@ and apply comparable mocking strategies and best practices.
 
 The target function is {function_name}, located in the file {file_path}.
 Here's the source code of the function:
+
 ```
 {function_str}
 ```
