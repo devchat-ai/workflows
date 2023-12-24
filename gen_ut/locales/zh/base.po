@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-24 16:48+0800\n"
+"POT-Creation-Date: 2023-12-24 18:14+0800\n"
 "PO-Revision-Date: 2023-12-24 16:51+0800\n"
 "Last-Translator: kagami <mingjing@merico.dev>\n"
 "Language-Team: Chinese\n"
@@ -16,6 +16,38 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: main.py:78
+#: main.py:72
 msgid "hello"
 msgstr "你好"
+
+#: main.py:76
+msgid ""
+"\n"
+"\n"
+"```Step\n"
+"# Analyzing the function and current unit tests...\n"
+msgstr ""
+"\n"
+"\n"
+"```Step\n"
+"# 正在分析目标函数和项目中现有的单元测试……\n"
+
+#: main.py:97
+msgid ""
+"Complete analyzing.\n"
+"```"
+msgstr ""
+"完成分析.\n"
+"```"
+
+#: main.py:106
+msgid "proposed cases"
+msgstr "建议的测试用例"
+
+#: main.py:112
+msgid "Select test cases to generate"
+msgstr "选择测试用例以生成单元测试"
+
+#: main.py:126
+msgid "Edit reference test file"
+msgstr "参考的测试文件"

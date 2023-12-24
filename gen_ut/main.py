@@ -66,14 +66,12 @@ def main(
     print(f"file_path: {file_path}\n\n")
     print(f"start_line: {start_line}\n\n")
     print(f"end_line: {end_line}\n\n")
-    print(f"tui_lang: {tui_lang}\n\n")
+    print(f"tui_lang: {tui_lang}, {tui_lang.language_code}, { tui_lang.chat_language}\n\n")
     print(_i("hello"))
     print("\n\n$$$$$$$$$$$\n\n", flush=True)
 
-    return
-
     print(
-        "\n\n```Step\n# Analyzing the function and current unit tests...\n",
+        _i("\n\n```Step\n# Analyzing the function and current unit tests...\n"),
         flush=True,
     )
 
@@ -94,41 +92,29 @@ def main(
         chat_language=tui_lang.chat_language,
     )
     ref_files = find_reference_tests(repo_root, func_name, file_path)
-    print("Complete analyzing.\n```", flush=True)
+    print(_i("Complete analyzing.\n```"), flush=True)
 
-    # print("\n\n$$$$$$$$$$$\n\n")
-    # pprint(test_cases)
-    # print(type(test_cases), len(test_cases))
-    # print("\n\n##########\n\n", flush=True)
 
     case_id_to_option: Dict[str, CheckboxOption] = {
         f"case_{i}": CheckboxOption(
-            id=f"case_{i}", text=desc, group="proposed cases", checked=False
+            id=f"case_{i}", text=desc, group=_i("proposed cases"), checked=False
         )
         for i, desc in enumerate(test_cases)
     }
 
     selected_ids = ui_checkbox_select(
-        "Select test cases to generate", list(case_id_to_option.values())
+        _i("Select test cases to generate"), list(case_id_to_option.values())
     )
 
-    time.sleep(0.5)
+    time.sleep(3)
 
     selected_cases = [case_id_to_option[id]._text for id in selected_ids]
 
-    # print("\n\n$$$$$$$$$$$\n\n")
-    # pprint(selected_ids)
-    # print(type(selected_ids), len(selected_ids))
-    # pprint(selected_cases)
-    # print("\n\n##########\n\n", flush=True)
 
     ref_file = ref_files[0] if ref_files else ""
-    new_ref_file = ui_text_edit("Edit reference test file", ref_file)
+    new_ref_file = ui_text_edit(_i("Edit reference test file"), ref_file)
 
-    # print("\n\n$$$$$$$$$$$\n\n")
-    # pprint(new_ref_file)
-    # print(type(new_ref_file), len(new_ref_file))
-    # print("\n\n##########\n\n", flush=True)
+    time.sleep(3)
 
 
     write_and_print_tests(
@@ -145,10 +131,3 @@ def main(
 if __name__ == "__main__":
     main()
 
-
-"""
-~/.chat/mamba/envs/devchat-commands/bin/python main.py \
-    "help me write test cases for propose_tests function" \
-    -fn propose_tests \
-    -fp chat/ask_codebase/assistants/propose_tests.py
-"""
