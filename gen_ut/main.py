@@ -5,7 +5,7 @@ import click
 
 from propose_test import propose_test
 from find_reference_tests import find_reference_tests
-from write_tests import write_tests
+from write_tests import write_and_print_tests
 from chat.ask_codebase.tools.retrieve_file_content import retrieve_file_content
 from i18n import TUILanguage, get_translation
 
@@ -16,9 +16,10 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 from ui_utils import ui_checkbox_select, ui_text_edit, CheckboxOption
 
 from pprint import pprint
+import time
 
 
-def _get_function_content(
+def _get_relevant_content(
     repo_root: str,
     file_path: str,
     function_name: str,
@@ -26,8 +27,9 @@ def _get_function_content(
     end_line: Optional[int] = None,  # 0-based, inclusive
 ) -> str:
     """
-    Get the content of a function in a file.
-    Return the entire file if start_line and end_line are not specified.
+    Get the relevant content for a function.
+
+    it can be the whole file, or the specified lines of the file.
     """
     file_content = retrieve_file_content(file_path, repo_root)
 
@@ -75,7 +77,7 @@ def main(
         flush=True,
     )
 
-    func_content = _get_function_content(
+    relevant_content = _get_relevant_content(
         repo_root=repo_root,
         file_path=file_path,
         function_name=func_name,
@@ -87,7 +89,7 @@ def main(
         repo_root=repo_root,
         user_prompt=user_prompt,
         function_name=func_name,
-        function_content=func_content,
+        function_content=relevant_content,
         file_path=file_path,
     )
     ref_files = find_reference_tests(repo_root, func_name, file_path)
@@ -108,6 +110,9 @@ def main(
     selected_ids = ui_checkbox_select(
         "Select test cases to generate", list(case_id_to_option.values())
     )
+
+    time.sleep(0.5)
+
     selected_cases = [case_id_to_option[id]._text for id in selected_ids]
 
     # print("\n\n$$$$$$$$$$$\n\n")
@@ -124,25 +129,16 @@ def main(
     # print(type(new_ref_file), len(new_ref_file))
     # print("\n\n##########\n\n", flush=True)
 
-    print(
-        "\n\n```Step\n# Generating tests...\n",
-        flush=True,
-    )
-    generated = write_tests(
+
+    write_and_print_tests(
         root_path=repo_root,
         function_name=func_name,
-        function_content=func_content,
+        function_content=relevant_content,
         file_path=file_path,
         test_cases=selected_cases,
         reference_files=[new_ref_file] if new_ref_file else None,
+        stream=True,
     )
-    print("Complete Generating.\n```", flush=True)
-
-    # print("\n\n$$$$$$$$$$$\n\n")
-    # print(generated)
-    # print(type(generated))
-    # print("\n\n##########\n\n", flush=True)
-    print(generated, flush=True)
 
 
 if __name__ == "__main__":

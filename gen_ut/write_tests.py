@@ -6,7 +6,9 @@ import tiktoken
 
 from chat.ask_codebase.tools.retrieve_file_content import retrieve_file_content
 from chat.util.openai_util import create_chat_completion
+import openai
 
+from datetime import datetime
 
 MODEL = "gpt-4-1106-preview"
 WRITE_TESTS_PROMPT = """
@@ -42,14 +44,14 @@ Test Case 2. <original test case 2 description>
 """
 
 
-def write_tests(
+def _mk_write_tests_msg(
     root_path: str,
     function_name: str,
     function_content: str,
     file_path: str,
     test_cases: List[str],
     reference_files: Optional[List[str]] = None,
-) -> str:
+) -> Optional[str]:
     encoding: tiktoken.Encoding = tiktoken.encoding_for_model(MODEL)
 
     # cost saving
@@ -80,14 +82,68 @@ def write_tests(
 
     tokens = len(encoding.encode(user_msg))
     if tokens > token_budget:
-        return "Token budget exceeded while generating test cases."
+        # "Token budget exceeded while generating test cases."
+        # TODO: how ot handle token budget exceeded
+        return None
 
-    response = create_chat_completion(
-        model=MODEL,
-        messages=[{"role": "user", "content": user_msg}],
-        temperature=0.1,
+    return user_msg
+    # response = create_chat_completion(
+    #     model=MODEL,
+    #     messages=[{"role": "user", "content": user_msg}],
+    #     temperature=0.1,
+    # )
+
+    # content = response.choices[0].message.content
+
+    # return content
+
+
+def write_and_print_tests(
+    root_path: str,
+    function_name: str,
+    function_content: str,
+    file_path: str,
+    test_cases: List[str],
+    reference_files: Optional[List[str]] = None,
+    stream: Optional[bool] = False,
+) -> str | None:
+    user_msg = _mk_write_tests_msg(
+        root_path=root_path,
+        function_name=function_name,
+        function_content=function_content,
+        file_path=file_path,
+        test_cases=test_cases,
+        reference_files=reference_files,
     )
+    if not user_msg:
+        # TODO: how ot handle token budget exceeded
+        print("Token budget exceeded while generating test cases.", flush=True)
 
-    content = response.choices[0].message.content
+    if not stream:
+        print(
+            "\n\n```Step\n# Generating tests...\n",
+            flush=True,
+        )
+        response = create_chat_completion(
+            model=MODEL,
+            messages=[{"role": "user", "content": user_msg}],
+            temperature=0.1,
+        )
+        print("Complete Generating.\n```", flush=True)
 
-    return content
+        content = response.choices[0].message.content
+        # return content
+        print(content, flush=True)
+
+    else:
+        client = openai.OpenAI()
+
+        chunks = client.chat.completions.create(
+            model=MODEL,
+            messages=[{"role": "user", "content": user_msg}],
+            temperature=0.1,
+            stream=True,
+        )
+
+        for chunk in chunks:
+            print(chunk.choices[0].delta.content, flush=True, end="")
