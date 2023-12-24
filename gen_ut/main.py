@@ -91,6 +91,7 @@ def main(
         function_name=func_name,
         function_content=relevant_content,
         file_path=file_path,
+        chat_language=tui_lang.chat_language,
     )
     ref_files = find_reference_tests(repo_root, func_name, file_path)
     print("Complete analyzing.\n```", flush=True)

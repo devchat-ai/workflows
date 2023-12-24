@@ -23,14 +23,14 @@ Here's the source code of the function:
 {function_content}
 
 Propose each test case with a one-line description of what behavior it tests.
-You don't have to write the test cases in code, just describe them in plain English.
+You don't have to write the test cases in code, just describe them in plain {chat_language}.
 Do not generate more than 6 test cases.
 
 Answer in JSON format:
 {{
     "test_cases": [
-        {{"description": "<test case 1>"}},
-        {{"description": "<test case 2>"}},
+        {{"description": "<describe test case 1 in {chat_language}>"}},
+        {{"description": "<describe test case 2 in {chat_language}>"}},
     ]
 }}
 """
@@ -46,6 +46,7 @@ def propose_test(
     function_name: str,
     function_content: str,
     file_path: str,
+    chat_language: str = "English",
 ) -> List[str]:
     """Propose test cases for a specified function based on a user prompt
 
@@ -67,6 +68,7 @@ def propose_test(
         function_name=function_name,
         file_path=file_path,
         function_content=function_content,
+        chat_language=chat_language,
     )
 
     tokens = len(encoding.encode(user_msg))
