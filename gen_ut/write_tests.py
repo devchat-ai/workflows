@@ -5,7 +5,7 @@ from typing import List, Optional
 import tiktoken
 
 from chat.ask_codebase.tools.retrieve_file_content import retrieve_file_content
-from chat.util.openai_util import create_chat_completion
+from openai_util import create_chat_completion_chunks
 import openai
 
 from datetime import datetime
@@ -108,7 +108,6 @@ def write_and_print_tests(
     test_cases: List[str],
     reference_files: Optional[List[str]] = None,
     chat_language: str = "English",
-    stream: Optional[bool] = False,
 ) -> str | None:
     user_msg = _mk_write_tests_msg(
         root_path=root_path,
@@ -123,31 +122,15 @@ def write_and_print_tests(
         # TODO: how ot handle token budget exceeded
         print("Token budget exceeded while generating test cases.", flush=True)
 
-    if not stream:
-        print(
-            "\n\n```Step\n# Generating tests...\n",
-            flush=True,
-        )
-        response = create_chat_completion(
-            model=MODEL,
-            messages=[{"role": "user", "content": user_msg}],
-            temperature=0.1,
-        )
-        print("Complete Generating.\n```", flush=True)
 
-        content = response.choices[0].message.content
-        # return content
-        print(content, flush=True)
 
-    else:
-        client = openai.OpenAI()
+    chunks = create_chat_completion_chunks(
+        model=MODEL,
+        messages=[{"role": "user", "content": user_msg}],
+        temperature=0.1,
+    )
 
-        chunks = client.chat.completions.create(
-            model=MODEL,
-            messages=[{"role": "user", "content": user_msg}],
-            temperature=0.1,
-            stream=True,
-        )
-
-        for chunk in chunks:
-            print(chunk.choices[0].delta.content, flush=True, end="")
+    for chunk in chunks:
+        if chunk.choices[0].finish_reason == "stop":
+            break
+        print(chunk.choices[0].delta.content, flush=True, end="")

@@ -4,8 +4,8 @@ from typing import Optional, List
 import tiktoken
 from openai import OpenAI
 import json
-from chat.ask_codebase.tools.retrieve_file_content import retrieve_file_content
-from chat.util.openai_util import create_chat_completion
+
+from openai_util import create_chat_completion_content
 
 
 PROPOSE_TEST_PROMPT = """
@@ -75,14 +75,12 @@ def propose_test(
     if tokens > token_budget:
         return f"Token budget exceeded while generating test cases. ({tokens}/{token_budget})"
 
-    response = create_chat_completion(
+    content = create_chat_completion_content(
         model=MODEL,
         messages=[{"role": "user", "content": user_msg}],
         response_format={"type": "json_object"},
         temperature=0.1,
     )
-
-    content = response.choices[0].message.content
 
     cases = json.loads(content).get("test_cases", [])
 
