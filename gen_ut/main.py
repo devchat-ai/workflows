@@ -7,6 +7,7 @@ from propose_test import propose_test
 from find_reference_tests import find_reference_tests
 from write_tests import write_tests
 from chat.ask_codebase.tools.retrieve_file_content import retrieve_file_content
+from i18n import TUILanguage, get_translation
 
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
@@ -53,6 +54,9 @@ def main(
     end_line: Optional[int],  # 0-based, inclusive
 ):
     repo_root = os.getcwd()
+    tui_lang = TUILanguage.from_str("zh")
+    _i = get_translation(tui_lang)
+
     print("\n\n$$$$$$$$$$$\n\n")
     print(f"repo_root: {repo_root}\n\n")
     print(f"user_prompt: {user_prompt}\n\n")
@@ -60,7 +64,11 @@ def main(
     print(f"file_path: {file_path}\n\n")
     print(f"start_line: {start_line}\n\n")
     print(f"end_line: {end_line}\n\n")
+    print(f"tui_lang: {tui_lang}\n\n")
+    print(_i("hello"))
     print("\n\n$$$$$$$$$$$\n\n", flush=True)
+
+    return
 
     print(
         "\n\n```Step\n# Analyzing the function and current unit tests...\n",
