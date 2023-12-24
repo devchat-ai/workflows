@@ -1,7 +1,8 @@
-from typing import Optional, List, Dict
+from typing import Optional, Dict
 import os
 import sys
 import click
+import time
 
 from propose_test import propose_test
 from find_reference_tests import find_reference_tests
@@ -15,10 +16,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 
 from ui_utils import ui_checkbox_select, ui_text_edit, CheckboxOption  # noqa: E402
 from ide_services import ide_language  # noqa: E402
-
-
-from pprint import pprint
-import time
 
 
 def _get_relevant_content(
@@ -59,7 +56,7 @@ def main(
 ):
     repo_root = os.getcwd()
     tui_lang = TUILanguage.from_str(ide_language())
-    # tui_lang = TUILanguage.from_str("zh")
+    tui_lang = TUILanguage.from_str("zh")
     _i = get_translation(tui_lang)
 
     print("\n\n$$$$$$$$$$$\n\n")
@@ -69,9 +66,7 @@ def main(
     print(f"file_path: {file_path}\n\n")
     print(f"start_line: {start_line}\n\n")
     print(f"end_line: {end_line}\n\n")
-    print(
-        f"tui_lang: {tui_lang}, {tui_lang.language_code}, { tui_lang.chat_language}\n\n"
-    )
+    print(f"tui_lang: {tui_lang}, {tui_lang.language_code}, { tui_lang.chat_language}\n\n")
     print(_i("hello"))
     print("\n\n$$$$$$$$$$$\n\n", flush=True)
 
@@ -110,14 +105,14 @@ def main(
         _i("Select test cases to generate"), list(case_id_to_option.values())
     )
 
-    time.sleep(3)
+    time.sleep(1)
 
     selected_cases = [case_id_to_option[id]._text for id in selected_ids]
 
     ref_file = ref_files[0] if ref_files else ""
     new_ref_file = ui_text_edit(_i("Edit reference test file"), ref_file)
 
-    time.sleep(3)
+    time.sleep(1)
 
     write_and_print_tests(
         root_path=repo_root,
@@ -127,7 +122,6 @@ def main(
         test_cases=selected_cases,
         reference_files=[new_ref_file] if new_ref_file else None,
         chat_language=tui_lang.chat_language,
-        stream=True,
     )
 
 

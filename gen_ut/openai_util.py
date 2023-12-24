@@ -1,5 +1,4 @@
-import os
-from typing import Dict, Generator, List, NamedTuple, Optional
+from typing import Optional
 from openai import OpenAI, Stream
 from openai.types.chat import ChatCompletionChunk
 

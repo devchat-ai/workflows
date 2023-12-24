@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from typing import List, Optional
 
@@ -6,42 +5,10 @@ import tiktoken
 
 from chat.ask_codebase.tools.retrieve_file_content import retrieve_file_content
 from openai_util import create_chat_completion_chunks
-import openai
+from prompts import WRITE_TESTS_PROMPT
 
-from datetime import datetime
 
 MODEL = "gpt-4-1106-preview"
-WRITE_TESTS_PROMPT = """
-You're an advanced AI test case generator.
-Given a target function, some reference test code, and a list of specific test case descriptions, write the test cases in code.
-Each test case should be self-contained and executable.
-Use the content of the reference test cases as a model, ensuring you use the same test framework and mock library,
-and apply comparable mocking strategies and best practices.
-
-
-The target function is {function_name}, located in the file {file_path}.
-Here's the source code of the function:
-```
-{function_str}
-```
-Content of reference test code:
-
-{reference_tests_str}
-
-Here's the list of test case descriptions:
-
-{test_cases_str}
-
-Answer in the following format in {chat_language}:
-
-Test Case 1. <original test case 1 description>
-
-<test case 1 code>
-
-Test Case 2. <original test case 2 description>
-
-<test case 2 code>
-"""
 
 
 def _mk_write_tests_msg(
@@ -89,15 +56,6 @@ def _mk_write_tests_msg(
         return None
 
     return user_msg
-    # response = create_chat_completion(
-    #     model=MODEL,
-    #     messages=[{"role": "user", "content": user_msg}],
-    #     temperature=0.1,
-    # )
-
-    # content = response.choices[0].message.content
-
-    # return content
 
 
 def write_and_print_tests(
@@ -121,8 +79,6 @@ def write_and_print_tests(
     if not user_msg:
         # TODO: how ot handle token budget exceeded
         print("Token budget exceeded while generating test cases.", flush=True)
-
-
 
     chunks = create_chat_completion_chunks(
         model=MODEL,

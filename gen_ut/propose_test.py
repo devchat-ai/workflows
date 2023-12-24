@@ -1,39 +1,9 @@
-import os
-from pathlib import Path
-from typing import Optional, List
+from typing import List
 import tiktoken
-from openai import OpenAI
 import json
 
 from openai_util import create_chat_completion_content
-
-
-PROPOSE_TEST_PROMPT = """
-You're an advanced AI test case generator.
-Given a user prompt and a target function, propose test cases for the function based on the prompt.
-
-The user prompt is as follows:
-
-{user_prompt}
-
-The target function is {function_name}, located in the file {file_path}.
-
-Here's the source code of the function:
-
-{function_content}
-
-Propose each test case with a one-line description of what behavior it tests.
-You don't have to write the test cases in code, just describe them in plain {chat_language}.
-Do not generate more than 6 test cases.
-
-Answer in JSON format:
-{{
-    "test_cases": [
-        {{"description": "<describe test case 1 in {chat_language}>"}},
-        {{"description": "<describe test case 2 in {chat_language}>"}},
-    ]
-}}
-"""
+from prompts import PROPOSE_TEST_PROMPT
 
 
 MODEL = "gpt-3.5-turbo-1106"
