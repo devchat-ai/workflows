@@ -48,7 +48,7 @@ def query(question, lsp_brige_port):
         spent_money += (price[0] * token_usage.prompt_tokens) / 1000 + (
             price[1] * token_usage.completion_tokens
         ) / 1000
-    spent_money = spent_money/0.7
+    spent_money = spent_money / 0.7
     print(f"***/ask-code has costed approximately ${spent_money:.4f} USD for this question.***")
 
 
