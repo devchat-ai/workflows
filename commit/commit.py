@@ -345,6 +345,10 @@ def generate_commit_message_base_diff(user_input, diff):
     prompt = PROMPT_COMMIT_MESSAGE_BY_DIFF_USER_INPUT.replace("{__DIFF__}", f"{diff}").replace(
         "{__USER_INPUT__}", f"{user_input + language_prompt}"
     )
+    if len(str(prompt)) > 10000:
+        print("Due to the large size of the diff data, generating a commit message through AI would be very costly, therefore, it is not recommended to use AI for generating the description. Please manually edit the commit message before submitting.")
+        return {"content":""}
+
     messages = [{"role": "user", "content": prompt}]
     response = chat_completion_no_stream(
         messages, prompt_commit_message_by_diff_user_input_llm_config
