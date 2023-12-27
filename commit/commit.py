@@ -1,5 +1,6 @@
 # flake8: noqa: E402
 import os
+import re
 import sys
 import json
 import subprocess
@@ -47,6 +48,17 @@ def assert_value(value, message):
         sys.exit(-1)
 
 
+def decode_path(encoded_path):
+    octal_pattern = re.compile(r"\\[0-7]{3}")
+
+    if octal_pattern.search(encoded_path):
+        bytes_path = encoded_path.encode("utf-8").decode("unicode_escape").encode("latin1")
+        decoded_path = bytes_path.decode("utf-8")
+        return decoded_path
+    else:
+        return encoded_path
+
+
 def get_modified_files():
     """
     获取当前修改文件列表以及已经staged的文件列表
@@ -58,8 +70,7 @@ def get_modified_files():
         tuple: 包含两个list的元组，第一个list包含当前修改过的文件，第二个list包含已经staged的文件
     """
     """ 获取当前修改文件列表以及已经staged的文件列表"""
-    output = subprocess.check_output(["git", "status", "-s", "-u"])
-    output = output.decode("utf-8")
+    output = subprocess.check_output(["git", "status", "-s", "-u"], text=True, encoding="utf-8")
     lines = output.split("\n")
     modified_files = []
     staged_files = []
@@ -72,7 +83,7 @@ def get_modified_files():
 
     for line in lines:
         if len(line) > 2:
-            status, filename = line[:2], line[3:]
+            status, filename = line[:2], decode_path(line[3:])
             # check wether filename is a directory
             if os.path.isdir(filename):
                 continue
@@ -345,6 +356,15 @@ def generate_commit_message_base_diff(user_input, diff):
     prompt = PROMPT_COMMIT_MESSAGE_BY_DIFF_USER_INPUT.replace("{__DIFF__}", f"{diff}").replace(
         "{__USER_INPUT__}", f"{user_input + language_prompt}"
     )
+    if len(str(prompt)) > 10000:
+        print(
+            "Due to the large size of the diff data, "
+            "generating a commit message through AI would be very costly, therefore, "
+            "it is not recommended to use AI for generating the description. "
+            "Please manually edit the commit message before submitting."
+        )
+        return {"content": ""}
+
     messages = [{"role": "user", "content": prompt}]
     response = chat_completion_no_stream(
         messages, prompt_commit_message_by_diff_user_input_llm_config
