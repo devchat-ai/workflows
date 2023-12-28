@@ -9,7 +9,7 @@ from model import FuncToTest, TokenBudgetExceededException
 
 
 MODEL = "gpt-4-1106-preview"
-TOKEN_BUDGET = int(16000 * 0.9)
+TOKEN_BUDGET = int(128000 * 0.9)
 
 
 def _mk_write_tests_msg(
