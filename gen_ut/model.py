@@ -31,6 +31,9 @@ class FuncToTest:
         self._file_content = None
         self._container_content = None
 
+    def __repr__(self) -> str:
+        return f"{self.file_path}:L{self.func_start_line}:{self.func_name}"
+
     @property
     def file_content(self) -> str:
         if self._file_content is None:

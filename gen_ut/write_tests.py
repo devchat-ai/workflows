@@ -9,7 +9,7 @@ from model import FuncToTest, TokenBudgetExceededException
 
 
 MODEL = "gpt-4-1106-preview"
-TOKEN_BUDGET = 16000 * 0.9
+TOKEN_BUDGET = int(16000 * 0.9)
 
 
 def _mk_write_tests_msg(
@@ -72,7 +72,7 @@ def _mk_write_tests_msg(
 
     # 3. even func content exceeds the token budget
     raise TokenBudgetExceededException(
-        f"Token budget exceeded while writing test cases for function <{func_to_test}>. "
+        f"Token budget exceeded while writing test cases for <{func_to_test}>. "
         f"({tokens}/{TOKEN_BUDGET})"
     )
 

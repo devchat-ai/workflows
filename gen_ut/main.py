@@ -28,8 +28,9 @@ def generate_unit_tests_workflow(
 
     _i = get_translation(tui_lang)
 
+    msg = _i("Analyzing the function and current unit tests...")
     print(
-        _i("\n\n```Step\n# Analyzing the function and current unit tests...\n"),
+        f"\n\n```Step\n# {msg}\n```\n",
         flush=True,
     )
 
@@ -40,7 +41,6 @@ def generate_unit_tests_workflow(
     )
 
     ref_files = find_reference_tests(repo_root, func_to_test.func_name, func_to_test.file_path)
-    print(_i("Complete analyzing.\n```"), flush=True)
 
     case_id_to_option: Dict[str, CheckboxOption] = {
         f"case_{i}": CheckboxOption(
@@ -89,6 +89,7 @@ def main(
     repo_root = os.getcwd()
     ide_lang = ide_language()
     tui_lang = TUILanguage.from_str(ide_lang)
+    # tui_lang = TUILanguage.from_str("zh")
     _i = get_translation(tui_lang)
 
     # Use relative path in inner logic
@@ -105,33 +106,34 @@ def main(
         container_end_line=container_end_line,
     )
 
-    print("\n\n$$$$$$$$$$$\n\n")
-    print(f"repo_root: {repo_root}\n\n")
-    print(f"user_prompt: {user_prompt}\n\n")
-    print(f"func_name: {func_name}\n\n")
-    print(func_to_test, "\n\n")
-    print("func_content: \n\n")
-    print("```")
-    print(func_to_test.func_content)
-    print("```")
-    print("container_content: \n\n")
-    print("```")
-    print(func_to_test.container_content)
-    print("```")
-    print(f"ide_lang: {ide_lang}\n\n")
-    print(f"tui_lang: {tui_lang}, {tui_lang.language_code}, { tui_lang.chat_language}\n\n")
-    print(_i("hello"))
-    print("\n\n$$$$$$$$$$$\n\n", flush=True)
+    # print("\n\n$$$$$$$$$$$\n\n")
+    # print(f"repo_root: {repo_root}\n\n")
+    # print(f"user_prompt: {user_prompt}\n\n")
+    # print(f"func_name: {func_name}\n\n")
+    # print(func_to_test, "\n\n")
+    # print("func_content: \n\n")
+    # print("```")
+    # print(func_to_test.func_content)
+    # print("```")
+    # print("container_content: \n\n")
+    # print("```")
+    # print(func_to_test.container_content)
+    # print("```")
+    # print(f"ide_lang: {ide_lang}\n\n")
+    # print(f"tui_lang: {tui_lang}, {tui_lang.language_code}, { tui_lang.chat_language}\n\n")
+    # print("\n\n$$$$$$$$$$$\n\n", flush=True)
 
     try:
         generate_unit_tests_workflow(user_prompt, func_to_test, tui_lang)
 
     except TokenBudgetExceededException as e:
-        print(
-            f"Funciton {func_to_test.func_name} is too large for AI to handle.",
-            flush=True,
-        )
-        print(e, flush=True)
+        msg = _i("The funciton is too large for AI to handle.")
+
+        info = "\n\n```Step\n"
+        info += f"# {msg}\n"
+        info += f"\n{e}\n```\n"
+        print(info, flush=True)
+
     except Exception as e:
         print(e, file=sys.stderr, flush=True)
         sys.exit(1)
