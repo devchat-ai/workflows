@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-24 18:14+0800\n"
+"POT-Creation-Date: 2023-12-28 16:58+0800\n"
 "PO-Revision-Date: 2023-12-24 16:51+0800\n"
 "Last-Translator: kagami <mingjing@merico.dev>\n"
 "Language-Team: English\n"
@@ -17,32 +17,25 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: main.py:72
-msgid "hello"
-msgstr "hello"
-
-#: main.py:76
-msgid ""
-"\n"
-"\n"
-"```Step\n"
-"# Analyzing the function and current unit tests...\n"
+#: main.py:31
+msgid "Analyzing the function and current unit tests..."
 msgstr ""
 
-#: main.py:97
-msgid ""
-"Complete analyzing.\n"
-"```"
-msgstr ""
-
-#: main.py:106
+#: main.py:47
 msgid "proposed cases"
 msgstr ""
 
-#: main.py:112
+#: main.py:53
 msgid "Select test cases to generate"
 msgstr ""
 
-#: main.py:126
+#: main.py:59
 msgid "Edit reference test file"
 msgstr ""
+
+#: main.py:130
+msgid "The funciton is too large for AI to handle."
+msgstr ""
+
+#~ msgid "hello"
+#~ msgstr "hello"
