@@ -12,9 +12,9 @@ The user prompt is as follows:
 
 The target function is {function_name}, located in the file {file_path}.
 
-Here's the source code of the function:
+Here's the relevant source code of the function:
 
-{function_content}
+{relevant_content}
 
 Propose each test case with a one-line description of what behavior it tests.
 You don't have to write the test cases in code, just describe them in plain {chat_language}.
@@ -46,11 +46,10 @@ and apply comparable mocking strategies and best practices.
 
 
 The target function is {function_name}, located in the file {file_path}.
-Here's the source code of the function:
+Here's the relevant source code of the function:
 
-```
-{function_str}
-```
+{relevant_content}
+
 Content of reference test code:
 
 {reference_tests_str}

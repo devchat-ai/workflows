@@ -4,18 +4,67 @@ import json
 
 from openai_util import create_chat_completion_content
 from prompts import PROPOSE_TEST_PROMPT
+from model import FuncToTest, TokenBudgetExceededException
 
 
 MODEL = "gpt-3.5-turbo-1106"
 # MODEL = "gpt-4-1106-preview"
+TOKEN_BUDGET = 16000 * 0.9
+
+
+def _mk_user_msg(
+    user_prompt: str,
+    func_to_test: FuncToTest,
+    chat_language: str,
+) -> str:
+    """
+    Create a user message to be sent to the model within the token budget.
+    """
+    encoding: tiktoken.Encoding = tiktoken.encoding_for_model(MODEL)
+
+    func_content = f"function code\n```\n{func_to_test.func_content}\n```\n"
+    class_content = ""
+    if func_to_test.container_content is not None:
+        class_content = f"class code\n```\n{func_to_test.container_content}\n```\n"
+
+    # Adjust relevant content to fit the token budget
+
+    # 1. both func content and class content
+    relevant_content = "\n".join([func_content, class_content])
+    usr_msg = PROPOSE_TEST_PROMPT.format(
+        user_prompt=user_prompt,
+        function_name=func_to_test.func_name,
+        file_path=func_to_test.file_path,
+        relevant_content=relevant_content,
+        chat_language=chat_language,
+    )
+    token_count = len(encoding.encode(usr_msg))
+    if token_count <= TOKEN_BUDGET:
+        return usr_msg
+
+    # 2. only func content
+    relevant_content = func_content
+    usr_msg = PROPOSE_TEST_PROMPT.format(
+        user_prompt=user_prompt,
+        function_name=func_to_test.func_name,
+        file_path=func_to_test.file_path,
+        relevant_content=relevant_content,
+        chat_language=chat_language,
+    )
+    token_count = len(encoding.encode(usr_msg))
+    if token_count <= TOKEN_BUDGET:
+        return usr_msg
+
+    # 3. even func content exceeds the token budget
+    raise TokenBudgetExceededException(
+        f"Token budget exceeded while proposing test cases for function <{func_to_test}>. "
+        f"({token_count}/{TOKEN_BUDGET})"
+    )
 
 
 def propose_test(
-    repo_root: str,
     user_prompt: str,
-    function_name: str,
-    function_content: str,
-    file_path: str,
+    func_to_test: FuncToTest,
     chat_language: str = "English",
 ) -> List[str]:
     """Propose test cases for a specified function based on a user prompt
@@ -29,21 +78,11 @@ def propose_test(
     Returns:
         List[str]: A list of test case descriptions.
     """
-
-    encoding: tiktoken.Encoding = tiktoken.encoding_for_model(MODEL)
-    token_budget = 16000 * 0.9
-
-    user_msg = PROPOSE_TEST_PROMPT.format(
+    user_msg = _mk_user_msg(
         user_prompt=user_prompt,
-        function_name=function_name,
-        file_path=file_path,
-        function_content=function_content,
+        func_to_test=func_to_test,
         chat_language=chat_language,
     )
-
-    tokens = len(encoding.encode(user_msg))
-    if tokens > token_budget:
-        return f"Token budget exceeded while generating test cases. ({tokens}/{token_budget})"
 
     content = create_chat_completion_content(
         model=MODEL,

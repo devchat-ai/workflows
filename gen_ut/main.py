@@ -2,100 +2,44 @@ from typing import Optional, Dict
 import os
 import sys
 import click
-import time
 
 from propose_test import propose_test
 from find_reference_tests import find_reference_tests
 from write_tests import write_and_print_tests
-from chat.ask_codebase.tools.retrieve_file_content import retrieve_file_content
 from i18n import TUILanguage, get_translation
 
+from model import FuncToTest, TokenBudgetExceededException
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
-# sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
 
 from ui_utils import ui_checkbox_select, ui_text_edit, CheckboxOption  # noqa: E402
 from ide_services import ide_language  # noqa: E402
 
 
-def _get_relevant_content(
-    repo_root: str,
-    file_path: str,
-    function_name: str,
-    start_line: Optional[int] = None,  # 0-based, inclusive
-    end_line: Optional[int] = None,  # 0-based, inclusive
-) -> str:
-    """
-    Get the relevant content for a function.
-
-    it can be the whole file, or the specified lines of the file.
-    """
-    file_content = retrieve_file_content(file_path, repo_root)
-
-    func_content = file_content
-
-    if start_line is not None and end_line is not None:
-        lines = file_content.split("\n")
-        func_content = "\n".join(lines[start_line : end_line + 1])
-
-    return func_content
-
-
-@click.command()
-@click.argument("user_prompt", required=True)
-@click.option("-fn", "--func_name", required=True, type=str)
-@click.option("-fp", "--file_path", required=True, type=str)
-@click.option("-sln", "--start_line", required=False, type=int)
-@click.option("-eln", "--end_line", required=False, type=int)
-def main(
+def generate_unit_tests_workflow(
     user_prompt: str,
-    func_name: str,
-    file_path: str,
-    start_line: Optional[int],  # 0-based, inclusive
-    end_line: Optional[int],  # 0-based, inclusive
+    func_to_test: FuncToTest,
+    tui_lang: TUILanguage,
 ):
+    """
+    The main workflow for generating unit tests.
+    """
     repo_root = os.getcwd()
-    tui_lang = TUILanguage.from_str(ide_language())
-    # tui_lang = TUILanguage.from_str("zh")
+
     _i = get_translation(tui_lang)
-
-    # Use relative path in inner logic
-    if os.path.isabs(file_path):
-        file_path = os.path.relpath(file_path, repo_root)
-
-    print("\n\n$$$$$$$$$$$\n\n")
-    print(f"repo_root: {repo_root}\n\n")
-    print(f"user_prompt: {user_prompt}\n\n")
-    print(f"func_name: {func_name}\n\n")
-    print(f"file_path: {file_path}\n\n")
-    print(f"start_line: {start_line}\n\n")
-    print(f"end_line: {end_line}\n\n")
-    print(f"tui_lang: {tui_lang}, {tui_lang.language_code}, { tui_lang.chat_language}\n\n")
-    print(_i("hello"))
-    print("\n\n$$$$$$$$$$$\n\n", flush=True)
 
     print(
         _i("\n\n```Step\n# Analyzing the function and current unit tests...\n"),
         flush=True,
     )
 
-    relevant_content = _get_relevant_content(
-        repo_root=repo_root,
-        file_path=file_path,
-        function_name=func_name,
-        start_line=start_line,
-        end_line=end_line,
-    )
-
     test_cases = propose_test(
-        repo_root=repo_root,
         user_prompt=user_prompt,
-        function_name=func_name,
-        function_content=relevant_content,
-        file_path=file_path,
+        func_to_test=func_to_test,
         chat_language=tui_lang.chat_language,
     )
-    ref_files = find_reference_tests(repo_root, func_name, file_path)
+
+    ref_files = find_reference_tests(repo_root, func_to_test.func_name, func_to_test.file_path)
     print(_i("Complete analyzing.\n```"), flush=True)
 
     case_id_to_option: Dict[str, CheckboxOption] = {
@@ -109,26 +53,88 @@ def main(
         _i("Select test cases to generate"), list(case_id_to_option.values())
     )
 
-    # tmp sleep to show some issues in demo
-    time.sleep(1)
-
     selected_cases = [case_id_to_option[id]._text for id in selected_ids]
 
     ref_file = ref_files[0] if ref_files else ""
     new_ref_file = ui_text_edit(_i("Edit reference test file"), ref_file)
 
-    # tmp sleep to show some issues in demo
-    time.sleep(1)
-
     write_and_print_tests(
         root_path=repo_root,
-        function_name=func_name,
-        function_content=relevant_content,
-        file_path=file_path,
+        func_to_test=func_to_test,
         test_cases=selected_cases,
         reference_files=[new_ref_file] if new_ref_file else None,
         chat_language=tui_lang.chat_language,
     )
+
+
+@click.command()
+@click.argument("user_prompt", required=True)
+@click.option("-fn", "--func_name", required=True, type=str)
+@click.option("-fp", "--file_path", required=True, type=str)
+@click.option("-fsl", "--func_start_line", required=True, type=int)
+@click.option("-fel", "--func_end_line", required=True, type=int)
+# Optional container_name is not well supported in Shortcut button's variable
+# @click.option("-cn", "--container_name", required=False, type=str)
+@click.option("-csl", "--container_start_line", required=False, type=int)
+@click.option("-cel", "--container_end_line", required=False, type=int)
+def main(
+    user_prompt: str,
+    func_name: str,
+    file_path: str,
+    func_start_line: Optional[int],  # 0-based, inclusive
+    func_end_line: Optional[int],  # 0-based, inclusive
+    container_start_line: Optional[int],  # 0-based, inclusive
+    container_end_line: Optional[int],  # 0-based, inclusive
+):
+    repo_root = os.getcwd()
+    ide_lang = ide_language()
+    tui_lang = TUILanguage.from_str(ide_lang)
+    _i = get_translation(tui_lang)
+
+    # Use relative path in inner logic
+    if os.path.isabs(file_path):
+        file_path = os.path.relpath(file_path, repo_root)
+
+    func_to_test = FuncToTest(
+        func_name=func_name,
+        repo_root=repo_root,
+        file_path=file_path,
+        func_start_line=func_start_line,
+        func_end_line=func_end_line,
+        container_start_line=container_start_line,
+        container_end_line=container_end_line,
+    )
+
+    print("\n\n$$$$$$$$$$$\n\n")
+    print(f"repo_root: {repo_root}\n\n")
+    print(f"user_prompt: {user_prompt}\n\n")
+    print(f"func_name: {func_name}\n\n")
+    print(func_to_test, "\n\n")
+    print("func_content: \n\n")
+    print("```")
+    print(func_to_test.func_content)
+    print("```")
+    print("container_content: \n\n")
+    print("```")
+    print(func_to_test.container_content)
+    print("```")
+    print(f"ide_lang: {ide_lang}\n\n")
+    print(f"tui_lang: {tui_lang}, {tui_lang.language_code}, { tui_lang.chat_language}\n\n")
+    print(_i("hello"))
+    print("\n\n$$$$$$$$$$$\n\n", flush=True)
+
+    try:
+        generate_unit_tests_workflow(user_prompt, func_to_test, tui_lang)
+
+    except TokenBudgetExceededException as e:
+        print(
+            f"Funciton {func_to_test.func_name} is too large for AI to handle.",
+            flush=True,
+        )
+        print(e, flush=True)
+    except Exception as e:
+        print(e, file=sys.stderr, flush=True)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
