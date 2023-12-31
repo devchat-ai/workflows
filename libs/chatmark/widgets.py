@@ -1,0 +1,342 @@
+from typing import List, Optional, Dict
+from .iobase import pipe_interaction
+from abc import ABC, abstractmethod
+
+
+class Widget(ABC):
+    """
+    Abstract base class for widgets
+    """
+
+    def __init__(self):
+        self._rendered = False
+
+    @abstractmethod
+    def _in_chatmark(self) -> str:
+        """
+        Generate ChatMark syntax for the widget
+        """
+        pass
+
+    @abstractmethod
+    def _parse_response(self, response: Dict) -> None:
+        """
+        Parse ChatMark response from user input
+        """
+        pass
+
+    def render(self) -> None:
+        """
+        Render the widget to receive user input
+        """
+        if self._rendered:
+            # already rendered once
+            # not sure if the constraint is necessary
+            # could be removed if re-rendering is needed
+            raise RuntimeError("Widget can only be rendered once")
+
+        self._rendered = True
+
+        lines = [
+            "```chatmark",
+            self._in_chatmark(),
+            "```",
+        ]
+
+        chatmark = "\n".join(lines)
+        response = pipe_interaction(chatmark)
+        self._parse_response(response)
+
+
+class Checkbox(Widget):
+    """
+    CharMark syntax:
+    ```chatmark
+    Which files would you like to commit? I've suggested a few.
+    > [x](file1) devchat/engine/prompter.py
+    > [x](file2) devchat/prompt.py
+    > [](file3) tests/test_cli_prompt.py
+    ```
+
+    Response:
+    ```yaml
+    file1: checked
+    file3: checked
+    ```
+    """
+
+    def __init__(
+        self,
+        options: List[str],
+        check_states: Optional[List[bool]] = None,
+        title: Optional[str] = None,
+    ):
+        """
+        options: options to be selected
+        check_states: initial check states of options, default to all False
+        title: title of the widget
+        """
+        super().__init__()
+
+        if check_states is not None:
+            assert len(options) == len(check_states)
+        else:
+            check_states = [False for _ in options]
+
+        self._options = options
+        self._states = check_states
+        self._title = title
+
+        self._selections: Optional[List[int]] = None
+
+    @property
+    def selections(self) -> Optional[List[int]]:
+        """
+        Get the indices of selected options
+        """
+        return self._selections
+
+    @property
+    def options(self) -> List[str]:
+        """
+        Get the options
+        """
+        return self._options
+
+    def _in_chatmark(self) -> str:
+        """
+        Generate ChatMark syntax for checkbox options
+        Use the index of option as id
+        """
+        lines = []
+
+        if self._title:
+            lines.append(self._title)
+
+        for idx, (option, state) in enumerate(zip(self._options, self._states)):
+            mark = "[x]" if state else "[]"
+            lines.append(f"> {mark}({idx}) {option}")
+
+        text = "\n".join(lines)
+        return text
+
+    def _parse_response(self, response: Dict):
+        selections = []
+        for key, value in response.items():
+            if value == "checked":
+                selections.append(int(key))
+        self._selections = selections
+
+
+class TextEditor(Widget):
+    """
+    CharMark syntax:
+    ```chatmark
+    I've drafted a commit message for you as below. Feel free to modify it.
+
+    > | (ID)
+    > fix: prevent racing of requests
+    >
+    > Introduce a request id and a reference to latest request. Dismiss
+    > incoming responses other than from latest request.
+    >
+    > Reviewed-by: Z
+    > Refs: #123
+    ```
+
+    Response:
+    ```yaml
+    ID: |
+        fix: prevent racing of requests
+
+        Introduce a request ID and a reference to latest request. Dismiss
+        incoming responses other than from latest request.
+
+        Reviewed-by: Z
+        Refs: #123
+    ```
+    """
+
+    _editor_id = "_text_editor"
+
+    def __init__(self, text: str, title: Optional[str] = None):
+        super().__init__()
+
+        self._title = title
+        self._text = text
+
+        self._new_text: Optional[str] = None
+
+    @property
+    def new_text(self):
+        return self._new_text
+
+    def _in_chatmark(self):
+        """
+        Generate ChatMark syntax for text editor
+        Use "_text_editor" as id
+        """
+        lines = self._text.split("\n")
+        new_lines = []
+
+        if self._title:
+            new_lines.append(self._title)
+        new_lines.append(f"> | ({self._editor_id})")
+        new_lines.extend([f"> {line}" for line in lines])
+
+        text = "\n".join(new_lines)
+        return text
+
+    def _parse_response(self, response: Dict):
+        self._new_text = response.get(self._editor_id, None)
+
+
+class Radio(Widget):
+    """
+    CharMark syntax:
+    ```chatmark
+    How would you like to make the change?
+    > - (insert) Insert the new code.
+    > - (new) Put the code in a new file.
+    > - (replace) Replace the current code.
+    ```
+
+    Reponse:
+    ```yaml
+    replace: checked
+    ```
+    """
+
+    def __init__(
+        self,
+        options: List[str],
+        # TODO: 设计缺陷 or Feature？无法指定默认选项
+        # default_selected: Optional[int] = None,
+        title: Optional[str] = None,
+    ) -> None:
+        """
+        options: options to be selected
+        default_selected: index of the option to be selected by default, default to None
+        title: title of the widget
+        """
+        # TODO: 设计缺陷 or Feature？无法指定默认选项
+        # if default_selected is not None:
+        #     assert 0 <= default_selected < len(options)
+
+        super().__init__()
+
+        self._options = options
+        self._title = title
+
+        self._selection: Optional[int] = None
+
+    @property
+    def options(self) -> List[str]:
+        """
+        Return the options
+        """
+        return self._options
+
+    @property
+    def selection(self) -> Optional[int]:
+        """
+        Return the index of the selected option
+        """
+        return self._selection
+
+    def _in_chatmark(self) -> str:
+        """
+        Generate ChatMark syntax for options
+        Use the index of option as id
+        """
+        lines = []
+
+        if self._title:
+            lines.append(self._title)
+
+        for idx, option in enumerate(self._options):
+            lines.append(f"> - ({idx}) {option}")
+
+        text = "\n".join(lines)
+        return text
+
+    def _parse_response(self, response: Dict):
+        selected = None
+        for key, value in response.items():
+            if value == "checked":
+                selected = int(key)
+                break
+
+        self._selection = selected
+
+
+class Button(Widget):
+    """
+    ChatMark syntax:
+    ```chatmark
+    Would you like to pay $0.02 for this LLM query?
+    > (Confirm) Yes, go ahead!
+    > (Cancel) No, let's skip this.
+    ```
+
+    ```yaml
+    Confirm: clicked
+    ```
+
+    # NOTE: almost the same as Radio essentially
+    # TODO: 点完后button显示有个x，bug or feature？
+    """
+
+    def __init__(
+        self,
+        buttons: List[str],
+        title: Optional[str] = None,
+    ) -> None:
+        """
+        buttons: button names to show
+        title: title of the widget
+        """
+        super().__init__()
+
+        self._buttons = buttons
+        self._title = title
+
+        self._clicked: Optional[int] = None
+
+    @property
+    def clicked(self) -> Optional[int]:
+        """
+        Return the index of the clicked button
+        """
+        return self._clicked
+
+    @property
+    def buttons(self) -> List[str]:
+        """
+        Return the buttons
+        """
+        return self._buttons
+
+    def _in_chatmark(self) -> str:
+        """
+        Generate ChatMark syntax for options
+        Use the index of button as id
+        """
+        lines = []
+
+        if self._title:
+            lines.append(self._title)
+
+        for idx, button in enumerate(self._buttons):
+            lines.append(f"> ({idx}) {button}")
+
+        text = "\n".join(lines)
+        return text
+
+    def _parse_response(self, response: Dict[str, str]):
+        clicked = None
+        for key, value in response.items():
+            if value == "clicked":
+                clicked = int(key)
+                break
+        self._clicked = clicked
