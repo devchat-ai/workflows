@@ -2,11 +2,6 @@ from typing import List, Optional, Dict
 from .iobase import pipe_interaction
 from .widgets import Widget, Button
 
-# TODO: 讨论以下是 feature or bug?
-# 1. chatmark语法: radio 无法指定默认选项
-# 2. chatmark实现：button 点完后显示个x
-# 3. chatmark实现：form 里不能有button
-
 
 class Form:
     """
