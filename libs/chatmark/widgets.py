@@ -1,6 +1,7 @@
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Tuple
 from .iobase import pipe_interaction
 from abc import ABC, abstractmethod
+from uuid import uuid4
 
 
 class Widget(ABC):
@@ -10,6 +11,8 @@ class Widget(ABC):
 
     def __init__(self):
         self._rendered = False
+        # Prefix for IDs/keys in the widget
+        self._id_prefix = self.gen_id_prefix()
 
     @abstractmethod
     def _in_chatmark(self) -> str:
@@ -47,10 +50,26 @@ class Widget(ABC):
         response = pipe_interaction(chatmark)
         self._parse_response(response)
 
+    @staticmethod
+    def gen_id_prefix() -> str:
+        return uuid4().hex
+
+    @staticmethod
+    def gen_id(id_prefix: str, index: int) -> str:
+        return f"{id_prefix}_{index}"
+
+    @staticmethod
+    def parse_id(a_id: str) -> Tuple[Optional[str], Optional[int]]:
+        try:
+            id_prefix, index = a_id.split("_")
+            return id_prefix, int(index)
+        except Exception:
+            return None, None
+
 
 class Checkbox(Widget):
     """
-    CharMark syntax:
+    ChatMark syntax:
     ```chatmark
     Which files would you like to commit? I've suggested a few.
     > [x](file1) devchat/engine/prompter.py
@@ -106,7 +125,7 @@ class Checkbox(Widget):
     def _in_chatmark(self) -> str:
         """
         Generate ChatMark syntax for checkbox options
-        Use the index of option as id
+        Use the index of option to generate id/key
         """
         lines = []
 
@@ -115,7 +134,8 @@ class Checkbox(Widget):
 
         for idx, (option, state) in enumerate(zip(self._options, self._states)):
             mark = "[x]" if state else "[]"
-            lines.append(f"> {mark}({idx}) {option}")
+            key = self.gen_id(self._id_prefix, idx)
+            lines.append(f"> {mark}({key}) {option}")
 
         text = "\n".join(lines)
         return text
@@ -123,14 +143,20 @@ class Checkbox(Widget):
     def _parse_response(self, response: Dict):
         selections = []
         for key, value in response.items():
+            prefix, index = self.parse_id(key)
+            # check if the prefix is the same as the widget's
+            if prefix != self._id_prefix:
+                continue
+
             if value == "checked":
-                selections.append(int(key))
+                selections.append(index)
+
         self._selections = selections
 
 
 class TextEditor(Widget):
     """
-    CharMark syntax:
+    ChatMark syntax:
     ```chatmark
     I've drafted a commit message for you as below. Feel free to modify it.
 
@@ -155,9 +181,8 @@ class TextEditor(Widget):
         Reviewed-by: Z
         Refs: #123
     ```
+    # TODO: 实际返回与文档描述不符，是key-value
     """
-
-    _editor_id = "_text_editor"
 
     def __init__(self, text: str, title: Optional[str] = None):
         super().__init__()
@@ -165,35 +190,37 @@ class TextEditor(Widget):
         self._title = title
         self._text = text
 
+        self._editor_key = self.gen_id(self._id_prefix, 0)
         self._new_text: Optional[str] = None
 
     @property
     def new_text(self):
         return self._new_text
 
-    def _in_chatmark(self):
+    def _in_chatmark(self) -> str:
         """
         Generate ChatMark syntax for text editor
-        Use "_text_editor" as id
+        Use _editor_key as id
         """
         lines = self._text.split("\n")
         new_lines = []
 
         if self._title:
             new_lines.append(self._title)
-        new_lines.append(f"> | ({self._editor_id})")
+
+        new_lines.append(f"> | ({self._editor_key})")
         new_lines.extend([f"> {line}" for line in lines])
 
         text = "\n".join(new_lines)
         return text
 
     def _parse_response(self, response: Dict):
-        self._new_text = response.get(self._editor_id, None)
+        self._new_text = response.get(self._editor_key, None)
 
 
 class Radio(Widget):
     """
-    CharMark syntax:
+    ChatMark syntax:
     ```chatmark
     How would you like to make the change?
     > - (insert) Insert the new code.
@@ -247,7 +274,7 @@ class Radio(Widget):
     def _in_chatmark(self) -> str:
         """
         Generate ChatMark syntax for options
-        Use the index of option as id
+        Use the index of option to generate id/key
         """
         lines = []
 
@@ -255,7 +282,8 @@ class Radio(Widget):
             lines.append(self._title)
 
         for idx, option in enumerate(self._options):
-            lines.append(f"> - ({idx}) {option}")
+            key = self.gen_id(self._id_prefix, idx)
+            lines.append(f"> - ({key}) {option}")
 
         text = "\n".join(lines)
         return text
@@ -263,8 +291,13 @@ class Radio(Widget):
     def _parse_response(self, response: Dict):
         selected = None
         for key, value in response.items():
+            prefix, idx = self.parse_id(key)
+            # check if the prefix is the same as the widget's
+            if prefix != self._id_prefix:
+                continue
+
             if value == "checked":
-                selected = int(key)
+                selected = idx
                 break
 
         self._selection = selected
@@ -320,7 +353,7 @@ class Button(Widget):
     def _in_chatmark(self) -> str:
         """
         Generate ChatMark syntax for options
-        Use the index of button as id
+        Use the index of button to generate id/key
         """
         lines = []
 
@@ -328,7 +361,8 @@ class Button(Widget):
             lines.append(self._title)
 
         for idx, button in enumerate(self._buttons):
-            lines.append(f"> ({idx}) {button}")
+            key = self.gen_id(self._id_prefix, idx)
+            lines.append(f"> ({key}) {button}")
 
         text = "\n".join(lines)
         return text
@@ -336,7 +370,12 @@ class Button(Widget):
     def _parse_response(self, response: Dict[str, str]):
         clicked = None
         for key, value in response.items():
+            prefix, idx = self.parse_id(key)
+            # check if the prefix is the same as the widget's
+            if prefix != self._id_prefix:
+                continue
+
             if value == "clicked":
-                clicked = int(key)
+                clicked = idx
                 break
         self._clicked = clicked
