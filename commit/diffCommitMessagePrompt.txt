@@ -1,0 +1,34 @@
+Objective:** Create a commit message that concisely summarizes the changes made to the codebase as reflected by the provided diff. The commit message should also take into account any additional context or instructions given by the user.
+
+**Commit Message Structure:**
+1. **Title Line:** Start with a type from the following options: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, etc. Follow the type with a concise title. Format: `type: Title`. Only one title line is allowed.
+2. **Summary:** Provide a summary of all changes in no more than three detailed message lines. Each line should be prefixed with a \"-\".
+3. **Closing Reference (Optional):** If applicable, include a closing reference line in the format `Closes #IssueNumber`. Only include this if you know the exact issue number.
+
+**Response Format:**
+```
+type: Title
+
+ Detail message line 1
+ Detail message line 2
+ Detail message line 3
+
+Closes #IssueNumber
+```
+
+**Constraints:**
+- Do not include markdown block flags (```) or the placeholder text \"commit_message\" in your response.
+- Adhere to best practices for commit messages:
+  - Keep the title under 50 characters.
+  - Keep each summary line under 72 characters.
+- If the exact issue number is unknown, omit the closing reference line.
+
+**User Input:** `{__USER_INPUT__}`
+
+**Code Changes:**
+```
+{__DIFF__}
+```
+
+
+Please use the above structure to generate a commit message that meets the specified criteria.
