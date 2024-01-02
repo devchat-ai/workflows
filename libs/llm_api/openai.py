@@ -31,7 +31,9 @@ def _try_remove_markdown_block_flag(content):
         return content
 
 
-def chat_completion_no_stream(messages, llm_config, error_out: bool = True, stream_out=False) -> str:
+def chat_completion_no_stream(
+    messages, llm_config, error_out: bool = True, stream_out=False
+) -> str:
     """
     通过ChatCompletion API获取OpenAI聊天机器人的回复。
 
