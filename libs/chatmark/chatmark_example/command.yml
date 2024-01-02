@@ -1,3 +1,0 @@
-description: chatmark examples
-steps:
-  - run: $command_python $command_path/main.py

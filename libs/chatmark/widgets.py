@@ -181,7 +181,6 @@ class TextEditor(Widget):
         Reviewed-by: Z
         Refs: #123
     ```
-    # TODO: 实际返回与文档描述不符，是key-value
     """
 
     def __init__(self, text: str, title: Optional[str] = None):
@@ -237,7 +236,7 @@ class Radio(Widget):
     def __init__(
         self,
         options: List[str],
-        # TODO: 设计缺陷 or Feature？无法指定默认选项
+        # TODO: implement default_selected after the design is ready
         # default_selected: Optional[int] = None,
         title: Optional[str] = None,
     ) -> None:
@@ -246,7 +245,7 @@ class Radio(Widget):
         default_selected: index of the option to be selected by default, default to None
         title: title of the widget
         """
-        # TODO: 设计缺陷 or Feature？无法指定默认选项
+        # TODO: implement default_selected after the design is ready
         # if default_selected is not None:
         #     assert 0 <= default_selected < len(options)
 
@@ -317,7 +316,6 @@ class Button(Widget):
     ```
 
     # NOTE: almost the same as Radio essentially
-    # TODO: 点完后button显示有个x，bug or feature？
     """
 
     def __init__(
