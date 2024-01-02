@@ -1,4 +1,4 @@
-description: 提交当前代码修改.
+description: 为你选定的代码变更生成格式规范的提交信息，并通过 Git 提交。如需要可包含对应 issue 编号（例如，输入“/commit to close #12”）。
 hint: to close Issue #issue_number
 input: optional
 steps:
