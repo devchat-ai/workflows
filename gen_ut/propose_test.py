@@ -1,4 +1,6 @@
 from typing import List
+from functools import partial
+
 import tiktoken
 import json
 
@@ -27,35 +29,32 @@ def _mk_user_msg(
     if func_to_test.container_content is not None:
         class_content = f"class code\n```\n{func_to_test.container_content}\n```\n"
 
-    # Adjust relevant content to fit the token budget
-
-    # 1. both func content and class content
-    relevant_content = "\n".join([func_content, class_content])
-    usr_msg = PROPOSE_TEST_PROMPT.format(
+    # Prepare a list of user messages to fit the token budget
+    # by adjusting the relevant content
+    relevant_content_fmt = partial(
+        PROPOSE_TEST_PROMPT.format,
         user_prompt=user_prompt,
         function_name=func_to_test.func_name,
         file_path=func_to_test.file_path,
-        relevant_content=relevant_content,
         chat_language=chat_language,
     )
-    token_count = len(encoding.encode(usr_msg))
-    if token_count <= TOKEN_BUDGET:
-        return usr_msg
-
-    # 2. only func content
-    relevant_content = func_content
-    usr_msg = PROPOSE_TEST_PROMPT.format(
-        user_prompt=user_prompt,
-        function_name=func_to_test.func_name,
-        file_path=func_to_test.file_path,
-        relevant_content=relevant_content,
-        chat_language=chat_language,
+    # 1. func content & class content
+    msg_1 = relevant_content_fmt(
+        relevant_content="\n".join([func_content, class_content]),
     )
-    token_count = len(encoding.encode(usr_msg))
-    if token_count <= TOKEN_BUDGET:
-        return usr_msg
+    # 2. func content only
+    msg_2 = relevant_content_fmt(
+        relevant_content=func_content,
+    )
 
-    # 3. even func content exceeds the token budget
+    prioritized_msgs = [msg_1, msg_2]
+
+    for msg in prioritized_msgs:
+        token_count = len(encoding.encode(msg))
+        if token_count <= TOKEN_BUDGET:
+            return msg
+
+    # Even func content exceeds the token budget
     raise TokenBudgetExceededException(
         f"Token budget exceeded while proposing test cases for <{func_to_test}>. "
         f"({token_count}/{TOKEN_BUDGET})"

@@ -50,9 +50,7 @@ Here's the relevant source code of the function:
 
 {relevant_content}
 
-Content of reference test code:
-
-{reference_tests_str}
+{reference_content}
 
 Here's the list of test case descriptions:
 

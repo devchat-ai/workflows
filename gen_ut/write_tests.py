@@ -1,4 +1,5 @@
 from typing import List, Optional
+from functools import partial
 
 import tiktoken
 
@@ -25,50 +26,51 @@ def _mk_write_tests_msg(
     for i, test_case in enumerate(test_cases, 1):
         test_cases_str += f"{i}. {test_case}\n"
 
+    reference_content = "\nContent of reference test code:\n\n"
     if reference_files:
-        reference_tests_str = ""
         for i, fp in enumerate(reference_files, 1):
             reference_test_content = retrieve_file_content(fp, root_path)
-            reference_tests_str += f"{i}. {fp}\n\n"
-            reference_tests_str += f"```{reference_test_content}```\n"
+            reference_content += f"{i}. {fp}\n\n"
+            reference_content += f"```{reference_test_content}```\n\n"
     else:
-        reference_tests_str = "No reference test cases provided."
+        reference_content += "No reference test cases provided.\n\n"
 
-    func_content = f"function code\n```\n{func_to_test.func_content}\n```\n"
+    func_content = f"\nfunction code\n```\n{func_to_test.func_content}\n```\n"
     class_content = ""
     if func_to_test.container_content is not None:
-        class_content = f"class code\n```\n{func_to_test.container_content}\n```\n"
+        class_content = f"\nclass code\n```\n{func_to_test.container_content}\n```\n"
 
-    # Adjust relevant content to fit the token budget
-
-    # 1. both func content and class content
-    relevant_content = "\n".join([func_content, class_content])
-
-    user_msg = WRITE_TESTS_PROMPT.format(
+    # Prepare a list of user messages to fit the token budget
+    # by adjusting the relevant content and reference content
+    content_fmt = partial(
+        WRITE_TESTS_PROMPT.format,
         function_name=func_to_test.func_name,
         file_path=func_to_test.file_path,
-        relevant_content=relevant_content,
         test_cases_str=test_cases_str,
         chat_language=chat_language,
-        reference_tests_str=reference_tests_str,
     )
-    tokens = len(encoding.encode(user_msg))
-    if tokens <= TOKEN_BUDGET:
-        return user_msg
+    # 1. func content & class content & reference file content
+    msg_1 = content_fmt(
+        relevant_content="\n".join([func_content, class_content]),
+        reference_content=reference_content,
+    )
+    # 2. func content & class content
+    msg_2 = content_fmt(
+        relevant_content="\n".join([func_content, class_content]),
+        reference_content="",
+    )
+    # 3. func content only
+    msg_3 = content_fmt(
+        relevant_content=func_content,
+        reference_content="",
+    )
 
-    # 2. only func content
-    relevant_content = func_content
-    user_msg = WRITE_TESTS_PROMPT.format(
-        function_name=func_to_test.func_name,
-        file_path=func_to_test.file_path,
-        relevant_content=relevant_content,
-        test_cases_str=test_cases_str,
-        chat_language=chat_language,
-        reference_tests_str=reference_tests_str,
-    )
-    tokens = len(encoding.encode(user_msg))
-    if tokens <= TOKEN_BUDGET:
-        return user_msg
+    prioritized_msgs = [msg_1, msg_2, msg_3]
+
+    for msg in prioritized_msgs:
+        tokens = len(encoding.encode(msg))
+        if tokens <= TOKEN_BUDGET:
+            return msg
 
     # 3. even func content exceeds the token budget
     raise TokenBudgetExceededException(
