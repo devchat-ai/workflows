@@ -16,6 +16,21 @@ from ide_services.services import log_info
 
 # Read the prompt from the diffCommitMessagePrompt.txt file
 def read_prompt_from_file(filename):
+    """
+    Reads the content of a file and returns it as a string.
+
+    This function is designed to read a prompt message from a text file. It expects the file to be encoded in UTF-8 and will strip any leading or trailing whitespace from the content of the file. If the file does not exist or an error occurs during reading, the function logs an error message and exits the script.
+
+    Parameters:
+    - filename (str): The path to the file that contains the prompt message.
+
+    Returns:
+    - str: The content of the file as a string.
+
+    Raises:
+    - FileNotFoundError: If the file does not exist.
+    - Exception: If any other error occurs during file reading.
+    """
     try:
         with open(filename, 'r', encoding='utf-8') as file:
             return file.read().strip()
