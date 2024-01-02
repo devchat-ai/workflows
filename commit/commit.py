@@ -3,7 +3,6 @@ import os
 import re
 import sys
 import subprocess
-from typing import List
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
@@ -136,17 +135,17 @@ def get_marked_files(modified_files, staged_files):
     staged_checkbox = Checkbox(staged_files, [True] * len(staged_files))
 
     unstaged_files = [file for file in modified_files if file not in staged_files]
-    unstaged_checkbox = Checkbox(
-        unstaged_files, [False] * len(unstaged_files)
-    )
+    unstaged_checkbox = Checkbox(unstaged_files, [False] * len(unstaged_files))
 
     # Create a Form with both Checkbox instances
-    form = Form([
-        "Select files to commit:\n\Staged:\n\n",
-        staged_checkbox,
-        "Unstaged:\n\n",
-        unstaged_checkbox,
-    ])
+    form = Form(
+        [
+            "Select files to commit:\n\Staged:\n\n",
+            staged_checkbox,
+            "Unstaged:\n\n",
+            unstaged_checkbox,
+        ]
+    )
 
     # Render the Form and get user input
     form.render()
@@ -244,7 +243,7 @@ def display_commit_message_and_commit(commit_message):
     print("Edit commit meesage:\n\n")
     text_editor = TextEditor(commit_message)
     text_editor.render()
-    
+
     new_commit_message = text_editor.new_text
     if not new_commit_message:
         return
@@ -302,7 +301,8 @@ def main():
         rebuild_stage_list(selected_files)
 
         print(
-            "Step 2/2: Edit commit message and click submit button to commit",
+            "Step 2/2: Generate commit message, "
+            "Edit commit message and click submit button to commit",
             end="\n\n",
             flush=True,
         )
