@@ -31,7 +31,7 @@ def read_prompt_from_file(filename):
 script_path = os.path.dirname(__file__)
 PROMPT_FILENAME = os.path.join(script_path, "diffCommitMessagePrompt.txt")
 PROMPT_COMMIT_MESSAGE_BY_DIFF_USER_INPUT = read_prompt_from_file(PROMPT_FILENAME)
-prompt_commit_message_by_diff_user_input_llm_config = {"model": "gpt-3.5-turbo-1106"}
+prompt_commit_message_by_diff_user_input_llm_config = {"model": "gpt-4-1106-preview"}
 
 
 language = ""
