@@ -451,10 +451,12 @@ def main():
         if not check_git_installed():
             sys.exit(-1)
 
+        print("Step 1/4: Searching for modified files ...", end="\n\n", flush=True)
         modified_files, staged_files = get_modified_files()
         if len(modified_files) == 0:
             print("No files to commit.", file=sys.stderr, flush=True)
             sys.exit(-1)
+        print("Step 2/4: Generating file summaries ...", end="\n\n", flush=True)
         file_summaries = get_file_summaries(modified_files, staged_files, user_input)
         selected_files = get_marked_files(modified_files, staged_files, file_summaries)
         if not selected_files:
@@ -466,6 +468,7 @@ def main():
             file: file_summaries[file] for file in selected_files if file in file_summaries
         }
 
+        print("Step 3/4: Generating commit message ...", end="\n\n", flush=True)
         if len(summaries_for_select_files.keys()) < len(selected_files):
             diff = get_diff()
             commit_message = generate_commit_message_base_diff(user_input, diff)
@@ -474,7 +477,9 @@ def main():
                 user_input, summaries_for_select_files
             )
 
+        print("Step 4/4: Edit commit message and commit ...", end="\n\n", flush=True)
         display_commit_message_and_commit(commit_message["content"])
+        print("Commit completed.", flush=True)
         sys.exit(0)
     except Exception as err:
         print("Exception:", err, file=sys.stderr, flush=True)
