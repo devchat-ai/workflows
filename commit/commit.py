@@ -2,7 +2,6 @@
 import os
 import re
 import sys
-import json
 import subprocess
 from typing import List
 
@@ -11,21 +10,28 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
 sys.path.append(os.path.dirname(__file__))
 
 from ui_utils import ui_checkbox_select, ui_text_edit, CheckboxOption  # noqa: E402
-from llm_api import chat_completion_no_stream, chat_completion_no_stream_return_json  # noqa: E402
+from llm_api import chat_completion_no_stream  # noqa: E402
 from ide_services.services import log_info
 
-from prompts import (
-    PROMPT_SUMMARY_FOR_FILES,
-    PROMPT_GROUP_FILES,
-    PROMPT_COMMIT_MESSAGE_BY_DIFF_USER_INPUT,
-    PROMPT_COMMIT_MESSAGE_BY_SUMMARY_USER_INPUT,
-    PROMPT_SUMMARY_FOR_FILES_RETRY,
-    PROMPT_GROUP_FILES_RETRY,
-    prompt_summary_for_files_llm_config,
-    prompt_group_files_llm_config,
-    prompt_commit_message_by_diff_user_input_llm_config,
-    prompt_commit_message_by_summary_user_input_llm_config,
-)
+
+# Read the prompt from the diffCommitMessagePrompt.txt file
+def read_prompt_from_file(filename):
+    try:
+        with open(filename, 'r', encoding='utf-8') as file:
+            return file.read().strip()
+    except FileNotFoundError:
+        log_info(f"File {filename} not found. Please make sure it exists in the same directory as the script.")
+        sys.exit(1)
+    except Exception as e:
+        log_info(f"An error occurred while reading the file {filename}: {e}")
+        sys.exit(1)
+
+
+# Read the prompt content from the file
+script_path = os.path.dirname(__file__)
+PROMPT_FILENAME = os.path.join(script_path, "diffCommitMessagePrompt.txt")
+PROMPT_COMMIT_MESSAGE_BY_DIFF_USER_INPUT = read_prompt_from_file(PROMPT_FILENAME)
+prompt_commit_message_by_diff_user_input_llm_config = {"model": "gpt-3.5-turbo-1106"}
 
 
 language = ""
