@@ -288,6 +288,10 @@ def main():
         diff = get_diff()
         commit_message = generate_commit_message_base_diff(user_input, diff)
 
+        # TODO
+        # remove Closes #IssueNumber in commit message
+        commit_message["content"] = commit_message["content"].replace("Closes #IssueNumber", "")
+
         display_commit_message_and_commit(commit_message["content"])
         print("Commit completed.", flush=True)
         sys.exit(0)
