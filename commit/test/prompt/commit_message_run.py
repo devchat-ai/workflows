@@ -8,6 +8,7 @@ def get_script_path():
     """Return the directory path of the current script."""
     return os.path.dirname(__file__)
 
+
 def update_sys_path():
     """Extend system path to include library directories."""
     libs_path = os.path.join(get_script_path(), "..", "..", "..", "libs")
@@ -29,6 +30,7 @@ def load_commit_cache():
             return json.load(cache_file)
     except (FileNotFoundError, json.JSONDecodeError):
         return None
+
 
 def save_commit_cache(commit_cache):
     """Save the commit cache to a JSON file."""
@@ -55,9 +57,7 @@ def get_commit_diff(url, commit_cache):
                 return commit_cache[commit_hash]["diff"]
             response = requests.get(
                 api_url,
-                headers={
-                    "Accept": "application/vnd.github.v3.diff"
-                },
+                headers={"Accept": "application/vnd.github.v3.diff"},
                 timeout=20,
             )
 
@@ -82,13 +82,14 @@ def get_commit_messages():
 
     diff = get_commit_diff(commit_url, commit_cache)
     save_commit_cache(commit_cache)
-    
+
     prompt = prompt.replace("{__USER_INPUT__}", "").replace("{__DIFF__}", diff)
-    
+
     messages = [{"role": "user", "content": prompt}]
     response = chat_completion_no_stream(messages, {"model": "gpt-4-1106-preview"})
 
     print(response.get("content", "")) if response.get("content", "") else print(response)
+
 
 if __name__ == "__main__":
     get_commit_messages()
