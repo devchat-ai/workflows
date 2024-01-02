@@ -1,34 +1,37 @@
-Objective:** Create a commit message that concisely summarizes the changes made to the codebase as reflected by the provided diff. The commit message should also take into account any additional context or instructions given by the user.
+Objective:** Generate a commit message that succinctly describes the codebase changes reflected in the provided diff, while incorporating any extra context or guidance from the user.
 
 **Commit Message Structure:**
-1. **Title Line:** Start with a type from the following options: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, etc. Follow the type with a concise title. Format: `type: Title`. Only one title line is allowed.
-2. **Summary:** Provide a summary of all changes in no more than three detailed message lines. Each line should be prefixed with a \"-\".
-3. **Closing Reference (Optional):** If applicable, include a closing reference line in the format `Closes #IssueNumber`. Only include this if you know the exact issue number.
+1. **Title Line:** Choose a type such as `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, and so on, and couple it with a succinct title. Use the format: `type: Title`. Only one title line is permissible.
+2. **Summary:** Summarize all adjustments concisely within a maximum of three detailed message lines. Prefix each line with a \"-\".
+3. **Closing Reference (Conditional):** Include the line `Closes #IssueNumber` only if a specific, relevant issue number has been mentioned in the user input.
 
 **Response Format:**
 ```
 type: Title
 
- Detail message line 1
- Detail message line 2
- Detail message line 3
+- Detail message line 1
+- Detail message line 2
+- Detail message line 3
 
 Closes #IssueNumber
 ```
+Only append the \"Closes #IssueNumber\" if the user input explicitly references an issue to close.
 
 **Constraints:**
-- Do not include markdown block flags (```) or the placeholder text \"commit_message\" in your response.
-- Adhere to best practices for commit messages:
-  - Keep the title under 50 characters.
-  - Keep each summary line under 72 characters.
-- If the exact issue number is unknown, omit the closing reference line.
+- Exclude markdown code block indicators (```) and the placeholder \"commit_message\" from your response.
+- Follow commit message best practices:
+  - Limit the title length to 50 characters.
+  - Limit each summary line to 72 characters.
+- If the precise issue number is not known or not stated by the user, do not include the closing reference.
 
 **User Input:** `{__USER_INPUT__}`
+
+Determine if `{__USER_INPUT__}` contains a reference to closing an issue. If so, include the closing reference in the commit message. Otherwise, exclude it.
 
 **Code Changes:**
 ```
 {__DIFF__}
 ```
 
+Utilize the provided format to craft a commit message that adheres to the stipulated criteria.
 
-Please use the above structure to generate a commit message that meets the specified criteria.
