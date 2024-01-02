@@ -9,7 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
 sys.path.append(os.path.dirname(__file__))
 
-from ui_utils import ui_checkbox_select, ui_text_edit, CheckboxOption  # noqa: E402
+from chatmark import Checkbox, Form, TextEditor  # noqa: E402
 from llm_api import chat_completion_no_stream  # noqa: E402
 from ide_services.services import log_info
 
@@ -132,15 +132,32 @@ def get_marked_files(modified_files, staged_files):
     Returns:
         List[str]: 用户选中的文件列表
     """
-    options: List[CheckboxOption] = []
-    options += [CheckboxOption(file, file, "Staged", True) for file in staged_files]
-    options += [
-        CheckboxOption(file, file, "Unstaged", False)
-        for file in modified_files
-        if file not in staged_files
-    ]
+    # Create two Checkbox instances for staged and unstaged files
+    staged_checkbox = Checkbox(staged_files, [True] * len(staged_files))
 
-    selected_files = ui_checkbox_select("Select files to commit", options)
+    unstaged_files = [file for file in modified_files if file not in staged_files]
+    unstaged_checkbox = Checkbox(
+        unstaged_files, [False] * len(unstaged_files)
+    )
+
+    # Create a Form with both Checkbox instances
+    form = Form([
+        "Select files to commit:\n\Staged:\n\n",
+        staged_checkbox,
+        "Unstaged:\n\n",
+        unstaged_checkbox,
+    ])
+
+    # Render the Form and get user input
+    form.render()
+
+    # Retrieve the selected files from both Checkbox instances
+    selected_staged_files = [staged_files[idx] for idx in staged_checkbox.selections]
+    selected_unstaged_files = [unstaged_files[idx] for idx in unstaged_checkbox.selections]
+
+    # Combine the selections from both checkboxes
+    selected_files = selected_staged_files + selected_unstaged_files
+
     return selected_files
 
 
@@ -224,7 +241,11 @@ def display_commit_message_and_commit(commit_message):
         None。
 
     """
-    new_commit_message = ui_text_edit("Edit commit meesage", commit_message)
+    print("Edit commit meesage:\n\n")
+    text_editor = TextEditor(commit_message)
+    text_editor.render()
+    
+    new_commit_message = text_editor.new_text
     if not new_commit_message:
         return
     subprocess.check_output(["git", "commit", "-m", new_commit_message])
@@ -252,7 +273,7 @@ def check_git_installed():
 def main():
     global language
     try:
-        log_info(
+        print(
             "I can help you generate a summary for your code commit. "
             "Please follow the steps below to complete the process."
         )
