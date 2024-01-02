@@ -301,7 +301,7 @@ def get_marked_files(modified_files, staged_files, file_summaries):
         if file not in staged_files
     ]
 
-    selected_files = ui_checkbox_select("Select files to commit", options)
+    selected_files = ui_checkbox_select("Select the files you've changed that you wish to include in this commit, then click 'Submit'.", options)
     return selected_files
 
 
@@ -411,7 +411,7 @@ def display_commit_message_and_commit(commit_message):
         None。
 
     """
-    new_commit_message = ui_text_edit("Edit commit meesage", commit_message)
+    new_commit_message = ui_text_edit("I've drafted a commit message for the code changes you selected. You can edit this message in the widget below. After confirming the message, click 'Commit', and I will proceed with the commit using this message.", commit_message)
     if not new_commit_message:
         return
     subprocess.check_output(["git", "commit", "-m", new_commit_message])
