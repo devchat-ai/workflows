@@ -1,4 +1,4 @@
-from typing import Optional, Dict
+from typing import Optional
 import os
 import sys
 import click
@@ -12,7 +12,7 @@ from model import FuncToTest, TokenBudgetExceededException
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 
-from ui_utils import ui_checkbox_select, ui_text_edit, CheckboxOption  # noqa: E402
+from chatmark import Checkbox, TextEditor, Form  # noqa: E402
 from ide_services import ide_language  # noqa: E402
 
 
@@ -41,22 +41,19 @@ def generate_unit_tests_workflow(
     )
 
     ref_files = find_reference_tests(repo_root, func_to_test.func_name, func_to_test.file_path)
-
-    case_id_to_option: Dict[str, CheckboxOption] = {
-        f"case_{i}": CheckboxOption(
-            id=f"case_{i}", text=desc, group=_i("proposed cases"), checked=False
-        )
-        for i, desc in enumerate(test_cases)
-    }
-
-    selected_ids = ui_checkbox_select(
-        _i("Select test cases to generate"), list(case_id_to_option.values())
-    )
-
-    selected_cases = [case_id_to_option[id]._text for id in selected_ids]
-
     ref_file = ref_files[0] if ref_files else ""
-    new_ref_file = ui_text_edit(_i("Edit reference test file"), ref_file)
+
+    cases_checkbox = Checkbox(
+        options=test_cases,
+        title=_i("Select test cases to generate"),
+    )
+    ref_file_editor = TextEditor(text=ref_file, title=_i("Edit reference test file"))
+
+    form = Form(components=[cases_checkbox, ref_file_editor])
+    form.render()
+
+    selected_cases = [cases_checkbox.options[idx] for idx in cases_checkbox.selections]
+    new_ref_file = ref_file_editor.new_text
 
     write_and_print_tests(
         root_path=repo_root,
