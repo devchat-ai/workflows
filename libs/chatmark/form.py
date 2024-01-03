@@ -1,4 +1,4 @@
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Union
 from .iobase import pipe_interaction
 from .widgets import Widget, Button
 
@@ -12,7 +12,7 @@ class Form:
 
     def __init__(
         self,
-        components: List[Widget | str],
+        components: List[Union[Widget, str]],
         title: Optional[str] = None,
     ):
         """
@@ -29,7 +29,7 @@ class Form:
         self._rendered = False
 
     @property
-    def components(self) -> List[Widget | str]:
+    def components(self) -> List[Union[Widget, str]]:
         """
         Return the components
         """
