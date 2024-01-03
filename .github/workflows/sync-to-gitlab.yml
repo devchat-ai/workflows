@@ -1,0 +1,26 @@
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitHub repository
+        uses: actions/checkout@v4
+
+      - name: Setup Git
+        run: |
+          git config user.name "bobo"
+          git config user.email "bobo.yang@merico.dev"
+
+      - name: Add GitLab remote
+        run: |
+          # 使用环境变量中的访问令牌来设置GitLab远程仓库的URL
+          git remote add gitlab https://oauth2:${{ secrets.GITLAB_ACCESS_TOKEN }}@gitlab.com/devchat-ai/workflows.git
+
+      - name: Retry Command
+        uses: nick-invision/retry@v4
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: |
+            git fetch gitlab &&
+            git rebase gitlab/main &&
+            git push gitlab
