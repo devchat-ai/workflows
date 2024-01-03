@@ -1,7 +1,5 @@
 import yaml
 
-# almost the same as ui_utils/iobase.py
-
 
 def _send_message(message):
     out_data = f"""\n{message}\n"""
