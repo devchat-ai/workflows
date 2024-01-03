@@ -31,7 +31,7 @@ def _try_remove_markdown_block_flag(content):
         return content
 
 
-def chat_completion_no_stream(
+def chat_completion_stream(
     messages, llm_config, error_out: bool = True, stream_out=False
 ) -> str:
     """
@@ -102,7 +102,7 @@ def chat_completion_no_stream_return_json(messages, llm_config, error_out: bool 
             如果无法解析JSON或达到最大尝试次数，则返回None。
     """
     for _1 in range(3):
-        response = chat_completion_no_stream(messages, llm_config)
+        response = chat_completion_stream(messages, llm_config)
         if response is None:
             return None
 
