@@ -22,7 +22,7 @@ jobs:
           git remote add gitlab https://oauth2:${{ secrets.GITLAB_ACCESS_TOKEN }}@gitlab.com/devchat-ai/workflows.git
 
       - name: Retry Command
-        uses: nick-invision/retry@v4
+        uses: nick-invision/retry@v2
         with:
           timeout_minutes: 10
           max_attempts: 3
