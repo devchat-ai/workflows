@@ -28,5 +28,5 @@ jobs:
           max_attempts: 3
           command: |
             git fetch gitlab &&
-            git rebase gitlab/main &&
+            git rebase gitlab/main -Xours &&
             git push gitlab
