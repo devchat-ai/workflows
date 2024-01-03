@@ -74,3 +74,53 @@ def log_warn(message: str):
 @rpc_call
 def log_error(message: str):
     pass
+
+
+@rpc_call
+def visible_lines(message: str):
+    pass
+
+
+@rpc_call
+def selected_lines(message: str):
+    pass
+
+
+@rpc_call
+def document_symbols(abspath: str):
+    pass
+
+
+@rpc_call
+def workspace_symbols(query: str):
+    pass
+
+
+@rpc_call
+def find_definition(abspath: str, line: int, col: int):
+    pass
+
+
+@rpc_call
+def find_type_definition(abspath: str, line: int, col: int):
+    pass
+
+
+@rpc_call
+def find_declaration(abspath: str, line: int, col: int):
+    pass
+
+
+@rpc_call
+def find_implementation(abspath: str, line: int, col: int):
+    pass
+
+
+@rpc_call
+def find_reference(abspath: str, line: int, col: int):
+    pass
+
+
+@rpc_call
+def diff_apply(filepath, content):
+    pass

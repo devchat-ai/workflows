@@ -1,0 +1,9 @@
+prompts:
+  [
+    '../../diffCommitMessagePrompt.txt'
+  ]
+providers:
+  - id: "exec:python commit_message_run.py"
+tests:
+  - commit_message_tests.yaml
+

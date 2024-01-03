@@ -1,0 +1,126 @@
+- vars:
+    commit_message: The commit fixes a use-after-free error in the AFS volume tree
+      due to a race condition between volume lookup and removal. The patch prevents
+      looking up volumes with zero reference count and ensures that once a volume's
+      refcount reaches zero, it is flagged and not looked up again. This resolves
+      crashes and warnings caused by the race.
+    commit_url: https://github.com/torvalds/linux/commit/9a6b294ab496650e9f270123730df37030911b55
+- vars:
+    commit_message: Fix implemented in IDA to prevent crashes during `ida_free` when
+      the bitmap is empty, addressing overlooked double-free detection for NULL bitmaps.
+      New tests added, albeit with noisy output, to avoid future regressions. Reported
+      by Zhenghan Wang and signed by Matthew Wilcox and Linus Torvalds.
+    commit_url: https://github.com/torvalds/linux/commit/af73483f4e8b6f5c68c9aa63257bdd929a9c194a
+- vars:
+    commit_message: This update allows DNS-related keys to be immediately reclaimed
+      upon expiry without delay, facilitating faster DNS lookups. Previously, expired
+      keys had a default 5-minute buffer period. Now, DNS keys expire instantly and
+      negative DNS results have a 1-second default expiry if not otherwise specified.
+    commit_url: https://github.com/torvalds/linux/commit/39299bdd2546688d92ed9db4948f6219ca1b9542
+- vars:
+    commit_message: The commit updates the names of constants for USB PIDs in the
+      ftdi_sio driver to match the new products assigned to those IDs, ensuring accuracy
+      in the identification of Actisense products.
+    commit_url: https://github.com/torvalds/linux/commit/513d88a88e0203188a38f4647dd08170aebd85df
+- vars:
+    commit_message: The IPv6 network code is reverting a previous change due to race
+      conditions and use-after-free errors related to managing expired routes. The
+      problematic commit aimed to handle expired routes with a separate list but introduced
+      issues. It will be revisited in a future release. Fixes and reviews are noted.
+    commit_url: https://github.com/torvalds/linux/commit/dade3f6a1e4e35a5ae916d5e78b3229ec34c78ec
+- vars:
+    commit_message: Confirmed successful generation of events2table.c.
+    commit_url: https://github.com/ruby/ruby/commit/7016ab873eaa68d1dfe1af50198c157e451c784b
+- vars:
+    commit_message: Introduced a new `errno_ptr` property to the Universal Parser
+      to facilitate error tracking, allowing the parser to communicate and store error
+      codes more efficiently during parsing operations.
+    commit_url: https://github.com/ruby/ruby/commit/4374236e959c1e585611acfc7a2e3d2142265ab0
+- vars:
+    commit_message: The commit introduces an `ary_modify` property to the Universal
+      Parser, enabling flexible array modifications during data parsing.
+    commit_url: https://github.com/ruby/ruby/commit/73fa3224975c42e1c4e2231212a64ac325054130
+- vars:
+    commit_message: 'Fixed the ARCH_FLAG issue to enable correct cross-compilation
+      as mandated by bug report #20088.'
+    commit_url: https://github.com/ruby/ruby/commit/2a4a84664a1972c48c4365c29e73be83f8004139
+- vars:
+    commit_message: Added basic documentation for constants in the Ruby 'etc' library,
+      enhancing code understandability and usability by providing information on their
+      purpose and usage.
+    commit_url: https://github.com/ruby/ruby/commit/c027dcfde2bf40c45dfb0fe1b79f97b8827d89f3
+- vars:
+    commit_message: "Implemented automatic import feature for the `imports` field\
+      \ in `package.json`, enhancing the module resolution process for projects, with\
+      \ contributions from Mateusz Burzy\u0144ski and Andrew Branch."
+    commit_url: https://github.com/microsoft/TypeScript/commit/fbcdb8cf4fbbbea0111a9adeb9d0d2983c088b7c
+- vars:
+    commit_message: 'Implemented checks to ensure enums are consistent across different
+      versions to maintain compatibility in project issue #55924.'
+    commit_url: https://github.com/microsoft/TypeScript/commit/93e6b9da0c4cb164ca90a5a1b07415e81e97f2b1
+- vars:
+    commit_message: This commit provides type suggestions for `@types/bun` when the
+      `Bun` global is not detected, aiding in proper type hinting and code completion.
+      (#56795)
+    commit_url: https://github.com/microsoft/TypeScript/commit/0e5927d5d38399bac1818ad4160f2ff91c33c174
+- vars:
+    commit_message: Added functionality to support the 'const' modifier on type parameters
+      within JSDoc, enhancing TypeScript compatibility and type-checking features.
+      (#56649)
+    commit_url: https://github.com/microsoft/TypeScript/commit/a36d04fc63c83b6ec5a8099942b653a5caa29eb1
+- vars:
+    commit_message: 'Corrected a formatting issue where a space was missing after
+      the ''implements'' or ''extends'' keywords when followed by generics in typescript
+      files, resolving issue #56699.'
+    commit_url: https://github.com/microsoft/TypeScript/commit/2c134db31df48ba5f158f490168dea733a11ae44
+- vars:
+    commit_message: The commit updates the configuration to ensure that functions
+      major(), makedev(), and minor() are enabled on HP-UX systems, by enforcing the
+      inclusion order of <sys/types.h> before <sys/sysmacros.h>. Co-authored by Serhiy
+      Storchaka.
+    commit_url: https://github.com/python/cpython/commit/f108468970bf4e70910862476900f924fb701399
+- vars:
+    commit_message: Fixed the `--with-openssl-rpath` option for macOS to correctly
+      use the platform-specific `-rpath` linker flag, resolving compatibility issues
+      on that OS. (#113441)
+    commit_url: https://github.com/python/cpython/commit/cc13eabc7ce08accf49656e258ba500f74a1dae8
+- vars:
+    commit_message: The commit deprecates the `_enablelegacywindowsfsencoding` method
+      (#107729) which is tracked in issue gh-73427.
+    commit_url: https://github.com/python/cpython/commit/bfee2f77e16f01a718c1044564ee624f1f2bc328
+- vars:
+    commit_message: 'Moved the `cpp.py` script to the `libclinic` directory for better
+      organization as part of Pull Request #113526, which addresses issue gh-113299.'
+    commit_url: https://github.com/python/cpython/commit/7ab9efdd6a2fb21cddca1ccd70175f1ac6bd9168
+- vars:
+    commit_message: Refactored error handling in Argument Clinic's C preprocessor
+      helper by creating a subclass of ClinicError for improved exception management,
+      and relocated ClinicError into a separate errors module, streamlining preparations
+      to integrate cpp.py into libclinic.
+    commit_url: https://github.com/python/cpython/commit/87295b4068762f9cbdfcae5fed5ff54aadd3cb62
+- vars:
+    commit_message: 'Updated the ''lib/time'' package to the 2023d version. This update
+      was part of addressing issue #22487 and included a code review process with
+      multiple reviewers before auto-submission.'
+    commit_url: https://github.com/golang/go/commit/36a2463e7c01151b05fff9a1f1c6fb08d764c82e
+- vars:
+    commit_message: 'This commit fixes issue #64826 by ensuring the Go compiler correctly
+      handles the constant-folding of jump table indices that are out of range, even
+      for statically unreachable code.'
+    commit_url: https://github.com/golang/go/commit/f6509cf5cdbb5787061b784973782933c47f1782
+- vars:
+    commit_message: 'The `go mod init` command no longer imports configurations from
+      other vendoring tools as of Go 1.22, with the change documented and support
+      removed. This addresses issues #61422 and fixes #53327.'
+    commit_url: https://github.com/golang/go/commit/9dd1cde9ac0f1e935ed44d33f6b4668be538c1ed
+- vars:
+    commit_message: 'The commit reverts a change in the ''go'' command that tried
+      to improve flag parsing for ''go run'' and ''go install''. It reintroduces Go
+      1.21 behavior and defers the decision for a fix to a later date due to new problems.
+      It addresses issue #64738 and rolls back to a previous commit.'
+    commit_url: https://github.com/golang/go/commit/52dbffeac86863e1e0c9455b5b216ec50c828946
+- vars:
+    commit_message: Removed the 'interfacecycles' debug flag from Go compiler since
+      no related issues have emerged since Go 1.20, eliminating checks for anonymous
+      interface cycles. The relevant tests have been updated to reflect this change.
+    commit_url: https://github.com/golang/go/commit/6fe0d3758b35afcc342832e376d8d985a5a29070
