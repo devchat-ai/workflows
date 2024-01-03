@@ -1,3 +1,10 @@
+name: Sync to GitLab
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -12,7 +19,6 @@ jobs:
 
       - name: Add GitLab remote
         run: |
-          # 使用环境变量中的访问令牌来设置GitLab远程仓库的URL
           git remote add gitlab https://oauth2:${{ secrets.GITLAB_ACCESS_TOKEN }}@gitlab.com/devchat-ai/workflows.git
 
       - name: Retry Command
