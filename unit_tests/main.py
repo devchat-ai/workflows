@@ -42,9 +42,7 @@ def generate_unit_tests_workflow(
         chat_language=tui_lang.chat_language,
     )
 
-    ref_files = find_reference_tests(
-        repo_root, func_to_test.func_name, func_to_test.file_path
-    )
+    ref_files = find_reference_tests(repo_root, func_to_test.func_name, func_to_test.file_path)
     ref_file = ref_files[0] if ref_files else ""
 
     cases_checkbox = Checkbox(
@@ -60,19 +58,15 @@ def generate_unit_tests_workflow(
     new_ref_file = ref_file_editor.new_text
 
     # Check user input
-    # check if any test case is selected
+    # Check if any test case is selected
     if not cases_checkbox.selections:
-        raise UserCancelledException(
-            _i("No test case is selected. Quit generating tests.")
-        )
+        raise UserCancelledException(_i("No test case is selected. Quit generating tests."))
 
-    # validate reference file
+    # Validate reference file
     try:
         retrieve_file_content(file_path=new_ref_file, root_path=repo_root)
     except Exception as e:
-        msg = _i(
-            "Failed to retrieve the reference file. Will not use reference to generate tests."
-        )
+        msg = _i("Failed to retrieve the reference file. Will not use reference to generate tests.")
         info = "\n\n```Step\n"
         info += f"# {msg}\n"
         info += f"\n{e}\n```\n\n"
@@ -126,23 +120,6 @@ def main(
         container_start_line=container_start_line,
         container_end_line=container_end_line,
     )
-
-    # print("\n\n$$$$$$$$$$$\n\n")
-    # print(f"repo_root: {repo_root}\n\n")
-    # print(f"user_prompt: {user_prompt}\n\n")
-    # print(f"func_name: {func_name}\n\n")
-    # print(func_to_test, "\n\n")
-    # print("func_content: \n\n")
-    # print("```")
-    # print(func_to_test.func_content)
-    # print("```")
-    # print("container_content: \n\n")
-    # print("```")
-    # print(func_to_test.container_content)
-    # print("```")
-    # print(f"ide_lang: {ide_lang}\n\n")
-    # print(f"tui_lang: {tui_lang}, {tui_lang.language_code}, { tui_lang.chat_language}\n\n")
-    # print("\n\n$$$$$$$$$$$\n\n", flush=True)
 
     try:
         generate_unit_tests_workflow(user_prompt, func_to_test, tui_lang)
