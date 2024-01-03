@@ -17,7 +17,7 @@ def update_sys_path():
 
 
 update_sys_path()
-from llm_api import chat_completion_no_stream  # noqa: E402
+from llm_api import chat_completion_stream  # noqa: E402
 
 
 def load_commit_cache():
@@ -86,7 +86,7 @@ def get_commit_messages():
     prompt = prompt.replace("{__USER_INPUT__}", "").replace("{__DIFF__}", diff)
 
     messages = [{"role": "user", "content": prompt}]
-    response = chat_completion_no_stream(messages, {"model": "gpt-4-1106-preview"})
+    response = chat_completion_stream(messages, {"model": "gpt-4-1106-preview"})
 
     print(response.get("content", "")) if response.get("content", "") else print(response)
 

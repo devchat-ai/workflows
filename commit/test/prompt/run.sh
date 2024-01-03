@@ -3,7 +3,7 @@
 # 获取脚本所在目录
 SCRIPT_DIR=$(dirname "$0")
 TEST_DIR="${SCRIPT_DIR}"
-REQUIREMENTS_FILE="${TEST_DIR}/requirements.txt"
+REQUIREMENTS_FILE="${TEST_DIR}/requirements-test.txt"
 CONFIG_FILE="${TEST_DIR}/commit_message_prompt_config.yaml"
 
 # 安装Node.js依赖
