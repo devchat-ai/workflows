@@ -2,4 +2,5 @@
 line-length = 100
 
 [tool.ruff.lint]
+select = ["I"]           # Enable the isort rules
 extend-select = ["E501"] # explicitly adding the rules
