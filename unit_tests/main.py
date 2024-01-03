@@ -86,7 +86,7 @@ def main(
     repo_root = os.getcwd()
     ide_lang = ide_language()
     tui_lang = TUILanguage.from_str(ide_lang)
-    # tui_lang = TUILanguage.from_str("zh")
+    tui_lang = TUILanguage.from_str("zh")
     _i = get_translation(tui_lang)
 
     # Use relative path in inner logic
