@@ -9,7 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
 sys.path.append(os.path.dirname(__file__))
 
 from chatmark import Checkbox, Form, TextEditor  # noqa: E402
-from llm_api import chat_completion_no_stream  # noqa: E402
+from llm_api import chat_completion_stream  # noqa: E402
 from ide_services.services import log_info
 
 
@@ -52,7 +52,7 @@ def read_prompt_from_file(filename):
 script_path = os.path.dirname(__file__)
 PROMPT_FILENAME = os.path.join(script_path, "diffCommitMessagePrompt.txt")
 PROMPT_COMMIT_MESSAGE_BY_DIFF_USER_INPUT = read_prompt_from_file(PROMPT_FILENAME)
-prompt_commit_message_by_diff_user_input_llm_config = {"model": "gpt-4-1106-preview"}
+prompt_commit_message_by_diff_user_input_llm_config = {'model': os.environ.get('LLM_MODEL', 'gpt-3.5-turbo-1106')}
 
 
 language = ""
@@ -140,7 +140,8 @@ def get_marked_files(modified_files, staged_files):
     # Create a Form with both Checkbox instances
     form = Form(
         [
-            "Select files to commit:\n\Staged:\n\n",
+            "Select the files you've changed that you wish to include in this commit, "
+            "then click 'Submit'.\n\nStaged:\n\n",
             staged_checkbox,
             "Unstaged:\n\n",
             unstaged_checkbox,
@@ -222,7 +223,7 @@ def generate_commit_message_base_diff(user_input, diff):
     #     return {"content": ""}
 
     messages = [{"role": "user", "content": prompt}]
-    response = chat_completion_no_stream(
+    response = chat_completion_stream(
         messages, prompt_commit_message_by_diff_user_input_llm_config
     )
     assert_value(not response, "")
@@ -240,7 +241,10 @@ def display_commit_message_and_commit(commit_message):
         None。
 
     """
-    print("Edit commit meesage:\n\n")
+    print(("I've drafted a commit message for the code changes you selected. "
+          "You can edit this message in the widget below. After confirming "
+          "the message, click 'Commit', and I will proceed with the commit "
+          "using this message.\n\n"))
     text_editor = TextEditor(commit_message)
     text_editor.render()
 
@@ -274,7 +278,7 @@ def main():
     try:
         print(
             "I can help you generate a summary for your code commit. "
-            "Please follow the steps below to complete the process."
+            "Please follow the steps below to complete the process.\n\n"
         )
         # Ensure enough command line arguments are provided
         if len(sys.argv) < 3:
@@ -301,8 +305,7 @@ def main():
         rebuild_stage_list(selected_files)
 
         print(
-            "Step 2/2: Generate commit message, "
-            "Edit commit message and click submit button to commit",
+            "Step 2/2: Generating commit message ...",
             end="\n\n",
             flush=True,
         )
