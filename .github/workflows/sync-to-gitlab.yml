@@ -14,8 +14,8 @@ jobs:
 
       - name: Setup Git
         run: |
-          git config user.name "bobo"
-          git config user.email "bobo.yang@merico.dev"
+          git config user.name "gh-action"
+          git config user.email "gh-action@merico.dev"
 
       - name: Add GitLab remote
         run: |
