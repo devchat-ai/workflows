@@ -13,6 +13,26 @@ from llm_api import chat_completion_stream  # noqa: E402
 from ide_services.services import log_info
 
 
+def extract_markdown_block(text):
+    """
+    Extracts the first Markdown code block from the given text without the language specifier.
+
+    :param text: A string containing Markdown text
+    :return: The content of the first Markdown code block, or None if not found
+    """
+    # 正则表达式匹配Markdown代码块，忽略可选的语言类型标记
+    pattern = r"```(?:\w+)?\s*\n(.*?)\n```"
+    match = re.search(pattern, text, re.DOTALL)
+
+    if match:
+        # 返回第一个匹配的代码块内容，去除首尾的反引号和语言类型标记
+        # 去除块结束标记前的一个换行符，但保留其他内容
+        block_content = match.group(1)
+        return block_content
+    else:
+        return text
+
+
 # Read the prompt from the diffCommitMessagePrompt.txt file
 def read_prompt_from_file(filename):
     """
@@ -117,7 +137,7 @@ def get_modified_files():
             if os.path.isdir(filename):
                 continue
             modified_files.append(os.path.normpath(strip_file_name(filename)))
-            if status[0:1] == "M" or status[0:1] == "A":
+            if status[0:1] == "M" or status[0:1] == "A" or status[0:1] == "D":
                 staged_files.append(os.path.normpath(strip_file_name(filename)))
     return modified_files, staged_files
 
@@ -195,6 +215,23 @@ def get_diff():
     return subprocess.check_output(["git", "diff", "--cached"])
 
 
+def get_current_branch():
+    try:
+        # 使用git命令获取当前分支名称
+        result = subprocess.check_output(
+            ["git", "branch", "--show-current"], stderr=subprocess.STDOUT
+        ).strip()
+        # 将结果从bytes转换为str
+        current_branch = result.decode("utf-8")
+        return current_branch
+    except subprocess.CalledProcessError:
+        # 如果发生错误，打印错误信息
+        return None
+    except FileNotFoundError:
+        # 如果未找到git命令，可能是没有安装git或者不在PATH中
+        return None
+
+
 def generate_commit_message_base_diff(user_input, diff):
     """
     根据diff信息，通过AI生成一个commit消息
@@ -227,6 +264,8 @@ def generate_commit_message_base_diff(user_input, diff):
     messages = [{"role": "user", "content": prompt}]
     response = chat_completion_stream(messages, prompt_commit_message_by_diff_user_input_llm_config)
     assert_value(not response, "")
+
+    response["content"] = extract_markdown_block(response["content"])
     return response
 
 
@@ -314,6 +353,9 @@ def main():
             flush=True,
         )
         diff = get_diff()
+        branch_name = get_current_branch()
+        if branch_name:
+            user_input += "\ncurrent repo branch name is:" + branch_name
         commit_message = generate_commit_message_base_diff(user_input, diff)
 
         # TODO
