@@ -7,6 +7,10 @@ class TokenBudgetExceededException(Exception):
     pass
 
 
+class UserCancelledException(Exception):
+    pass
+
+
 @dataclass
 class FuncToTest:
     func_name: str
