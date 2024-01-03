@@ -318,10 +318,12 @@ def main():
 
         # TODO
         # remove Closes #IssueNumber in commit message
-        commit_message["content"] = commit_message["content"]\
-            .replace("Closes #IssueNumber", "")\
-            .replace("No specific issue to close", "")\
+        commit_message["content"] = (
+            commit_message["content"]
+            .replace("Closes #IssueNumber", "")
+            .replace("No specific issue to close", "")
             .replace("No specific issue mentioned.", "")
+        )
 
         display_commit_message_and_commit(commit_message["content"])
         print("Commit completed.", flush=True)
