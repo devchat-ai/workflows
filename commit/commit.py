@@ -160,21 +160,27 @@ def get_marked_files(modified_files, staged_files):
     unstaged_checkbox = Checkbox(unstaged_files, [False] * len(unstaged_files))
 
     # Create a Form with both Checkbox instances
+    form_list = []
+    if len(staged_files) > 0:
+        form_list.append("Staged:\n\n")
+        form_list.append(staged_checkbox)
+    
+    if len(unstaged_files) > 0:
+        form_list.append("Unstaged:\n\n")
+        form_list.append(unstaged_checkbox)
+
     form = Form(
-        [
-            "Staged:\n\n",
-            staged_checkbox,
-            "Unstaged:\n\n",
-            unstaged_checkbox,
-        ]
+        form_list
     )
 
     # Render the Form and get user input
     form.render()
 
     # Retrieve the selected files from both Checkbox instances
-    selected_staged_files = [staged_files[idx] for idx in staged_checkbox.selections]
-    selected_unstaged_files = [unstaged_files[idx] for idx in unstaged_checkbox.selections]
+    staged_checkbox_selections = staged_checkbox.selections if staged_checkbox.selections else []
+    unstaged_checkbox_selections = unstaged_checkbox.selections if unstaged_checkbox.selections else []
+    selected_staged_files = [staged_files[idx] for idx in staged_checkbox_selections]
+    selected_unstaged_files = [unstaged_files[idx] for idx in unstaged_checkbox_selections]
 
     # Combine the selections from both checkboxes
     selected_files = selected_staged_files + selected_unstaged_files
