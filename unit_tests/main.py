@@ -1,4 +1,3 @@
-from typing import Optional
 import os
 import sys
 import click
@@ -83,24 +82,35 @@ def generate_unit_tests_workflow(
 
 
 @click.command()
-@click.argument("user_prompt", required=True)
-@click.option("-fn", "--func_name", required=True, type=str)
-@click.option("-fp", "--file_path", required=True, type=str)
-@click.option("-fsl", "--func_start_line", required=True, type=int)
-@click.option("-fel", "--func_end_line", required=True, type=int)
-# Optional container_name is not well supported in Shortcut button's variable
-# @click.option("-cn", "--container_name", required=False, type=str)
-@click.option("-csl", "--container_start_line", required=False, type=int)
-@click.option("-cel", "--container_end_line", required=False, type=int)
-def main(
-    user_prompt: str,
-    func_name: str,
-    file_path: str,
-    func_start_line: Optional[int],  # 0-based, inclusive
-    func_end_line: Optional[int],  # 0-based, inclusive
-    container_start_line: Optional[int],  # 0-based, inclusive
-    container_end_line: Optional[int],  # 0-based, inclusive
-):
+@click.argument("input", required=True)
+def main(input: str):
+    """
+    The main entry point for the unit tests generation workflow.
+    "/unit_tests {a}:::{b}:::{c}:::{d}:::{e}:::{f}"
+    """
+    # Parse input
+    params = input.strip().split(":::")
+    assert len(params) == 6, f"Invalid input: {input}, number of params: {len(params)}"
+
+    (
+        file_path,
+        func_name,
+        func_start_line,  # 0-based, inclusive
+        func_end_line,  # 0-based, inclusive
+        container_start_line,  # 0-based, inclusive
+        container_end_line,  # 0-based, inclusive
+    ) = params
+
+    try:
+        func_start_line = int(func_start_line)
+        func_end_line = int(func_end_line)
+        container_start_line = int(container_start_line)
+        container_end_line = int(container_end_line)
+    except Exception as e:
+        raise Exception(f"Invalid input: {input}, error: {e}")
+
+    user_prompt = f"Help me write unit tests for the `{func_name}` function"
+
     repo_root = os.getcwd()
     ide_lang = ide_language()
     tui_lang = TUILanguage.from_str(ide_lang)
@@ -138,8 +148,7 @@ def main(
         print(info, flush=True)
 
     except Exception as e:
-        print(e, file=sys.stderr, flush=True)
-        sys.exit(1)
+        raise e
 
 
 if __name__ == "__main__":
