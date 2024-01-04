@@ -322,7 +322,12 @@ def main():
         if not check_git_installed():
             sys.exit(-1)
 
-        print("Step 1/2: Select the files you've changed that you wish to include in this commit, then click 'Submit'.", end="\n\n", flush=True)
+        print(
+            "Step 1/2: Select the files you've changed that you wish to include in this commit, "
+            "then click 'Submit'.",
+            end="\n\n",
+            flush=True,
+        )
         modified_files, staged_files = get_modified_files()
         if len(modified_files) == 0:
             print("No files to commit.", file=sys.stderr, flush=True)
@@ -337,7 +342,8 @@ def main():
 
         print(
             "Step 2/2: Review the commit message I've drafted for you. "
-            "Edit it below if needed. Then click 'Commit' to proceed with the commit using this message.",
+            "Edit it below if needed. Then click 'Commit' to proceed with "
+            "the commit using this message.",
             end="\n\n",
             flush=True,
         )
