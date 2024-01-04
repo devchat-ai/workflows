@@ -178,9 +178,9 @@ def get_marked_files(modified_files, staged_files):
 
     # Retrieve the selected files from both Checkbox instances
     staged_checkbox_selections = staged_checkbox.selections if staged_checkbox.selections else []
-    unstaged_checkbox_selections = unstaged_checkbox.selections if unstaged_checkbox.selections else []
+    unstaged_selections = unstaged_checkbox.selections if unstaged_checkbox.selections else []
     selected_staged_files = [staged_files[idx] for idx in staged_checkbox_selections]
-    selected_unstaged_files = [unstaged_files[idx] for idx in unstaged_checkbox_selections]
+    selected_unstaged_files = [unstaged_files[idx] for idx in unstaged_selections]
 
     # Combine the selections from both checkboxes
     selected_files = selected_staged_files + selected_unstaged_files
