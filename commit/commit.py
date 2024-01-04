@@ -164,14 +164,12 @@ def get_marked_files(modified_files, staged_files):
     if len(staged_files) > 0:
         form_list.append("Staged:\n\n")
         form_list.append(staged_checkbox)
-    
+
     if len(unstaged_files) > 0:
         form_list.append("Unstaged:\n\n")
         form_list.append(unstaged_checkbox)
 
-    form = Form(
-        form_list
-    )
+    form = Form(form_list)
 
     # Render the Form and get user input
     form.render()
