@@ -162,8 +162,7 @@ def get_marked_files(modified_files, staged_files):
     # Create a Form with both Checkbox instances
     form = Form(
         [
-            "Select the files you've changed that you wish to include in this commit, "
-            "then click 'Submit'.\n\nStaged:\n\n",
+            "Staged:\n\n",
             staged_checkbox,
             "Unstaged:\n\n",
             unstaged_checkbox,
@@ -280,21 +279,13 @@ def display_commit_message_and_commit(commit_message):
         None。
 
     """
-    print(
-        (
-            "I've drafted a commit message for the code changes you selected. "
-            "You can edit this message in the widget below. After confirming "
-            "the message, click 'Commit', and I will proceed with the commit "
-            "using this message.\n\n"
-        )
-    )
     text_editor = TextEditor(commit_message)
     text_editor.render()
 
     new_commit_message = text_editor.new_text
     if not new_commit_message:
-        return
-    subprocess.check_output(["git", "commit", "-m", new_commit_message])
+        return None
+    return subprocess.check_output(["git", "commit", "-m", new_commit_message])
 
 
 def check_git_installed():
@@ -319,10 +310,7 @@ def check_git_installed():
 def main():
     global language
     try:
-        print(
-            "I can help you generate a summary for your code commit. "
-            "Please follow the steps below to complete the process.\n\n"
-        )
+        print("Let's follow the steps below.\n\n")
         # Ensure enough command line arguments are provided
         if len(sys.argv) < 3:
             print("Usage: python script.py <user_input> <language>", file=sys.stderr, flush=True)
@@ -334,7 +322,12 @@ def main():
         if not check_git_installed():
             sys.exit(-1)
 
-        print("Step 1/2: Please select the file to be submitted.", end="\n\n", flush=True)
+        print(
+            "Step 1/2: Select the files you've changed that you wish to include in this commit, "
+            "then click 'Submit'.",
+            end="\n\n",
+            flush=True,
+        )
         modified_files, staged_files = get_modified_files()
         if len(modified_files) == 0:
             print("No files to commit.", file=sys.stderr, flush=True)
@@ -348,7 +341,9 @@ def main():
         rebuild_stage_list(selected_files)
 
         print(
-            "Step 2/2: Generating commit message ...",
+            "Step 2/2: Review the commit message I've drafted for you. "
+            "Edit it below if needed. Then click 'Commit' to proceed with "
+            "the commit using this message.",
             end="\n\n",
             flush=True,
         )
@@ -367,8 +362,11 @@ def main():
             .replace("No specific issue mentioned.", "")
         )
 
-        display_commit_message_and_commit(commit_message["content"])
-        print("Commit completed.", flush=True)
+        commit_result = display_commit_message_and_commit(commit_message["content"])
+        if not commit_result:
+            print("Commit aborted.", flush=True)
+        else:
+            print("Commit completed.", flush=True)
         sys.exit(0)
     except Exception as err:
         print("Exception:", err, file=sys.stderr, flush=True)

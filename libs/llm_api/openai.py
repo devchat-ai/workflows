@@ -74,7 +74,7 @@ def chat_completion_stream(messages, llm_config, error_out: bool = True, stream_
                         response_result["content"] = delta["content"]
             return response_result
         except (openai.APIConnectionError, openai.APITimeoutError) as err:
-            log_warn(f"Exception: {err}")
+            log_warn(f"Exception: {err.__class__.__name__}: {err}")
             if try_times >= 2:
                 return None
             continue
