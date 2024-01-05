@@ -14,6 +14,8 @@ class Form:
         self,
         components: List[Union[Widget, str]],
         title: Optional[str] = None,
+        submit_button_name = "Submit",
+        cancel_button_name = "Cancel"
     ):
         """
         components: components in the form, can be widgets (except Button) or strings
@@ -27,6 +29,8 @@ class Form:
         self._title = title
 
         self._rendered = False
+        self._submit = submit_button_name
+        self._cancel = cancel_button_name
 
     @property
     def components(self) -> List[Union[Widget, str]]:
@@ -75,7 +79,7 @@ class Form:
         self._rendered = True
 
         lines = [
-            "```chatmark type=form",
+            f"```chatmark submit={self._submit} cancel={self._cancel}",
             self._in_chatmark(),
             "```",
         ]
