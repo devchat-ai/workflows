@@ -169,7 +169,7 @@ def get_marked_files(modified_files, staged_files):
         form_list.append("Unstaged:\n\n")
         form_list.append(unstaged_checkbox)
 
-    form = Form(form_list)
+    form = Form(form_list, submit_button_name="Continue")
 
     # Render the Form and get user input
     form.render()
@@ -283,7 +283,7 @@ def display_commit_message_and_commit(commit_message):
         None。
 
     """
-    text_editor = TextEditor(commit_message)
+    text_editor = TextEditor(commit_message, submit_button_name="Commit")
     text_editor.render()
 
     new_commit_message = text_editor.new_text

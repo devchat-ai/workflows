@@ -9,10 +9,12 @@ class Widget(ABC):
     Abstract base class for widgets
     """
 
-    def __init__(self):
+    def __init__(self, submit: Optional[str] = None, cancel: Optional[str] = None):
         self._rendered = False
         # Prefix for IDs/keys in the widget
         self._id_prefix = self.gen_id_prefix()
+        self._submit = submit
+        self._cancel = cancel
 
     @abstractmethod
     def _in_chatmark(self) -> str:
@@ -40,8 +42,12 @@ class Widget(ABC):
 
         self._rendered = True
 
+        chatmark_header = "```chatmark"
+        chatmark_header += f" submit={self._submit}" if self._submit else ""
+        chatmark_header += f" cancel={self._cancel}" if self._cancel else ""
+
         lines = [
-            "```chatmark",
+            chatmark_header,
             self._in_chatmark(),
             "```",
         ]
@@ -89,13 +95,15 @@ class Checkbox(Widget):
         options: List[str],
         check_states: Optional[List[bool]] = None,
         title: Optional[str] = None,
+        submit_button_name: str = "Submit",
+        cancel_button_name: str = "Cancel",
     ):
         """
         options: options to be selected
         check_states: initial check states of options, default to all False
         title: title of the widget
         """
-        super().__init__()
+        super().__init__(submit_button_name, cancel_button_name)
 
         if check_states is not None:
             assert len(options) == len(check_states)
@@ -183,8 +191,14 @@ class TextEditor(Widget):
     ```
     """
 
-    def __init__(self, text: str, title: Optional[str] = None):
-        super().__init__()
+    def __init__(
+        self,
+        text: str,
+        title: Optional[str] = None,
+        submit_button_name: str = "Submit",
+        cancel_button_name: str = "Cancel",
+    ):
+        super().__init__(submit_button_name, cancel_button_name)
 
         self._title = title
         self._text = text
@@ -236,25 +250,25 @@ class Radio(Widget):
     def __init__(
         self,
         options: List[str],
-        # TODO: implement default_selected after the design is ready
-        # default_selected: Optional[int] = None,
+        default_selected: Optional[int] = None,
         title: Optional[str] = None,
+        submit_button_name: str = "Submit",
+        cancel_button_name: str = "Cancel",
     ) -> None:
         """
         options: options to be selected
         default_selected: index of the option to be selected by default, default to None
         title: title of the widget
         """
-        # TODO: implement default_selected after the design is ready
-        # if default_selected is not None:
-        #     assert 0 <= default_selected < len(options)
+        if default_selected is not None:
+            assert 0 <= default_selected < len(options)
 
-        super().__init__()
+        super().__init__(submit_button_name, cancel_button_name)
 
         self._options = options
         self._title = title
 
-        self._selection: Optional[int] = None
+        self._selection: Optional[int] = default_selected
 
     @property
     def options(self) -> List[str]:
@@ -282,7 +296,10 @@ class Radio(Widget):
 
         for idx, option in enumerate(self._options):
             key = self.gen_id(self._id_prefix, idx)
-            lines.append(f"> - ({key}) {option}")
+            if self._selection is not None and self._selection == idx:
+                lines.append(f"> x ({key}) {option}")
+            else:
+                lines.append(f"> - ({key}) {option}")
 
         text = "\n".join(lines)
         return text
