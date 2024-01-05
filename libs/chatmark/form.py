@@ -14,8 +14,8 @@ class Form:
         self,
         components: List[Union[Widget, str]],
         title: Optional[str] = None,
-        submit_button_name = "Submit",
-        cancel_button_name = "Cancel"
+        submit_button_name="Submit",
+        cancel_button_name="Cancel",
     ):
         """
         components: components in the form, can be widgets (except Button) or strings

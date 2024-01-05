@@ -41,7 +41,7 @@ class Widget(ABC):
             raise RuntimeError("Widget can only be rendered once")
 
         self._rendered = True
-        
+
         if self._submit is None:
             chatmark_header = "```chatmark"
         else:
@@ -97,7 +97,7 @@ class Checkbox(Widget):
         check_states: Optional[List[bool]] = None,
         title: Optional[str] = None,
         submit_button_name: str = "Submit",
-        cancel_button_name: str = "Cancel"
+        cancel_button_name: str = "Cancel",
     ):
         """
         options: options to be selected
@@ -192,11 +192,13 @@ class TextEditor(Widget):
     ```
     """
 
-    def __init__(self,
-                 text: str,
-                 title: Optional[str] = None,
-                 submit_button_name: str = "Submit",
-                 cancel_button_name: str = "Cancel"):
+    def __init__(
+        self,
+        text: str,
+        title: Optional[str] = None,
+        submit_button_name: str = "Submit",
+        cancel_button_name: str = "Cancel",
+    ):
         super().__init__(submit_button_name, cancel_button_name)
 
         self._title = title
@@ -252,7 +254,7 @@ class Radio(Widget):
         default_selected: Optional[int] = None,
         title: Optional[str] = None,
         submit_button_name: str = "Submit",
-        cancel_button_name: str = "Cancel"
+        cancel_button_name: str = "Cancel",
     ) -> None:
         """
         options: options to be selected
