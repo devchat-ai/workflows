@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-03 16:28+0800\n"
+"POT-Creation-Date: 2024-01-05 10:12+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,28 +17,28 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: main.py:33
+#: main.py:32
 msgid "Analyzing the function and current unit tests..."
 msgstr ""
 
-#: main.py:50
+#: main.py:49
 msgid "Select test cases to generate"
 msgstr ""
 
-#: main.py:52
+#: main.py:51
 msgid "Edit reference test file"
 msgstr ""
 
-#: main.py:63
+#: main.py:62
 msgid "No test case is selected. Quit generating tests."
 msgstr ""
 
-#: main.py:69
+#: main.py:68
 msgid ""
 "Failed to retrieve the reference file. Will not use reference to generate "
 "tests."
 msgstr ""
 
-#: main.py:128
-msgid "The funciton is too large for AI to handle."
+#: main.py:137
+msgid "The function's size surpasses AI's context capacity."
 msgstr ""
