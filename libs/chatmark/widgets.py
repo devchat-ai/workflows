@@ -9,7 +9,7 @@ class Widget(ABC):
     Abstract base class for widgets
     """
 
-    def __init__(self, submit: Optional[str] = None, cancel: str = "Cancel"):
+    def __init__(self, submit: Optional[str] = None, cancel: Optional[str] = None):
         self._rendered = False
         # Prefix for IDs/keys in the widget
         self._id_prefix = self.gen_id_prefix()
@@ -42,10 +42,9 @@ class Widget(ABC):
 
         self._rendered = True
 
-        if self._submit is None:
-            chatmark_header = "```chatmark"
-        else:
-            chatmark_header = f"```chatmark submit={self._submit} cancel={self._cancel}"
+        chatmark_header = "```chatmark"
+        chatmark_header += f" submit={self._submit}" if self._submit else ""
+        chatmark_header += f" cancel={self._cancel}" if self._cancel else ""
 
         lines = [
             chatmark_header,
@@ -261,9 +260,8 @@ class Radio(Widget):
         default_selected: index of the option to be selected by default, default to None
         title: title of the widget
         """
-        # TODO: implement default_selected after the design is ready
-        # if default_selected is not None:
-        #     assert 0 <= default_selected < len(options)
+        if default_selected is not None:
+            assert 0 <= default_selected < len(options)
 
         super().__init__(submit_button_name, cancel_button_name)
 
@@ -299,7 +297,7 @@ class Radio(Widget):
         for idx, option in enumerate(self._options):
             key = self.gen_id(self._id_prefix, idx)
             if self._selection is not None and self._selection == idx:
-                lines.append(f"> X ({key}) {option}")
+                lines.append(f"> x ({key}) {option}")
             else:
                 lines.append(f"> - ({key}) {option}")
 
