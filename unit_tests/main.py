@@ -134,7 +134,7 @@ def main(input: str):
         generate_unit_tests_workflow(user_prompt, func_to_test, tui_lang)
 
     except TokenBudgetExceededException as e:
-        msg = _i("The funciton is too large for AI to handle.")
+        msg = _i("The function's size surpasses AI's context capacity.")
 
         info = "\n\n```Step\n"
         info += f"# {msg}\n"
