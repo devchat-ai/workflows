@@ -1,8 +1,8 @@
 # flake8: noqa: E402
-import re
-import os
-import sys
 import json
+import os
+import re
+import sys
 
 import openai
 

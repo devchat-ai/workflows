@@ -1,5 +1,5 @@
-from .widgets import Checkbox, TextEditor, Radio, Button
 from .form import Form
+from .widgets import Button, Checkbox, Radio, TextEditor
 
 __all__ = [
     "Checkbox",

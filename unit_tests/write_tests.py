@@ -1,13 +1,11 @@
-from typing import List, Optional
 from functools import partial
+from typing import List, Optional
 
 import tiktoken
-
 from chat.ask_codebase.tools.retrieve_file_content import retrieve_file_content
+from model import FuncToTest, TokenBudgetExceededException
 from openai_util import create_chat_completion_chunks
 from prompts import WRITE_TESTS_PROMPT
-from model import FuncToTest, TokenBudgetExceededException
-
 
 MODEL = "gpt-4-1106-preview"
 TOKEN_BUDGET = int(128000 * 0.9)
