@@ -1,0 +1,56 @@
+# Chinese translations for PACKAGE package.
+# Copyright (C) 2023 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# kagami <mingjing@merico.dev>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-03 16:28+0800\n"
+"PO-Revision-Date: 2023-12-24 16:51+0800\n"
+"Last-Translator: kagami <mingjing@merico.dev>\n"
+"Language-Team: Chinese\n"
+"Language: zh\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: main.py:33
+msgid "Analyzing the function and current unit tests..."
+msgstr "正在分析目标函数和项目中现有的单元测试……"
+
+#: main.py:50
+msgid "Select test cases to generate"
+msgstr "选择测试用例以生成单元测试"
+
+#: main.py:52
+msgid "Edit reference test file"
+msgstr "参考的测试文件"
+
+#: main.py:63
+msgid "No test case is selected. Quit generating tests."
+msgstr "未选择测试用例，退出生成单元测试。"
+
+#: main.py:69
+msgid ""
+"Failed to retrieve the reference file. Will not use reference to generate "
+"tests."
+msgstr "无法获取参考文件的内容，生成单元测试时将不使用参考。"
+
+#: main.py:128
+msgid "The funciton is too large for AI to handle."
+msgstr "由于当前函数过大，AI暂时无法处理。"
+
+#~ msgid "proposed cases"
+#~ msgstr "建议的测试用例"
+
+#~ msgid "hello"
+#~ msgstr "你好"
+
+#~ msgid ""
+#~ "Complete analyzing.\n"
+#~ "```"
+#~ msgstr ""
+#~ "完成分析.\n"
+#~ "```"
