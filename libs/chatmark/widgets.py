@@ -249,8 +249,7 @@ class Radio(Widget):
     def __init__(
         self,
         options: List[str],
-        # TODO: implement default_selected after the design is ready
-        # default_selected: Optional[int] = None,
+        default_selected: Optional[int] = None,
         title: Optional[str] = None,
         submit_button_name: str = "Submit",
         cancel_button_name: str = "Cancel"
@@ -269,7 +268,7 @@ class Radio(Widget):
         self._options = options
         self._title = title
 
-        self._selection: Optional[int] = None
+        self._selection: Optional[int] = default_selected
 
     @property
     def options(self) -> List[str]:
@@ -297,7 +296,10 @@ class Radio(Widget):
 
         for idx, option in enumerate(self._options):
             key = self.gen_id(self._id_prefix, idx)
-            lines.append(f"> - ({key}) {option}")
+            if self._selection is not None and self._selection == idx:
+                lines.append(f"> X ({key}) {option}")
+            else:
+                lines.append(f"> - ({key}) {option}")
 
         text = "\n".join(lines)
         return text
