@@ -1,6 +1,7 @@
-from typing import List, Optional, Dict, Union
+from typing import Dict, List, Optional, Union
+
 from .iobase import pipe_interaction
-from .widgets import Widget, Button
+from .widgets import Button, Widget
 
 
 class Form:

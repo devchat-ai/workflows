@@ -1,6 +1,7 @@
-import requests
 import os
 from functools import wraps
+
+import requests
 
 BASE_SERVER_URL = os.environ.get("DEVCHAT_IDE_SERVICE_URL", "http://localhost:3000")
 

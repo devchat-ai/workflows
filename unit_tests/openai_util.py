@@ -1,4 +1,5 @@
 from typing import Optional
+
 from openai import OpenAI, Stream
 from openai.types.chat import ChatCompletionChunk
 from tenacity import retry, stop_after_attempt, wait_random_exponential

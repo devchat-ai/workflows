@@ -1,7 +1,8 @@
-from typing import List, Optional, Dict, Tuple
-from .iobase import pipe_interaction
 from abc import ABC, abstractmethod
+from typing import Dict, List, Optional, Tuple
 from uuid import uuid4
+
+from .iobase import pipe_interaction
 
 
 class Widget(ABC):

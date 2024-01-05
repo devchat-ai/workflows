@@ -1,10 +1,10 @@
-import sys
 import os
+import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
 
-from chatmark import Checkbox, TextEditor, Radio, Button, Form  # noqa: E402
+from chatmark import Button, Checkbox, Form, Radio, TextEditor  # noqa: E402
 
 
 def main():

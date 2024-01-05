@@ -1,19 +1,17 @@
 import os
 import sys
+
 import click
-
 from chat.ask_codebase.tools.retrieve_file_content import retrieve_file_content
-
-from propose_test import propose_test
 from find_reference_tests import find_reference_tests
-from write_tests import write_and_print_tests
 from i18n import TUILanguage, get_translation
-
 from model import FuncToTest, TokenBudgetExceededException, UserCancelledException
+from propose_test import propose_test
+from write_tests import write_and_print_tests
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 
-from chatmark import Checkbox, TextEditor, Form  # noqa: E402
+from chatmark import Checkbox, Form, TextEditor  # noqa: E402
 from ide_services import ide_language  # noqa: E402
 
 

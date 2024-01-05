@@ -1,13 +1,11 @@
-from typing import List
+import json
 from functools import partial
+from typing import List
 
 import tiktoken
-import json
-
+from model import FuncToTest, TokenBudgetExceededException
 from openai_util import create_chat_completion_content
 from prompts import PROPOSE_TEST_PROMPT
-from model import FuncToTest, TokenBudgetExceededException
-
 
 MODEL = "gpt-3.5-turbo-1106"
 # MODEL = "gpt-4-1106-preview"

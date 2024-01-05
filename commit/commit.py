@@ -1,16 +1,16 @@
 # flake8: noqa: E402
 import os
 import re
-import sys
 import subprocess
+import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
 sys.path.append(os.path.dirname(__file__))
 
 from chatmark import Checkbox, Form, TextEditor  # noqa: E402
-from llm_api import chat_completion_stream  # noqa: E402
 from ide_services.services import log_info
+from llm_api import chat_completion_stream  # noqa: E402
 
 
 def extract_markdown_block(text):

@@ -1,5 +1,6 @@
 import os
 import sys
+
 from chat.ask_codebase.chains.smart_qa import SmartQA
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
