@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-05 10:12+0800\n"
+"POT-Creation-Date: 2024-01-11 21:35+0800\n"
 "PO-Revision-Date: 2023-12-24 16:51+0800\n"
 "Last-Translator: kagami <mingjing@merico.dev>\n"
 "Language-Team: English\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: main.py:32
+#: main.py:30
 msgid "Analyzing the function and current unit tests..."
 msgstr ""
 
@@ -25,21 +25,37 @@ msgstr ""
 msgid "Select test cases to generate"
 msgstr ""
 
-#: main.py:51
-msgid "Edit reference test file"
-msgstr ""
-
-#: main.py:62
-msgid "No test case is selected. Quit generating tests."
+#: main.py:54
+msgid ""
+"Edit reference test file\n"
+"(Multiple files can be separated by line breaks)"
 msgstr ""
 
 #: main.py:68
-msgid ""
-"Failed to retrieve the reference file. Will not use reference to generate "
-"tests."
+msgid "No test case is selected. Quit generating tests."
 msgstr ""
 
-#: main.py:137
+#: main.py:90
+msgid "No valid file is provided. Will not use reference to generate tests."
+msgstr ""
+
+#: main.py:93
+msgid "Will use the following reference files to generate tests:"
+msgstr ""
+
+#: main.py:94
+msgid ""
+"\n"
+"Valid reference files:"
+msgstr ""
+
+#: main.py:98
+msgid ""
+"\n"
+"Invalid files:"
+msgstr ""
+
+#: main.py:169
 msgid "The function's size surpasses AI's context capacity."
 msgstr ""
 

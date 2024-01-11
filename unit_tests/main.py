@@ -39,9 +39,7 @@ def generate_unit_tests_workflow(
         chat_language=tui_lang.chat_language,
     )
 
-    ref_files = find_reference_tests(
-        repo_root, func_to_test.func_name, func_to_test.file_path
-    )
+    ref_files = find_reference_tests(repo_root, func_to_test.func_name, func_to_test.file_path)
     ref_file = ref_files[0] if ref_files else ""
 
     cases_checkbox = Checkbox(
@@ -50,9 +48,7 @@ def generate_unit_tests_workflow(
     )
     ref_file_editor = TextEditor(
         text=ref_file,
-        title=_i(
-            "Edit reference test file\n(Multiple files can be separated by line breaks)"
-        ),
+        title=_i("Edit reference test file\n(Multiple files can be separated by line breaks)"),
     )
 
     form = Form(components=[cases_checkbox, ref_file_editor])
@@ -64,9 +60,7 @@ def generate_unit_tests_workflow(
     # Check user input
     # Check if any test case is selected
     if not cases_checkbox.selections:
-        raise UserCancelledException(
-            _i("No test case is selected. Quit generating tests.")
-        )
+        raise UserCancelledException(_i("No test case is selected. Quit generating tests."))
 
     # Validate reference files
     valid_files = []
@@ -86,9 +80,7 @@ def generate_unit_tests_workflow(
     title = ""
     lines = []
     if not valid_files:
-        title = _i(
-            "No valid file is provided. Will not use reference to generate tests."
-        )
+        title = _i("No valid file is provided. Will not use reference to generate tests.")
     else:
         title = _i("Will use the following reference files to generate tests:")
         lines.append(_i("\nValid reference files:"))
