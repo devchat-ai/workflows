@@ -11,7 +11,7 @@ from write_tests import write_and_print_tests
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 
-from chatmark import Checkbox, Form, TextEditor  # noqa: E402
+from chatmark import Checkbox, Form, Step, TextEditor  # noqa: E402
 from ide_services import ide_language  # noqa: E402
 
 
@@ -28,18 +28,16 @@ def generate_unit_tests_workflow(
     _i = get_translation(tui_lang)
 
     msg = _i("Analyzing the function and current unit tests...")
-    print(
-        f"\n\n```Step\n# {msg}\n```\n",
-        flush=True,
-    )
 
-    test_cases = propose_test(
-        user_prompt=user_prompt,
-        func_to_test=func_to_test,
-        chat_language=tui_lang.chat_language,
-    )
+    with Step(msg):
+        test_cases = propose_test(
+            user_prompt=user_prompt,
+            func_to_test=func_to_test,
+            chat_language=tui_lang.chat_language,
+        )
 
-    ref_files = find_reference_tests(repo_root, func_to_test.func_name, func_to_test.file_path)
+        ref_files = find_reference_tests(repo_root, func_to_test.func_name, func_to_test.file_path)
+
     ref_file = ref_files[0] if ref_files else ""
 
     cases_checkbox = Checkbox(
@@ -90,11 +88,8 @@ def generate_unit_tests_workflow(
         lines.append(_i("\nInvalid files:"))
         lines.extend(invalid_files)
 
-    info = "\n\n```Step\n"
-    info += f"# {title}\n"
-    info += "\n".join(lines)
-    info += "\n```\n\n"
-    print(info, flush=True)
+    with Step(title):
+        print("\n".join(lines), flush=True)
 
     write_and_print_tests(
         root_path=repo_root,
@@ -160,16 +155,12 @@ def main(input: str):
     except TokenBudgetExceededException as e:
         msg = _i("The function's size surpasses AI's context capacity.")
 
-        info = "\n\n```Step\n"
-        info += f"# {msg}\n"
-        info += f"\n{e}\n```\n"
-        print(info, flush=True)
+        with Step(msg):
+            print(f"\n{e}\n", flush=True)
 
     except UserCancelledException as e:
-        info = "\n\n```Step\n"
-        info += f"# {e}\n"
-        info += "\n```\n"
-        print(info, flush=True)
+        with Step(f"{e}"):
+            pass
 
     except Exception as e:
         raise e
