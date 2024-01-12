@@ -1,14 +1,33 @@
 import os
 import sys
+import time
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
 
-from chatmark import Button, Checkbox, Form, Radio, TextEditor  # noqa: E402
+from chatmark import Button, Checkbox, Form, Radio, Step, TextEditor  # noqa: E402
 
 
 def main():
     print("\n\n---\n\n")
+
+    # Step
+    print("\n\n# Step Example\n\n")
+    with Step("Something is running..."):
+        print("Will sleep for 5 seconds...", flush=True)
+        time.sleep(5)
+        print("Done", flush=True)
+
+    print("\n\n# Step Example with exception\n\n")
+    try:
+        with Step("Something is running (will raise exception)..."):
+            print("Will sleep for 5 seconds...", flush=True)
+            time.sleep(5)
+            raise Exception("oops!")
+
+    except Exception:
+        pass
+
     # Button
     print("\n\n# Button Example\n\n")
     button = Button(
