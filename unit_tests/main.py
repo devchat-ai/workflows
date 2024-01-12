@@ -46,35 +46,61 @@ def generate_unit_tests_workflow(
         options=test_cases,
         title=_i("Select test cases to generate"),
     )
-    ref_file_editor = TextEditor(text=ref_file, title=_i("Edit reference test file"))
+    ref_file_editor = TextEditor(
+        text=ref_file,
+        title=_i("Edit reference test file\n(Multiple files can be separated by line breaks)"),
+    )
 
     form = Form(components=[cases_checkbox, ref_file_editor])
     form.render()
 
     selected_cases = [cases_checkbox.options[idx] for idx in cases_checkbox.selections]
-    new_ref_file = ref_file_editor.new_text
+    new_refs = ref_file_editor.new_text
 
     # Check user input
     # Check if any test case is selected
     if not cases_checkbox.selections:
         raise UserCancelledException(_i("No test case is selected. Quit generating tests."))
 
-    # Validate reference file
-    try:
-        retrieve_file_content(file_path=new_ref_file, root_path=repo_root)
-    except Exception as e:
-        msg = _i("Failed to retrieve the reference file. Will not use reference to generate tests.")
-        info = "\n\n```Step\n"
-        info += f"# {msg}\n"
-        info += f"\n{e}\n```\n\n"
-        print(info, flush=True)
-        new_ref_file = None
+    # Validate reference files
+    valid_files = []
+    invalid_files = []
+    ref_files = [f.strip() for f in new_refs.split("\n")]
+
+    for ref_file in ref_files:
+        if not ref_file:
+            continue
+        try:
+            retrieve_file_content(file_path=ref_file, root_path=repo_root)
+            valid_files.append(ref_file)
+
+        except Exception as e:
+            invalid_files.append(ref_file)
+
+    title = ""
+    lines = []
+    if not valid_files:
+        title = _i("No valid file is provided. Will not use reference to generate tests.")
+    else:
+        title = _i("Will use the following reference files to generate tests:")
+        lines.append(_i("\nValid reference files:"))
+        lines.extend(valid_files)
+
+    if invalid_files:
+        lines.append(_i("\nInvalid files:"))
+        lines.extend(invalid_files)
+
+    info = "\n\n```Step\n"
+    info += f"# {title}\n"
+    info += "\n".join(lines)
+    info += "\n```\n\n"
+    print(info, flush=True)
 
     write_and_print_tests(
         root_path=repo_root,
         func_to_test=func_to_test,
         test_cases=selected_cases,
-        reference_files=[new_ref_file] if new_ref_file else None,
+        reference_files=valid_files,
         chat_language=tui_lang.chat_language,
     )
 

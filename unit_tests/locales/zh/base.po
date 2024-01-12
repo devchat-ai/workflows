@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-05 10:12+0800\n"
+"POT-Creation-Date: 2024-01-11 21:35+0800\n"
 "PO-Revision-Date: 2023-12-24 16:51+0800\n"
 "Last-Translator: kagami <mingjing@merico.dev>\n"
 "Language-Team: Chinese\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: main.py:32
+#: main.py:30
 msgid "Analyzing the function and current unit tests..."
 msgstr "正在分析目标函数和项目中现有的单元测试……"
 
@@ -24,21 +24,43 @@ msgstr "正在分析目标函数和项目中现有的单元测试……"
 msgid "Select test cases to generate"
 msgstr "选择测试用例以生成单元测试"
 
-#: main.py:51
-msgid "Edit reference test file"
-msgstr "参考的测试文件"
+#: main.py:54
+msgid ""
+"Edit reference test file\n"
+"(Multiple files can be separated by line breaks)"
+msgstr ""
+"参考的测试文件\n"
+"（多个文件路径用换行分隔）"
 
-#: main.py:62
+#: main.py:68
 msgid "No test case is selected. Quit generating tests."
 msgstr "未选择测试用例，退出生成单元测试。"
 
-#: main.py:68
-msgid ""
-"Failed to retrieve the reference file. Will not use reference to generate "
-"tests."
-msgstr "无法获取参考文件的内容，生成单元测试时将不使用参考。"
+#: main.py:90
+msgid "No valid file is provided. Will not use reference to generate tests."
+msgstr "没有提供合法的文件，生成单元测试时将不使用参考。"
 
-#: main.py:137
+#: main.py:93
+msgid "Will use the following reference files to generate tests:"
+msgstr "将参考以下文件生成单元测试："
+
+#: main.py:94
+msgid ""
+"\n"
+"Valid reference files:"
+msgstr ""
+"\n"
+"参考文件："
+
+#: main.py:98
+msgid ""
+"\n"
+"Invalid files:"
+msgstr ""
+"\n"
+"不合法的文件："
+
+#: main.py:169
 msgid "The function's size surpasses AI's context capacity."
 msgstr "由于当前函数过大，AI暂时无法处理。"
 
