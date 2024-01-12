@@ -1,10 +1,15 @@
 import os
+import sys
 from typing import Optional
 
 import click
 from chat.ask_codebase.assistants.directory_structure.repo_explainer import (
     RepoStructureExplainer,
 )
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
+
+from chatmark import Step  # noqa: E402
 
 Languages = {
     "en": "English",
@@ -28,9 +33,9 @@ def main(objective: Optional[str], language: str):
 
     e = RepoStructureExplainer(root_path=repo_path, chat_language=chat_lang)
 
-    print("\n\n```Step\n# Analyzing codebase...\n", flush=True)
-    answer = e.analyze(user_query=objective)
-    print("Scanning complete.\n```", flush=True)
+    with Step("Analyzing codebase..."):
+        answer = e.analyze(user_query=objective)
+        print("Done.", flush=True)
 
     print(f"\n{answer}\n", flush=True)
 
