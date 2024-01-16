@@ -34,6 +34,7 @@ class UnitTestsWorkflow:
         Run the workflow to generate unit tests.
         """
         cases, files = self.step1_propose_cases_and_reference_files()
+
         cases, files = self.step2_edit_cases_and_reference_files(cases, files)
 
         self.step3_write_and_print_tests(cases, files)
@@ -82,22 +83,36 @@ class UnitTestsWorkflow:
             options=test_cases,
             title=_i("Select test cases to generate"),
         )
-        editor = TextEditor(
+        case_editor = TextEditor(
+            text="",
+            title=_i(
+                "You can add more test cases here\n"
+                "(Multiple cases can be separated by line breaks)"
+            ),
+        )
+        ref_editor = TextEditor(
             text=reference_files[0] if reference_files else "",
             title=_i("Edit reference test file\n(Multiple files can be separated by line breaks)"),
         )
 
-        form = Form(components=[checkbox, editor])
+        form = Form(components=[checkbox, case_editor, ref_editor])
         form.render()
 
+        # Check test cases
         cases = [checkbox.options[idx] for idx in checkbox.selections]
-        ref_files = [f.strip() for f in editor.new_text.split("\n")]
+        user_cases = []
+        if case_editor.new_text:
+            user_cases = [c.strip() for c in case_editor.new_text.split("\n")]
+            user_cases = [c for c in user_cases if c]
+
+        cases.extend(user_cases)
 
         # Check if any test case is selected
         if not cases:
             raise UserCancelledException(_i("No test case is selected. Quit generating tests."))
 
         # Validate reference files
+        ref_files = [f.strip() for f in ref_editor.new_text.split("\n")]
         valid_files = []
         invalid_files = []
 
@@ -110,18 +125,31 @@ class UnitTestsWorkflow:
             except Exception as e:
                 invalid_files.append(ref_file)
 
-        title = ""
+        # Print summary
+        title = "Will generate tests for the following cases."
         lines = []
+
+        lines.append(_i("\nTest cases:"))
+        width = len(str(len(cases)))
+        lines.extend([f"{(i+1):>{width}}. {c}" for i, c in enumerate(cases)])
+
         if not valid_files:
-            title = _i("No valid file is provided. Will not use reference to generate tests.")
+            lines.append(
+                _i(
+                    "\nNo valid reference file is provided. "
+                    "Will not use reference to generate tests."
+                )
+            )
         else:
-            title = _i("Will use the following reference files to generate tests:")
+            lines.append(_i("\nWill use the following reference files to generate tests."))
             lines.append(_i("\nValid reference files:"))
-            lines.extend(valid_files)
+            width = len(str(len(valid_files)))
+            lines.extend([f"{(i+1):>{width}}. {f}" for i, f in enumerate(valid_files)])
 
         if invalid_files:
             lines.append(_i("\nInvalid files:"))
-            lines.extend(invalid_files)
+            width = len(str(len(invalid_files)))
+            lines.extend([f"{(i+1):>{width}}. {f}" for i, f in enumerate(invalid_files)])
 
         with Step(title):
             print("\n".join(lines), flush=True)
