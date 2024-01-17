@@ -83,7 +83,6 @@ class RelevantFileFinder(DirectoryStructureBase):
             user_msg = self._mk_message(objective, dir_structure)
 
             response = create_chat_completion_content(
-                client=self._client,
                 model=self.model_name,
                 messages=[
                     {"role": "user", "content": user_msg},
