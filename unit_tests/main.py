@@ -2,7 +2,7 @@ import os
 import sys
 
 import click
-from chat.ask_codebase.tools.retrieve_file_content import retrieve_file_content
+from tools.file_util import retrieve_file_content
 from find_reference_tests import find_reference_tests
 from i18n import TUILanguage, get_translation
 from model import FuncToTest, TokenBudgetExceededException, UserCancelledException
