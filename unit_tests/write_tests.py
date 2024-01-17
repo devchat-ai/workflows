@@ -1,14 +1,13 @@
 from functools import partial
 from typing import List, Optional
 
+import tiktoken
 from model import FuncToTest, TokenBudgetExceededException
 from openai_util import create_chat_completion_chunks
 from prompts import WRITE_TESTS_PROMPT
 from tools.file_util import retrieve_file_content
-from tools.tiktoken_util import get_encoding
 
 MODEL = "gpt-4-1106-preview"
-ENCODING = "cl100k_base"
 TOKEN_BUDGET = int(128000 * 0.9)
 
 
@@ -19,7 +18,7 @@ def _mk_write_tests_msg(
     chat_language: str,
     reference_files: Optional[List[str]] = None,
 ) -> Optional[str]:
-    encoding = get_encoding(ENCODING)
+    encoding: tiktoken.Encoding = tiktoken.encoding_for_model(MODEL)
 
     test_cases_str = ""
     for i, test_case in enumerate(test_cases, 1):

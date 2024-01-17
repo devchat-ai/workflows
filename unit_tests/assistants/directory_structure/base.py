@@ -14,6 +14,7 @@ class DirectoryStructureBase(ABC):
     ) -> None:
         self._root_path = root_path
 
+        self._client = OpenAI()
         self._chat_language = chat_language
 
     @property
