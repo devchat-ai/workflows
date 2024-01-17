@@ -1,8 +1,9 @@
 import json
 from typing import List, Tuple
 
-from chat.util.openai_util import create_chat_completion
+from openai_util import create_chat_completion_content
 
+# ruff: noqa: E501
 
 rerank_file_prompt = """
 You're an advanced coding assistant. A user will present a coding question, and you'll be provided with a list of code files.
@@ -46,9 +47,7 @@ def rerank_files(
 
     files_str = ""
     for file in items:
-        assert isinstance(
-            file, str
-        ), "items must be a list of str when item_type is 'file'"
+        assert isinstance(file, str), "items must be a list of str when item_type is 'file'"
         files_str += f"- {file}\n"
 
     user_msg = rerank_file_prompt.format(
@@ -57,7 +56,7 @@ def rerank_files(
         accumulated_knowledge=knowledge,
     )
 
-    response = create_chat_completion(
+    response = create_chat_completion_content(
         model=RERANK_MODEL,
         messages=[
             {
@@ -69,8 +68,7 @@ def rerank_files(
         temperature=0.1,
     )
 
-    json_res = response.choices[0].message.content
-    result = json.loads(json_res)
+    result = json.loads(response)
     reranked = [(i["item"], i["relevance"]) for i in result["result"]]
 
     return reranked

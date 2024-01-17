@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Any, Callable, Optional
 
 from openai import OpenAI
-
 from tools.directory_viewer import mk_repo_file_criteria
 
 

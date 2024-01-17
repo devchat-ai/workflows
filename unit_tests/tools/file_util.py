@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import List
 
 
@@ -95,3 +96,61 @@ def resolve_relative_path(file: str, path: str) -> str:
 
     # If the path is not relative, return it as is
     return path
+
+
+def is_not_hidden(relpath: Path) -> bool:
+    return not relpath.name.startswith(".")
+
+
+def is_source_code(file_name: str, only_code=False) -> bool:
+    """
+    Check if a given file is a source code file based on its extension.
+
+    Args:
+        file_name (str): The name of the file to check.
+        only_code (bool): if include md/yaml/json...
+
+    Returns:
+        bool: True if the file is a source code file, False otherwise.
+    """
+    # List of meaningful source code file extensions
+    source_code_extensions = [
+        ".py",  # Python
+        ".java",  # Java
+        ".c",  # C
+        ".cpp",  # C++
+        ".h",  # C header
+        ".hpp",  # C++ header
+        ".hh",  # C++ header
+        ".js",  # JavaScript
+        ".ts",  # TypeScript
+        ".go",  # Go
+        ".rs",  # Rust
+        ".rb",  # Ruby
+        ".cs",  # C#
+        ".m",  # Objective-C
+        ".swift",  # Swift
+        ".php",  # PHP
+        ".kt",  # Kotlin
+        ".scala",  # Scala
+        ".r",  # R
+        ".pl",  # Perl
+        ".lua",  # Lua
+        ".groovy",  # Groovy
+        ".dart",  # Dart
+        ".sh",  # Bash
+        ".bat",  # Batch file
+        ".ipynb",  # Jupyter Notebook
+    ]
+    if not only_code:
+        source_code_extensions.extend(
+            [
+                ".md",  # Markdown
+                ".yaml",  # YAML
+                ".yml",  # YAML
+            ]
+        )
+
+    _, extension = os.path.splitext(file_name)
+
+    return extension in source_code_extensions

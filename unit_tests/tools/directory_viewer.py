@@ -3,8 +3,8 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Callable, List, Optional
 
+from tools.file_util import is_not_hidden, is_source_code
 from tools.git_util import git_file_of_interest_filter
-from chat.util.misc import is_not_hidden, is_source_code
 
 
 class DirectoryViewer(ABC):
@@ -65,9 +65,7 @@ def mk_repo_file_criteria(repo_path: str) -> Callable[[Path], bool]:
 
     def criteria(filepath: Path) -> bool:
         return (
-            is_not_hidden(filepath)
-            and is_git_interest(filepath)
-            and is_source_code(str(filepath))
+            is_not_hidden(filepath) and is_git_interest(filepath) and is_source_code(str(filepath))
         )
 
     return criteria
@@ -90,19 +88,11 @@ class ListViewer(DirectoryViewer):
         items_ = (
             self.items
             if depth is None
-            else [
-                i
-                for i in self.items
-                if len(i.relative_to(self.root_path).parts) <= depth
-            ]
+            else [i for i in self.items if len(i.relative_to(self.root_path).parts) <= depth]
         )
 
         # Get items to show on the page if page size is given.
-        items_ = (
-            items_
-            if page_size is None
-            else items_[page * page_size : (page + 1) * page_size]
-        )
+        items_ = items_ if page_size is None else items_[page * page_size : (page + 1) * page_size]
 
         return items_
 
@@ -120,9 +110,7 @@ class ListViewer(DirectoryViewer):
             page_size: The number of items to show on the page. if None, show all items.
             page: The page number to show. 0-based.
         """
-        items_to_show = self._get_items_to_show(
-            depth=depth, page_size=page_size, page=page
-        )
+        items_to_show = self._get_items_to_show(depth=depth, page_size=page_size, page=page)
         dir_files = defaultdict(list)
         for item in items_to_show:
             relpath = item.relative_to(self.root_path)

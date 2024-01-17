@@ -2,11 +2,11 @@ import os
 import sys
 
 import click
-from tools.file_util import retrieve_file_content
 from find_reference_tests import find_reference_tests
 from i18n import TUILanguage, get_translation
 from model import FuncToTest, TokenBudgetExceededException, UserCancelledException
 from propose_test import propose_test
+from tools.file_util import retrieve_file_content
 from write_tests import write_and_print_tests
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))

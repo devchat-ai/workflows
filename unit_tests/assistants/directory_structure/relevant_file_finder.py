@@ -3,14 +3,12 @@ from pathlib import Path
 from typing import Callable, List
 
 import tiktoken
-
 from assistants.directory_structure.base import DirectoryStructureBase
-
 from assistants.rerank_files import rerank_files
+from openai_util import create_chat_completion_content
 from tools.directory_viewer import (
     ListViewer,
 )
-from chat.util.openai_util import create_chat_completion
 
 
 class RelevantFileFinder(DirectoryStructureBase):
@@ -81,14 +79,12 @@ class RelevantFileFinder(DirectoryStructureBase):
 
         return message
 
-    def _find_relevant_files(
-        self, objective: str, dir_structure_pages: List[str]
-    ) -> List[str]:
+    def _find_relevant_files(self, objective: str, dir_structure_pages: List[str]) -> List[str]:
         files: List[str] = []
         for dir_structure in dir_structure_pages:
             user_msg = self._mk_message(objective, dir_structure)
 
-            response = create_chat_completion(
+            response = create_chat_completion_content(
                 client=self._client,
                 model=self.model_name,
                 messages=[
@@ -98,8 +94,7 @@ class RelevantFileFinder(DirectoryStructureBase):
                 temperature=0.1,
             )
 
-            choice = response.choices[0]
-            json_res = json.loads(choice.message.content)
+            json_res = json.loads(response)
 
             files.extend(json_res.get("files", []))
 
