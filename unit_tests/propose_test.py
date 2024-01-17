@@ -2,14 +2,13 @@ import json
 from functools import partial
 from typing import List
 
+import tiktoken
 from model import FuncToTest, TokenBudgetExceededException
 from openai_util import create_chat_completion_content
 from prompts import PROPOSE_TEST_PROMPT
-from tools.tiktoken_util import get_encoding
 
 MODEL = "gpt-3.5-turbo-1106"
 # MODEL = "gpt-4-1106-preview"
-ENCODING = "cl100k_base"
 TOKEN_BUDGET = int(16000 * 0.9)
 
 
@@ -21,7 +20,7 @@ def _mk_user_msg(
     """
     Create a user message to be sent to the model within the token budget.
     """
-    encoding = get_encoding(ENCODING)
+    encoding: tiktoken.Encoding = tiktoken.encoding_for_model(MODEL)
 
     func_content = f"function code\n```\n{func_to_test.func_content}\n```\n"
     class_content = ""
