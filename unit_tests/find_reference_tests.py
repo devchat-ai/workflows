@@ -1,10 +1,8 @@
 from typing import List
 
-from chat.ask_codebase.assistants.directory_structure.relevant_file_finder import (
-    RelevantFileFinder,
-)
-from chat.ask_codebase.tools.file_list_util import verify_file_list
+from assistants.directory_structure.relevant_file_finder import RelevantFileFinder
 from prompts import FIND_REFERENCE_PROMPT
+from tools.file_util import verify_file_list
 
 
 def find_reference_tests(root_path: str, function_name: str, file_path: str) -> List[str]:
