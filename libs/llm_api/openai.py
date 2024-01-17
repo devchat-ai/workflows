@@ -7,8 +7,10 @@ import sys
 import openai
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(os.path.dirname(__file__))
 
 from ide_services.services import log_warn
+from minimax_chat import stream_chat_completion
 
 
 def _try_remove_markdown_block_flag(content):
@@ -46,18 +48,23 @@ def chat_completion_stream(messages, llm_config, error_out: bool = True, stream_
     """
     for try_times in range(3):
         try:
-            client = openai.OpenAI(
-                api_key=os.environ.get("OPENAI_API_KEY", None),
-                base_url=os.environ.get("OPENAI_API_BASE", None),
-            )
+            if llm_config.get("model", "").startswith("abab"):
+                response = stream_chat_completion(messages, llm_config)
+                response_result = {"content": None, "function_name": None, "parameters": ""}
+            else:
+                client = openai.OpenAI(
+                    api_key=os.environ.get("OPENAI_API_KEY", None),
+                    base_url=os.environ.get("OPENAI_API_BASE", None),
+                )
 
-            llm_config["stream"] = True
-            llm_config["timeout"] = 8
-            response = client.chat.completions.create(messages=messages, **llm_config)
+                llm_config["stream"] = True
+                llm_config["timeout"] = 8
+                response = client.chat.completions.create(messages=messages, **llm_config)
 
             response_result = {"content": None, "function_name": None, "parameters": ""}
             for chunk in response:  # pylint: disable=E1133
-                chunk = chunk.dict()
+                if not isinstance(chunk, dict):
+                    chunk = chunk.dict()
                 delta = chunk["choices"][0]["delta"]
                 if "tool_calls" in delta and delta["tool_calls"]:
                     tool_call = delta["tool_calls"][0]["function"]
