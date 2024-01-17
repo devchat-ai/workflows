@@ -2,19 +2,17 @@ import json
 from pathlib import Path
 from typing import Callable, List
 
-import tiktoken
 from assistants.directory_structure.base import DirectoryStructureBase
 from assistants.rerank_files import rerank_files
 from openai_util import create_chat_completion_content
-from tools.directory_viewer import (
-    ListViewer,
-)
+from tools.directory_viewer import ListViewer
+from tools.tiktoken_util import get_encoding
 
 
 class RelevantFileFinder(DirectoryStructureBase):
     model_name = "gpt-3.5-turbo-1106"
     dir_token_budget = 16000 * 0.95
-    encoding: tiktoken.Encoding = tiktoken.encoding_for_model("gpt-3.5-turbo-1106")
+    encoding = get_encoding("cl100k_base")
 
     def _paginate_dir_structure(
         self, criteria: Callable[[Path], bool], style: str = "list"
