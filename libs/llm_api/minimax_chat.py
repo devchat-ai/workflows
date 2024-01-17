@@ -2,6 +2,7 @@ import json
 import os
 import sys
 import time
+
 import requests
 
 
@@ -20,35 +21,32 @@ class StreamIterWrapper:
             response_line = next(self.line_iterator)
             print("===> 2", file=sys.stderr, end="\n\n")
             print("response_line: ", response_line, file=sys.stderr, end="\n\n")
-            if response_line == b'':
+            if response_line == b"":
                 return self.__next__()
-            if response_line == b'\n':
+            if response_line == b"\n":
                 return self.__next__()
-            
-            response_line = response_line.replace(b'data: ', b'')
-            response_result = json.loads(response_line.decode('utf-8'))
+
+            response_line = response_line.replace(b"data: ", b"")
+            response_result = json.loads(response_line.decode("utf-8"))
             if response_result["choices"][0].get("finish_reason", "") == "stop":
                 raise StopIteration
 
             stream_response = {
-                'id': f'minimax_{self.create_time}',
-                'created': self.create_time,
-                'object': 'chat.completion.chunk',
-                'model': response_result["model"],
-                'choices': [
+                "id": f"minimax_{self.create_time}",
+                "created": self.create_time,
+                "object": "chat.completion.chunk",
+                "model": response_result["model"],
+                "choices": [
                     {
-                        'index': 0,
-                        'finish_reason': 'stop',
-                        'delta': {
-                            'role': 'assistant',
-                            'content': response_result["choices"][0]["messages"][0]["text"],
-                        }
+                        "index": 0,
+                        "finish_reason": "stop",
+                        "delta": {
+                            "role": "assistant",
+                            "content": response_result["choices"][0]["messages"][0]["text"],
+                        },
                     }
                 ],
-                'usage': {
-                    'prompt_tokens': 10,
-                    'completion_tokens': 100
-                }
+                "usage": {"prompt_tokens": 10, "completion_tokens": 100},
             }
 
             return stream_response
@@ -70,6 +68,7 @@ def chat_completion(messages, llm_config):
     response = requests.post(url, headers=headers, json=payload)
     return response
 
+
 def stream_chat_completion(messages, llm_config):
     url = _make_api_url()
     headers = _make_header()
@@ -88,6 +87,7 @@ def _is_private_llm():
     api_base_url = os.environ.get("OPENAI_API_BASE", "")
     return not api_base_url.startswith("https://api.minimax.chat")
 
+
 def _make_api_url():
     api_base_url = os.environ.get("OPENAI_API_BASE", None)
     if not api_base_url:
@@ -103,7 +103,7 @@ def _make_api_url():
         api_key = os.environ.get("OPENAI_API_KEY", None)
         if not api_key:
             raise ValueError("minimax api key is not set")
-        
+
         group_id = api_key.split("##")[0]
         api_base_url += f"?GroupId={group_id}"
         return api_base_url
@@ -122,34 +122,25 @@ def _make_api_key():
     api_key = os.environ.get("OPENAI_API_KEY", None)
     return api_key.split("##")[1]
 
+
 def _make_header():
     api_key = _make_api_key()
     return {
         **({"Authorization": f"Bearer {api_key}"} if not _is_private_llm() else {}),
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
+
 
 def _to_private_messages(messages):
     new_messages = []
     for message in messages:
         if message["role"] == "user":
-            new_messages.append({
-                "role": "user",
-                "name": "user",
-                "text": message["content"]
-            })
+            new_messages.append({"role": "user", "name": "user", "text": message["content"]})
         else:
-            new_messages.append({
-                "role": "ai",
-                "name": "ai",
-                "text": message["content"]
-            })
-    new_messages.append({
-        "role": "ai",
-        "name": "ai",
-        "text": ""
-    })
+            new_messages.append({"role": "ai", "name": "ai", "text": message["content"]})
+    new_messages.append({"role": "ai", "name": "ai", "text": ""})
     return new_messages
+
 
 def _make_private_payload(messages, llm_config, stream=False):
     return {
@@ -157,9 +148,9 @@ def _make_private_payload(messages, llm_config, stream=False):
         "model_control": {
             "system_data": [
                 {
-                "role": "system",
-                "ai_setting": "code assistant",
-                "text": "",
+                    "role": "system",
+                    "ai_setting": "code assistant",
+                    "text": "",
                 },
             ],
             # "alpha_frequency": 128,
@@ -187,25 +178,23 @@ def _make_private_payload(messages, llm_config, stream=False):
             # "top_p": 0.95,
             "temperature": llm_config.get("temperature", 0.95),
         },
-        "stream": stream
+        "stream": stream,
     }
+
 
 def _to_public_messages(messages):
     new_messages = []
     for message in messages:
         if message["role"] == "user":
-            new_messages.append({
-                "sender_type": "USER",
-                "sender_name": "USER",
-                "text": message["content"]
-            })
+            new_messages.append(
+                {"sender_type": "USER", "sender_name": "USER", "text": message["content"]}
+            )
         else:
-            new_messages.append({
-                "sender_type": "BOT",
-                "sender_name": "ai",
-                "text": message["content"]
-            })
+            new_messages.append(
+                {"sender_type": "BOT", "sender_name": "ai", "text": message["content"]}
+            )
     return new_messages
+
 
 def _make_public_payload(messages, llm_config, stream=False):
     response = {
@@ -213,17 +202,18 @@ def _make_public_payload(messages, llm_config, stream=False):
         "tokens_to_generate": llm_config.get("max_tokens", 512),
         "temperature": llm_config.get("temperature", 0.1),
         # "top_p": 0.9,
-        "reply_constraints": {
-            "sender_type": "BOT",
-            "sender_name": "ai"
-        },
+        "reply_constraints": {"sender_type": "BOT", "sender_name": "ai"},
         "sample_messages": [],
         "plugins": [],
         "messages": _to_public_messages(messages),
         "bot_setting": [
             {
-            "bot_name": "ai",
-            "content": "MM智能助理是一款由MiniMax自研的，没有调用其他产品的接口的大型语言模型。MiniMax是一家中国科技公司，一直致力于进行大模型相关的研究。"
+                "bot_name": "ai",
+                "content": (
+                    "MM智能助理是一款由MiniMax自研的，"
+                    "没有调用其他产品的接口的大型语言模型。"
+                    "MiniMax是一家中国科技公司，一直致力于进行大模型相关的研究。"
+                ),
             }
         ],
         "stream": stream,
