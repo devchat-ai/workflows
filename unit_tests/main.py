@@ -133,7 +133,8 @@ def main(input: str):
     user_prompt = f"Help me write unit tests for the `{func_name}` function"
 
     repo_root = os.getcwd()
-    ide_lang = ide_language()
+    # ide_lang = ide_language()
+    ide_lang = "zh"
     tui_lang = TUILanguage.from_str(ide_lang)
     _i = get_translation(tui_lang)
 
