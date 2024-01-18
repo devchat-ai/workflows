@@ -25,7 +25,7 @@ class StreamIterWrapper:
 
             response_line = response_line.replace(b"data: ", b"")
             response_result = json.loads(response_line.decode("utf-8"))
-            if response_result["choices"][0].get("finish_reason", "") == "stop":
+            if response_result["choices"][0].get("finish_reason", None):
                 raise StopIteration
 
             stream_response = {
@@ -164,7 +164,7 @@ def _make_private_payload(messages, llm_config, stream=False):
             # "repeat_filter": False,
             # "repeat_sampling": 1,
             # "skip_text_mask": True,
-            "tokens_to_generate": llm_config.get("max_tokens", 512),
+            "tokens_to_generate": llm_config.get("max_tokens", 2048),
             # "sampler_type": "nucleus",
             "beam_width": 1,
             # "delimiter": "\n",
@@ -195,7 +195,7 @@ def _to_public_messages(messages):
 def _make_public_payload(messages, llm_config, stream=False):
     response = {
         "model": "abab5.5-chat",
-        "tokens_to_generate": llm_config.get("max_tokens", 512),
+        "tokens_to_generate": llm_config.get("max_tokens", 2048),
         "temperature": llm_config.get("temperature", 0.1),
         # "top_p": 0.9,
         "reply_constraints": {"sender_type": "BOT", "sender_name": "ai"},
