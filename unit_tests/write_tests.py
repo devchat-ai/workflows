@@ -1,6 +1,8 @@
+import os
 from functools import partial
 from typing import List, Optional
 
+from minimax_util import chat_completion_stream
 from model import FuncToTest, TokenBudgetExceededException
 from openai_util import create_chat_completion_chunks
 from prompts import WRITE_TESTS_PROMPT
@@ -93,13 +95,9 @@ def write_and_print_tests(
         chat_language=chat_language,
     )
 
-    chunks = create_chat_completion_chunks(
-        model=MODEL,
+    model = os.environ.get("LLM_MODEL", MODEL)
+    chat_completion_stream(
         messages=[{"role": "user", "content": user_msg}],
-        temperature=0.1,
+        llm_config={"model": model, "temperature": 0.1},
+        stream_out=True,
     )
-
-    for chunk in chunks:
-        if chunk.choices[0].finish_reason == "stop":
-            break
-        print(chunk.choices[0].delta.content, flush=True, end="")

@@ -1,7 +1,10 @@
 import json
+import os
+import sys
 from functools import partial
 from typing import List
 
+from minimax_util import chat_completion_no_stream_return_json
 from model import FuncToTest, TokenBudgetExceededException
 from openai_util import create_chat_completion_content
 from prompts import PROPOSE_TEST_PROMPT
@@ -82,14 +85,16 @@ def propose_test(
         chat_language=chat_language,
     )
 
-    content = create_chat_completion_content(
-        model=MODEL,
+    model = os.environ.get("LLM_MODEL", MODEL)
+    content = chat_completion_no_stream_return_json(
         messages=[{"role": "user", "content": user_msg}],
-        response_format={"type": "json_object"},
-        temperature=0.1,
+        llm_config={
+            "model": model,
+            "temperature": 0.1,
+        },
     )
 
-    cases = json.loads(content).get("test_cases", [])
+    cases = content.get("test_cases", [])
 
     descriptions = []
     for case in cases:

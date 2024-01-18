@@ -1,9 +1,11 @@
 import json
+import os
 from pathlib import Path
 from typing import Callable, List
 
 from assistants.directory_structure.base import DirectoryStructureBase
 from assistants.rerank_files import rerank_files
+from minimax_util import chat_completion_no_stream_return_json
 from openai_util import create_chat_completion_content
 from tools.directory_viewer import ListViewer
 from tools.tiktoken_util import get_encoding
@@ -82,16 +84,15 @@ class RelevantFileFinder(DirectoryStructureBase):
         for dir_structure in dir_structure_pages:
             user_msg = self._mk_message(objective, dir_structure)
 
-            response = create_chat_completion_content(
-                model=self.model_name,
-                messages=[
-                    {"role": "user", "content": user_msg},
-                ],
-                response_format={"type": "json_object"},
-                temperature=0.1,
-            )
+            model = os.environ.get("LLM_MODEL", self.model_name)
 
-            json_res = json.loads(response)
+            json_res = chat_completion_no_stream_return_json(
+                messages=[{"role": "user", "content": user_msg}],
+                llm_config={
+                    "model": model,
+                    "temperature": 0.1,
+                },
+            )
 
             files.extend(json_res.get("files", []))
 
