@@ -4,15 +4,14 @@ import sys
 import click
 
 sys.path.append(os.path.dirname(__file__))
-
-from find_reference_tests import find_reference_tests
-from i18n import TUILanguage, get_translation
-from model import FuncToTest, TokenBudgetExceededException, UserCancelledException
-from propose_test import propose_test
-from tools.file_util import retrieve_file_content
-from write_tests import write_and_print_tests
-
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
+
+from find_reference_tests import find_reference_tests  # noqa: E402
+from i18n import TUILanguage, get_translation  # noqa: E402
+from model import FuncToTest, TokenBudgetExceededException, UserCancelledException  # noqa: E402
+from propose_test import propose_test  # noqa: E402
+from tools.file_util import retrieve_file_content  # noqa: E402
+from write_tests import write_and_print_tests  # noqa: E402
 
 from chatmark import Checkbox, Form, Step, TextEditor  # noqa: E402
 from ide_services import ide_language  # noqa: E402
