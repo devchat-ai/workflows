@@ -7,7 +7,9 @@ from typing import List
 from minimax_util import chat_completion_no_stream_return_json
 from model import FuncToTest, TokenBudgetExceededException
 from openai_util import create_chat_completion_content
-from prompts import PROPOSE_TEST_PROMPT
+
+# from prompts import PROPOSE_TEST_PROMPT
+from prompts_cn import PROPOSE_TEST_PROMPT
 from tools.tiktoken_util import get_encoding
 
 MODEL = "gpt-3.5-turbo-1106"
