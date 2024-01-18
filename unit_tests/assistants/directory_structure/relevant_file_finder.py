@@ -79,10 +79,37 @@ class RelevantFileFinder(DirectoryStructureBase):
 
         return message
 
+    def _mk_message_cn(self, objective: str, dir_structure: str) -> str:
+        message = f"""
+你是一位智能编程助手，你的任务是理解代码库的目录结构，推测各目录的作用，
+并根据用户输入的问题或者目标，找到与之最相关的10个文件。
+
+请注意，你的目的并不是分析各个文件里的代码，而是通过分析项目的结构来判断
+哪个文件最有可能包含用户需要的信息。
+
+以下是代码库的目录结构：
+
+{dir_structure}
+
+
+请根据你的理解，找出10个和以下问题最相关的文件：
+
+“{objective}”
+
+
+请按以下JSON格式回复：
+{{
+    "files": ["<文件1的路径>" , "<文件2的路径>", "<文件3的路径>", ... ]
+}}
+"""
+
+        return message
+
     def _find_relevant_files(self, objective: str, dir_structure_pages: List[str]) -> List[str]:
         files: List[str] = []
         for dir_structure in dir_structure_pages:
-            user_msg = self._mk_message(objective, dir_structure)
+            # user_msg = self._mk_message(objective, dir_structure)
+            user_msg = self._mk_message_cn(objective, dir_structure)
 
             model = os.environ.get("LLM_MODEL", self.model_name)
 

@@ -5,7 +5,9 @@ from typing import List, Optional
 from minimax_util import chat_completion_stream
 from model import FuncToTest, TokenBudgetExceededException
 from openai_util import create_chat_completion_chunks
-from prompts import WRITE_TESTS_PROMPT
+
+# from prompts import WRITE_TESTS_PROMPT
+from prompts_cn import WRITE_TESTS_PROMPT
 from tools.file_util import retrieve_file_content
 from tools.tiktoken_util import get_encoding
 

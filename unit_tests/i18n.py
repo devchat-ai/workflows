@@ -4,9 +4,12 @@ from enum import Enum
 
 
 class TUILanguage(Enum):
-    EN = ("en", "English")
-    ZH = ("zh", "Chinese")
-    Other = ("en", "English")  # default to show English
+    EN = ("en", "英文")
+    ZH = ("zh", "中文")
+    Other = ("zh", "中文")
+    # EN = ("en", "English")
+    # ZH = ("zh", "Chinese")
+    # Other = ("en", "English")  # default to show English
 
     @classmethod
     def from_str(cls, language: str) -> "TUILanguage":

@@ -1,7 +1,9 @@
 from typing import List
 
 from assistants.directory_structure.relevant_file_finder import RelevantFileFinder
-from prompts import FIND_REFERENCE_PROMPT
+
+# from prompts import FIND_REFERENCE_PROMPT
+from prompts_cn import FIND_REFERENCE_PROMPT
 from tools.file_util import verify_file_list
 
 

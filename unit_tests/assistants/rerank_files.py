@@ -31,6 +31,37 @@ Accumulated Knowledge: {accumulated_knowledge}
 Answer:
 """
 
+rerank_file_prompt_cn = """
+你是一位智能编程助手。
+用户将给你一个文件列表并提出一个和编程相关的问题，
+根据你对问题和每个文件可能包含的内容的理解，
+找到文件列表中有助于回答该问题的文件，
+并判断文件与问题的相关程度，从1到10为文件评分（10分表示相关度非常高，1分表示相关度很低），
+最后将文件按相关度从高到低排序。
+
+请注意，返回的所有文件路径都应在用户给出的文件列表里，不能额外添加文件，也不能修改文件路径。
+
+
+以下是用户给出的文件列表：
+
+{files}
+
+
+用户的问题是: {question}
+目前积累的相关背景知识: {accumulated_knowledge} 
+
+请按以下JSON格式回复：
+{{
+    "result": [
+        {{"item": "<最相关的文件路径>", "relevance": 7}},
+        {{"item": "<第二相关的文件路径>", "relevance": 4}},
+        {{"item": "<第三相关的文件路径>", "relevance": 3}}
+    ]
+}}
+
+
+"""
+
 RERANK_MODEL = "gpt-3.5-turbo-1106"
 
 
@@ -53,7 +84,7 @@ def rerank_files(
         assert isinstance(file, str), "items must be a list of str when item_type is 'file'"
         files_str += f"- {file}\n"
 
-    user_msg = rerank_file_prompt.format(
+    user_msg = rerank_file_prompt_cn.format(
         files=files_str,
         question=question,
         accumulated_knowledge=knowledge,
