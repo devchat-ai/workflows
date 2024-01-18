@@ -50,7 +50,6 @@ def chat_completion_stream(messages, llm_config, error_out: bool = True, stream_
         try:
             if llm_config.get("model", "").startswith("abab"):
                 response = stream_chat_completion(messages, llm_config)
-                response_result = {"content": None, "function_name": None, "parameters": ""}
             else:
                 client = openai.OpenAI(
                     api_key=os.environ.get("OPENAI_API_KEY", None),
@@ -65,6 +64,7 @@ def chat_completion_stream(messages, llm_config, error_out: bool = True, stream_
             for chunk in response:  # pylint: disable=E1133
                 if not isinstance(chunk, dict):
                     chunk = chunk.dict()
+                
                 delta = chunk["choices"][0]["delta"]
                 if "tool_calls" in delta and delta["tool_calls"]:
                     tool_call = delta["tool_calls"][0]["function"]

@@ -17,10 +17,7 @@ class StreamIterWrapper:
 
     def __next__(self):
         try:
-            print("===> 1", file=sys.stderr, end="\n\n")
             response_line = next(self.line_iterator)
-            print("===> 2", file=sys.stderr, end="\n\n")
-            print("response_line: ", response_line, file=sys.stderr, end="\n\n")
             if response_line == b"":
                 return self.__next__()
             if response_line == b"\n":
@@ -76,7 +73,6 @@ def stream_chat_completion(messages, llm_config):
         payload = _make_private_payload(messages, llm_config, True)
     else:
         payload = _make_public_payload(messages, llm_config, True)
-    print("payload:", payload, file=sys.stderr, end="\n\n")
 
     response = requests.post(url, headers=headers, json=payload)
     streamIters = StreamIterWrapper(response)
@@ -149,8 +145,8 @@ def _make_private_payload(messages, llm_config, stream=False):
             "system_data": [
                 {
                     "role": "system",
-                    "ai_setting": "code assistant",
-                    "text": "",
+                    "ai_setting": "ai",
+                    "text": "你是minimax编码助理，擅长编写代码，编写注释，编写测试用例，并且很注重编码的规范性。",
                 },
             ],
             # "alpha_frequency": 128,
