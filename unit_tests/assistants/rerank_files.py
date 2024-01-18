@@ -1,6 +1,9 @@
 import json
+import os
+import sys
 from typing import List, Tuple
 
+from minimax_util import chat_completion_no_stream_return_json
 from openai_util import create_chat_completion_content
 
 # ruff: noqa: E501
@@ -56,19 +59,22 @@ def rerank_files(
         accumulated_knowledge=knowledge,
     )
 
-    response = create_chat_completion_content(
-        model=RERANK_MODEL,
+    model = os.environ.get("LLM_MODEL", RERANK_MODEL)
+    result = chat_completion_no_stream_return_json(
         messages=[
             {
                 "role": "user",
                 "content": user_msg,
             },
         ],
-        response_format={"type": "json_object"},
-        temperature=0.1,
+        llm_config={
+            "model": model,
+            "temperature": 0.1,
+        },
     )
+    if not result:
+        return []
 
-    result = json.loads(response)
     reranked = [(i["item"], i["relevance"]) for i in result["result"]]
 
     return reranked
