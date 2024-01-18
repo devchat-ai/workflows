@@ -126,7 +126,7 @@ class UnitTestsWorkflow:
                 invalid_files.append(ref_file)
 
         # Print summary
-        title = "Will generate tests for the following cases."
+        title = _i("Will generate tests for the following cases.")
         lines = []
 
         lines.append(_i("\nTest cases:"))
