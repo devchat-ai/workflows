@@ -2,6 +2,9 @@ import os
 import sys
 
 import click
+
+sys.path.append(os.path.dirname(__file__))
+
 from find_reference_tests import find_reference_tests
 from i18n import TUILanguage, get_translation
 from model import FuncToTest, TokenBudgetExceededException, UserCancelledException
