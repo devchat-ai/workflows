@@ -7,16 +7,20 @@ import requests
 
 
 class StreamIterWrapper:
-    def __init__(self, response):
+    def __init__(self, response, is_private=True):
         self.response = response
         self.create_time = int(time.time())
         self.line_iterator = response.iter_lines()
+        self.is_private = is_private
+        self.stop = False
 
     def __iter__(self):
         return self
 
     def __next__(self):
         try:
+            if self.stop:
+                raise StopIteration
             response_line = next(self.line_iterator)
             if response_line == b"":
                 return self.__next__()
@@ -25,21 +29,31 @@ class StreamIterWrapper:
 
             response_line = response_line.replace(b"data: ", b"")
             response_result = json.loads(response_line.decode("utf-8"))
-            if response_result["choices"][0].get("finish_reason", None):
-                raise StopIteration
+            if self.is_private:
+                if "finish" in response_result and response_result["finish"] == True:
+                    self.stop = True
+                if "err" in response_result and response_result["err"]:
+                    raise ValueError(f"minimax api response error: {response_result['err']}")
+            if not self.is_private:
+                if response_result["choices"][0].get("finish_reason", None):
+                    raise StopIteration
 
+            data = {}
+            if self.is_private:
+                data = json.loads(response_result["data"])
+                
             stream_response = {
                 "id": f"minimax_{self.create_time}",
                 "created": self.create_time,
                 "object": "chat.completion.chunk",
-                "model": response_result["model"],
+                "model": response_result.get("model", "abab5.5-chat"),
                 "choices": [
                     {
                         "index": 0,
                         "finish_reason": "stop",
                         "delta": {
                             "role": "assistant",
-                            "content": response_result["choices"][0]["messages"][0]["text"],
+                            "content": response_result["choices"][0]["messages"][0]["text"] if not self.is_private else data.get("text", ""),
                         },
                     }
                 ],
@@ -63,7 +77,10 @@ def chat_completion(messages, llm_config):
         payload = _make_public_payload(messages, llm_config)
 
     response = requests.post(url, headers=headers, json=payload)
-    return response
+    response_json = json.loads(response.text)
+    if not response_json.get("texts", []):
+        raise ValueError(f"minimax api response error: {response_json}")
+    return {"content": response_json["texts"][0]}
 
 
 def stream_chat_completion(messages, llm_config):
@@ -75,7 +92,7 @@ def stream_chat_completion(messages, llm_config):
         payload = _make_public_payload(messages, llm_config, True)
 
     response = requests.post(url, headers=headers, json=payload)
-    streamIters = StreamIterWrapper(response)
+    streamIters = StreamIterWrapper(response, _is_private_llm())
     return streamIters
 
 
