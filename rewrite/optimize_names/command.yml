@@ -1,0 +1,4 @@
+description: Optimizing variable and function names in code.
+steps:
+  - run: $devchat_python $command_path/../rewrite.py "Refine internal variable and function names within the code to achieve concise and meaningful identifiers that comply with English naming conventions."
+

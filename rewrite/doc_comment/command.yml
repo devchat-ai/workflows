@@ -1,0 +1,3 @@
+description: add doc comment for selected code
+steps:
+  - run: $devchat_python $command_path/../rewrite.py "add doc comment"
