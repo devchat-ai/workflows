@@ -158,7 +158,9 @@ def get_marked_files(modified_files, staged_files):
     staged_checkbox = Checkbox(staged_files_show, [True] * len(staged_files_show))
 
     unstaged_files = [file for file in modified_files if file[1].strip() != ""]
-    unstaged_files_show = [f'{file[1] if file[1]!="?" else "U"} {file[0]}' for file in unstaged_files]
+    unstaged_files_show = [
+        f'{file[1] if file[1]!="?" else "U"} {file[0]}' for file in unstaged_files
+    ]
     unstaged_checkbox = Checkbox(unstaged_files_show, [False] * len(unstaged_files_show))
 
     # Create a Form with both Checkbox instances
@@ -197,7 +199,9 @@ def rebuild_stage_list(staged_select_files, unstaged_select_files):
         None
     """
     # 获取当前所有staged文件
-    current_staged_files = subprocess.check_output(["git", "diff", "--name-only", "--cached"], text=True).splitlines()
+    current_staged_files = subprocess.check_output(
+        ["git", "diff", "--name-only", "--cached"], text=True
+    ).splitlines()
 
     # 添加unstaged_select_files中的文件到staged
     for file in unstaged_select_files:
@@ -207,7 +211,7 @@ def rebuild_stage_list(staged_select_files, unstaged_select_files):
     user_selected_files = staged_select_files + unstaged_select_files
     files_to_unstage = [file for file in current_staged_files if file not in user_selected_files]
     for file in files_to_unstage:
-        subprocess.check_output(["git", "reset", file])    
+        subprocess.check_output(["git", "reset", file])
 
 
 def get_diff():
