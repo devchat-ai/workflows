@@ -136,9 +136,9 @@ def get_modified_files():
             # check wether filename is a directory
             if os.path.isdir(filename):
                 continue
-            modified_files.append(os.path.normpath(strip_file_name(filename)))
+            modified_files.append((os.path.normpath(strip_file_name(filename)), status[1:2]))
             if status[0:1] == "M" or status[0:1] == "A" or status[0:1] == "D":
-                staged_files.append(os.path.normpath(strip_file_name(filename)))
+                staged_files.append((os.path.normpath(strip_file_name(filename)), status[0:1]))
     return modified_files, staged_files
 
 
@@ -154,10 +154,12 @@ def get_marked_files(modified_files, staged_files):
         List[str]: 用户选中的文件列表
     """
     # Create two Checkbox instances for staged and unstaged files
-    staged_checkbox = Checkbox(staged_files, [True] * len(staged_files))
+    staged_files_show = [f'{file[1] if file[1]!="?" else "U"} {file[0]}' for file in staged_files]
+    staged_checkbox = Checkbox(staged_files_show, [True] * len(staged_files_show))
 
-    unstaged_files = [file for file in modified_files if file not in staged_files]
-    unstaged_checkbox = Checkbox(unstaged_files, [False] * len(unstaged_files))
+    unstaged_files = [file for file in modified_files if file[1].strip() != ""]
+    unstaged_files_show = [f'{file[1] if file[1]!="?" else "U"} {file[0]}' for file in unstaged_files]
+    unstaged_checkbox = Checkbox(unstaged_files_show, [False] * len(unstaged_files_show))
 
     # Create a Form with both Checkbox instances
     form_list = []
@@ -177,31 +179,35 @@ def get_marked_files(modified_files, staged_files):
     # Retrieve the selected files from both Checkbox instances
     staged_checkbox_selections = staged_checkbox.selections if staged_checkbox.selections else []
     unstaged_selections = unstaged_checkbox.selections if unstaged_checkbox.selections else []
-    selected_staged_files = [staged_files[idx] for idx in staged_checkbox_selections]
-    selected_unstaged_files = [unstaged_files[idx] for idx in unstaged_selections]
+    selected_staged_files = [staged_files[idx][0] for idx in staged_checkbox_selections]
+    selected_unstaged_files = [unstaged_files[idx][0] for idx in unstaged_selections]
 
-    # Combine the selections from both checkboxes
-    selected_files = selected_staged_files + selected_unstaged_files
-
-    return selected_files
+    return selected_staged_files, selected_unstaged_files
 
 
-def rebuild_stage_list(user_files):
+def rebuild_stage_list(staged_select_files, unstaged_select_files):
     """
     根据用户选中文件，重新构建stage列表
 
     Args:
-        user_files: 用户选中的文件列表
+        staged_select_files: 当前选中的已staged文件列表
+        unstaged_select_files: 当前选中的未staged文件列表
 
     Returns:
         None
-
     """
-    # Unstage all files
-    subprocess.check_output(["git", "reset"])
-    # Stage all user_files
-    for file in user_files:
-        os.system(f'git add "{file}"')
+    # 获取当前所有staged文件
+    current_staged_files = subprocess.check_output(["git", "diff", "--name-only", "--cached"], text=True).splitlines()
+
+    # 添加unstaged_select_files中的文件到staged
+    for file in unstaged_select_files:
+        subprocess.check_output(["git", "add", file])
+
+    # 将不在staged_select_files中的文件从staged移除
+    user_selected_files = staged_select_files + unstaged_select_files
+    files_to_unstage = [file for file in current_staged_files if file not in user_selected_files]
+    for file in files_to_unstage:
+        subprocess.check_output(["git", "reset", file])    
 
 
 def get_diff():
@@ -337,12 +343,12 @@ def main():
             print("No files to commit.", file=sys.stderr, flush=True)
             sys.exit(-1)
 
-        selected_files = get_marked_files(modified_files, staged_files)
-        if not selected_files:
+        staged_select_files, unstaged_select_files = get_marked_files(modified_files, staged_files)
+        if not staged_select_files and not unstaged_select_files:
             print("No files selected, commit aborted.")
             return
 
-        rebuild_stage_list(selected_files)
+        rebuild_stage_list(staged_select_files, unstaged_select_files)
 
         print(
             "Step 2/2: Review the commit message I've drafted for you. "
