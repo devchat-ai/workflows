@@ -6,14 +6,7 @@ from typing import Dict, List
 
 import openai
 
-from .pipeline import (
-	RetryException,
-	pipeline,
-	parallel,
-	retry,
-	exception_err,
-	exception_handle
-)
+from .pipeline import RetryException, exception_err, exception_handle, parallel, pipeline, retry
 
 
 def _try_remove_markdown_block_flag(content):
@@ -81,6 +74,7 @@ def retry_timeout(chunks):
 def chunk_list(chunks):
     return [chunk for chunk in chunks]
 
+
 def chunks_content(chunks):
     content = None
     for chunk in chunks:
@@ -92,10 +86,11 @@ def chunks_content(chunks):
             content += delta["content"]
     return content
 
+
 def chunks_call(chunks):
     function_name = None
     parameters = ""
-    
+
     for chunk in chunks:
         chunk = chunk.dict()
         delta = chunk["choices"][0]["delta"]
@@ -106,6 +101,7 @@ def chunks_call(chunks):
             if tool_call.get("arguments", None):
                 parameters += tool_call["arguments"]
     return {"function_name": function_name, "parameters": parameters}
+
 
 def content_to_json(content):
     try:
@@ -120,48 +116,24 @@ def content_to_json(content):
 
 
 def to_dict_content_and_call(content, function_call):
-    return {
-        "content": content,
-        **function_call
-    }
+    return {"content": content, **function_call}
 
 
 chat_completion_content = retry(
-    pipeline(
-        chat_completion_stream_commit,
-        retry_timeout,
-        chunks_content
-    ),
-    times=3
+    pipeline(chat_completion_stream_commit, retry_timeout, chunks_content), times=3
 )
 
 chat_completion_stream_content = retry(
-    pipeline(
-        chat_completion_stream_commit,
-        retry_timeout,
-        stream_out_chunk,
-        chunks_content
-    ),
-    times=3
+    pipeline(chat_completion_stream_commit, retry_timeout, stream_out_chunk, chunks_content),
+    times=3,
 )
 
 chat_completion_call = retry(
-    pipeline(
-        chat_completion_stream_commit,
-        retry_timeout,
-        chunks_call
-    ),
-    times=3
+    pipeline(chat_completion_stream_commit, retry_timeout, chunks_call), times=3
 )
 
 chat_completion_no_stream_return_json = retry(
-    pipeline(
-        chat_completion_stream_commit,
-        retry_timeout,
-        chunks_content,
-        content_to_json
-    ),
-    times=3
+    pipeline(chat_completion_stream_commit, retry_timeout, chunks_content, content_to_json), times=3
 )
 
 chat_completion_stream = exception_handle(
@@ -169,13 +141,10 @@ chat_completion_stream = exception_handle(
         pipeline(
             chat_completion_stream_commit,
             retry_timeout,
-            parallel(
-                chunks_content,
-                chunks_call
-            ),
-            to_dict_content_and_call
+            parallel(chunks_content, chunks_call),
+            to_dict_content_and_call,
         ),
-        times=3
+        times=3,
     ),
-    lambda err: {"content": None, "function_name": None, "parameters": "", "error": err}
+    lambda err: {"content": None, "function_name": None, "parameters": "", "error": err},
 )
