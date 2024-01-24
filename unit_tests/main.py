@@ -5,7 +5,11 @@ from typing import List, Tuple
 import click
 from find_reference_tests import find_reference_tests
 from i18n import TUILanguage, get_translation
-from model import FuncToTest, TokenBudgetExceededException, UserCancelledException
+from model import (
+    FuncToTest,
+    TokenBudgetExceededException,
+    UserCancelledException,
+)
 from propose_test import propose_test
 from tools.file_util import retrieve_file_content
 from write_tests import write_and_print_tests
@@ -39,7 +43,9 @@ class UnitTestsWorkflow:
 
         self.step3_write_and_print_tests(cases, files)
 
-    def step1_propose_cases_and_reference_files(self) -> Tuple[List[str], List[str]]:
+    def step1_propose_cases_and_reference_files(
+        self,
+    ) -> Tuple[List[str], List[str]]:
         """
         Propose test cases and reference files for a specified function.
 
@@ -60,7 +66,9 @@ class UnitTestsWorkflow:
             )
 
             ref_files = find_reference_tests(
-                self.repo_root, self.func_to_test.func_name, self.func_to_test.file_path
+                self.repo_root,
+                self.func_to_test.func_name,
+                self.func_to_test.file_path,
             )
 
         if ref_files:
@@ -122,7 +130,7 @@ class UnitTestsWorkflow:
             try:
                 retrieve_file_content(file_path=ref_file, root_path=self.repo_root)
                 valid_files.append(ref_file)
-            except Exception as e:
+            except Exception:
                 invalid_files.append(ref_file)
 
         # Print summary
