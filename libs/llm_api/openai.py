@@ -36,8 +36,7 @@ def chat_completion_stream(
     messages: List[Dict],  # [{"role": "user", "content": "hello"}]
     llm_config: Dict,  # {"model": "...", ...}
     error_out: bool = True,
-    stream_out=False,
-    ignore_tokens_limit_error=True,
+    stream_out=False
 ) -> str:
     """
     通过ChatCompletion API获取OpenAI聊天机器人的回复。
@@ -83,22 +82,16 @@ def chat_completion_stream(
         except (openai.APIConnectionError, openai.APITimeoutError) as err:
             log_warn(f"Exception: {err.__class__.__name__}: {err}")
             if try_times >= 2:
-                return None
+                return {"content": None, "function_name": None, "parameters": "", "error": err}
             continue
         except openai.APIError as err:
-            if (
-                ignore_tokens_limit_error
-                and err.message.find("This model's maximum context length is") > 0
-            ):
-                return {"content": err.message, "function_name": None, "parameters": ""}
             if error_out:
-                print("Exception2:", err, file=sys.stderr, flush=True)
-            return None
+                print("Exception:", err, file=sys.stderr, flush=True)
+            return {"content": None, "function_name": None, "parameters": "", "error": err}
         except Exception as err:
             if error_out:
-                print("Exception3:", err, file=sys.stderr, flush=True)
-            return None
-    return None
+                print("Exception:", err, file=sys.stderr, flush=True)
+            return {"content": None, "function_name": None, "parameters": "", "error": err}
 
 
 def chat_completion_no_stream_return_json(messages, llm_config, error_out: bool = True):
@@ -117,7 +110,7 @@ def chat_completion_no_stream_return_json(messages, llm_config, error_out: bool 
     """
     for _1 in range(3):
         response = chat_completion_stream(messages, llm_config)
-        if response is None:
+        if not response["content"]:
             return None
 
         try:
