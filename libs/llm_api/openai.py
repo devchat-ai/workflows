@@ -2,14 +2,18 @@
 import json
 import os
 import re
-import sys
 from typing import Dict, List
 
 import openai
 
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
-from ide_services.services import log_warn
+from .pipeline import (
+	RetryException,
+	pipeline,
+	parallel,
+	retry,
+	exception_err,
+	exception_handle
+)
 
 
 def _try_remove_markdown_block_flag(content):
@@ -32,99 +36,146 @@ def _try_remove_markdown_block_flag(content):
         return content
 
 
-def chat_completion_stream(
+def chat_completion_stream_commit(
     messages: List[Dict],  # [{"role": "user", "content": "hello"}]
     llm_config: Dict,  # {"model": "...", ...}
-    error_out: bool = True,
-    stream_out=False,
-) -> str:
-    """
-    通过ChatCompletion API获取OpenAI聊天机器人的回复。
+):
+    client = openai.OpenAI(
+        api_key=os.environ.get("OPENAI_API_KEY", None),
+        base_url=os.environ.get("OPENAI_API_BASE", None),
+    )
 
-    Args:
-        messages: 一个列表，包含用户输入的消息。
-        llm_config: 一个字典，包含ChatCompletion API的配置信息。
-        error_out: 如果为True，遇到异常时输出错误信息并返回None，否则返回None。
-
-    Returns:
-        如果成功获取到聊天机器人的回复，返回一个字符串类型的回复消息。如果连接失败，则返回None。
-
-    """
-    for try_times in range(3):
-        try:
-            client = openai.OpenAI(
-                api_key=os.environ.get("OPENAI_API_KEY", None),
-                base_url=os.environ.get("OPENAI_API_BASE", None),
-            )
-
-            llm_config["stream"] = True
-            llm_config["timeout"] = 8
-            response = client.chat.completions.create(messages=messages, **llm_config)
-
-            response_result = {"content": None, "function_name": None, "parameters": ""}
-            for chunk in response:  # pylint: disable=E1133
-                chunk = chunk.dict()
-                delta = chunk["choices"][0]["delta"]
-                if "tool_calls" in delta and delta["tool_calls"]:
-                    tool_call = delta["tool_calls"][0]["function"]
-                    if tool_call.get("name", None):
-                        response_result["function_name"] = tool_call["name"]
-                    if tool_call.get("arguments", None):
-                        response_result["parameters"] += tool_call["arguments"]
-                if delta.get("content", None):
-                    if stream_out:
-                        print(delta["content"], end="", flush=True)
-                    if response_result["content"]:
-                        response_result["content"] += delta["content"]
-                    else:
-                        response_result["content"] = delta["content"]
-            return response_result
-        except (openai.APIConnectionError, openai.APITimeoutError) as err:
-            log_warn(f"Exception: {err.__class__.__name__}: {err}")
-            if try_times >= 2:
-                return {"content": None, "function_name": None, "parameters": "", "error": err}
-            continue
-        except openai.APIError as err:
-            if error_out:
-                print("Exception:", err, file=sys.stderr, flush=True)
-            return {"content": None, "function_name": None, "parameters": "", "error": err}
-        except Exception as err:
-            if error_out:
-                print("Exception:", err, file=sys.stderr, flush=True)
-            return {"content": None, "function_name": None, "parameters": "", "error": err}
+    llm_config["stream"] = True
+    llm_config["timeout"] = 60
+    return client.chat.completions.create(messages=messages, **llm_config)
 
 
-def chat_completion_no_stream_return_json(messages, llm_config, error_out: bool = True):
-    """
-    尝试三次从聊天完成API获取结果，并返回JSON对象。
-    如果无法解析JSON，将尝试三次，直到出现错误或达到最大尝试次数。
+def chat_completion_stream_raw(**kwargs):
+    client = openai.OpenAI(
+        api_key=os.environ.get("OPENAI_API_KEY", None),
+        base_url=os.environ.get("OPENAI_API_BASE", None),
+    )
 
-    Args:
-        messages (List[str]): 用户输入的消息列表。
-        llm_config (Dict[str, Any]): 聊天配置字典。
-        error_out (bool, optional): 如果为True，则如果出现错误将打印错误消息并返回None。默认为True。
+    kwargs["stream"] = True
+    kwargs["timeout"] = 60
+    return client.chat.completions.create(**kwargs)
 
-    Returns:
-        Dict[str, Any]: 从聊天完成API获取的JSON对象。
-            如果无法解析JSON或达到最大尝试次数，则返回None。
-    """
-    for _1 in range(3):
-        response = chat_completion_stream(messages, llm_config)
-        if not response["content"]:
-            return None
 
-        try:
-            # json will format as ```json ... ``` in 1106 model
-            response_content = _try_remove_markdown_block_flag(response["content"])
-            response_obj = json.loads(response_content)
-            return response_obj
-        except json.JSONDecodeError:
-            log_warn(f"JSONDecodeError: {response['content']}")
-            continue
-        except Exception as err:
-            if error_out:
-                print("Exception: ", err, file=sys.stderr, flush=True)
-            return None
-    if error_out:
-        print("Not valid json response:", response["content"], file=sys.stderr, flush=True)
-    return None
+def stream_out_chunk(chunks):
+    for chunk in chunks:
+        chunk_dict = chunk.dict()
+        delta = chunk_dict["choices"][0]["delta"]
+        if delta.get("content", None):
+            print(delta["content"], end="", flush=True)
+        yield chunk
+
+
+def retry_timeout(chunks):
+    try:
+        for chunk in chunks:
+            yield chunk
+    except (openai.APIConnectionError, openai.APITimeoutError) as err:
+        raise RetryException(err)
+
+
+def chunk_list(chunks):
+    return [chunk for chunk in chunks]
+
+def chunks_content(chunks):
+    content = None
+    for chunk in chunks:
+        chunk_dict = chunk.dict()
+        delta = chunk_dict["choices"][0]["delta"]
+        if delta.get("content", None):
+            if content is None:
+                content = ""
+            content += delta["content"]
+    return content
+
+def chunks_call(chunks):
+    function_name = None
+    parameters = ""
+    
+    for chunk in chunks:
+        chunk = chunk.dict()
+        delta = chunk["choices"][0]["delta"]
+        if "tool_calls" in delta and delta["tool_calls"]:
+            tool_call = delta["tool_calls"][0]["function"]
+            if tool_call.get("name", None):
+                function_name = tool_call["name"]
+            if tool_call.get("arguments", None):
+                parameters += tool_call["arguments"]
+    return {"function_name": function_name, "parameters": parameters}
+
+def content_to_json(content):
+    try:
+        # json will format as ```json ... ``` in 1106 model
+        response_content = _try_remove_markdown_block_flag(content)
+        response_obj = json.loads(response_content)
+        return response_obj
+    except json.JSONDecodeError as err:
+        raise RetryException(err)
+    except Exception as err:
+        raise err
+
+
+def to_dict_content_and_call(content, function_call):
+    return {
+        "content": content,
+        **function_call
+    }
+
+
+chat_completion_content = retry(
+    pipeline(
+        chat_completion_stream_commit,
+        retry_timeout,
+        chunks_content
+    ),
+    times=3
+)
+
+chat_completion_stream_content = retry(
+    pipeline(
+        chat_completion_stream_commit,
+        retry_timeout,
+        stream_out_chunk,
+        chunks_content
+    ),
+    times=3
+)
+
+chat_completion_call = retry(
+    pipeline(
+        chat_completion_stream_commit,
+        retry_timeout,
+        chunks_call
+    ),
+    times=3
+)
+
+chat_completion_no_stream_return_json = retry(
+    pipeline(
+        chat_completion_stream_commit,
+        retry_timeout,
+        chunks_content,
+        content_to_json
+    ),
+    times=3
+)
+
+chat_completion_stream = exception_handle(
+    retry(
+        pipeline(
+            chat_completion_stream_commit,
+            retry_timeout,
+            parallel(
+                chunks_content,
+                chunks_call
+            ),
+            to_dict_content_and_call
+        ),
+        times=3
+    ),
+    lambda err: {"content": None, "function_name": None, "parameters": "", "error": err}
+)
