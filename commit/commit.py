@@ -23,6 +23,8 @@ diff_too_large_message_zh = (
     "可以尝试选择部分修改文件多次提交，小修改多提交是更好的做法。"
 )
 
+COMMIT_PROMPT_LIMIT_SIZE = 20000
+
 
 def extract_markdown_block(text):
     """
@@ -263,26 +265,25 @@ def generate_commit_message_base_diff(user_input, diff):
     prompt = PROMPT_COMMIT_MESSAGE_BY_DIFF_USER_INPUT.replace("{__DIFF__}", f"{diff}").replace(
         "{__USER_INPUT__}", f"{user_input + language_prompt}"
     )
-    
+
     model_token_limit_error = (
         diff_too_large_message_en if language == "en" else diff_too_large_message_zh
     )
-    if len(str(prompt)) > 20000:
+    if len(str(prompt)) > COMMIT_PROMPT_LIMIT_SIZE:
         print(model_token_limit_error, flush=True)
         sys.exit(0)
 
     messages = [{"role": "user", "content": prompt}]
     response = chat_completion_stream(messages, prompt_commit_message_by_diff_user_input_llm_config)
     assert_value(not response, "")
-    
+
     if (
-        not response["content"] and
-        response["error"] and
-        f'{response["error"]}'.find("This model's maximum context length is") > 0
+        not response["content"]
+        and response["error"]
+        and f'{response["error"]}'.find("This model's maximum context length is") > 0
     ):
         print(model_token_limit_error)
         sys.exit(0)
-        
 
     response["content"] = extract_markdown_block(response["content"])
     return response

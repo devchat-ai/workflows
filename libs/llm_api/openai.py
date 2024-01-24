@@ -36,7 +36,7 @@ def chat_completion_stream(
     messages: List[Dict],  # [{"role": "user", "content": "hello"}]
     llm_config: Dict,  # {"model": "...", ...}
     error_out: bool = True,
-    stream_out=False
+    stream_out=False,
 ) -> str:
     """
     通过ChatCompletion API获取OpenAI聊天机器人的回复。
