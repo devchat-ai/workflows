@@ -248,9 +248,7 @@ def generate_commit_message_base_diff(user_input, diff):
 
     """
     global language
-    language_prompt = (
-        "You must response commit message in chinese。\n" if language == "zh" else ""
-    )
+    language_prompt = "You must response commit message in chinese。\n" if language == "zh" else ""
     prompt = PROMPT_COMMIT_MESSAGE_BY_DIFF_USER_INPUT.replace("{__DIFF__}", f"{diff}").replace(
         "{__USER_INPUT__}", f"{user_input + language_prompt}"
     )
@@ -356,14 +354,20 @@ def main():
         if branch_name:
             user_input += "\ncurrent repo branch name is:" + branch_name
         commit_message = generate_commit_message_base_diff(user_input, diff)
-        
+
         if commit_message["content"].find("This model's maximum context length is") > 0:
-            model_token_limit_error = \
-                ("Commit failed. The modified content is too long and exceeds the model's length limit. "
-                 "You can try to make partial changes to the file and submit multiple times. "
-                 "Making small changes and submitting them multiple times is a better practice.") \
-                if language != "zh" else \
-                ("提交失败。修改内容太长，超出模型限制长度，可以尝试选择部分修改文件多次提交，小修改多提交是更好的做法。")
+            model_token_limit_error = (
+                (
+                    "Commit failed. The modified content is too long "
+                    "and exceeds the model's length limit. "
+                    "You can try to make partial changes to the file and submit multiple times. "
+                    "Making small changes and submitting them multiple times is a better practice."
+                )
+                if language != "zh"
+                else (
+                    "提交失败。修改内容太长，超出模型限制长度，可以尝试选择部分修改文件多次提交，小修改多提交是更好的做法。"
+                )
+            )
             print(model_token_limit_error)
             sys.exit(0)
 
