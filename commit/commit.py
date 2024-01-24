@@ -275,7 +275,6 @@ def generate_commit_message_base_diff(user_input, diff):
 
     messages = [{"role": "user", "content": prompt}]
     response = chat_completion_stream(messages, prompt_commit_message_by_diff_user_input_llm_config)
-    assert_value(not response, "")
 
     if (
         not response["content"]
@@ -285,6 +284,7 @@ def generate_commit_message_base_diff(user_input, diff):
         print(model_token_limit_error)
         sys.exit(0)
 
+    assert_value(not response["content"], response["error"])
     response["content"] = extract_markdown_block(response["content"])
     return response
 
