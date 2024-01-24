@@ -4,7 +4,7 @@
 
 PROPOSE_TEST_PROMPT = """
 You're an advanced AI test case generator.
-Given a user prompt and a target function, propose test cases for the function based on the prompt.
+Given a user prompt and a target function, propose detailed test cases for the function based on the prompt, categorizing each as either a 'happy path' or an 'edge case'.
 
 The user prompt is as follows:
 
@@ -16,18 +16,30 @@ Here's the relevant source code of the function:
 
 {relevant_content}
 
-Propose each test case with a one-line description of what behavior it tests.
+For each test case, provide a description that includes:
+- A brief explanation of the test's purpose
+- The specific conditions being tested.
+- The expected outcome the test is verifying.
+
+Categorize each test case as:
+- 'happy path': Tests the function with typical inputs and standard conditions, ensuring it performs as expected in normal use.
+- 'edge case': Tests the function with atypical inputs or in unusual conditions, checking its robustness and error handling.
+
 You don't have to write the test cases in code, just describe them in plain {chat_language}.
-Do not generate more than 6 test cases.
+
+Aim to generate 3 'happy path' test cases and 3 'edge case' test cases, totaling 6 test cases.
 
 Answer in JSON format:
 {{
     "test_cases": [
-        {{"description": "<describe test case 1 in {chat_language}>"}},
-        {{"description": "<describe test case 2 in {chat_language}>"}},
+        {{"description": "<describe test case 1 in {chat_language}>", "category": "happy path"}},
+        ...
+        {{"description": "<describe test case 4 in {chat_language}>", "category": "edge case"}},
+        ...
     ]
 }}
 """
+
 
 
 FIND_REFERENCE_PROMPT = """
