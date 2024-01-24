@@ -93,7 +93,11 @@ def propose_test(
     descriptions = []
     for case in cases:
         description = case.get("description", None)
+        category = case.get("category", None)
         if description:
-            descriptions.append(description)
+            if category:
+                descriptions.append(category + ": " + description)
+            else:
+                descriptions.append(description)
 
     return descriptions

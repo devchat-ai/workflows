@@ -344,12 +344,12 @@ def main():
         )
         modified_files, staged_files = get_modified_files()
         if len(modified_files) == 0:
-            print("No files to commit.", file=sys.stderr, flush=True)
-            sys.exit(-1)
+            print("There are no files to commit.", flush=True)
+            sys.exit(0)
 
         staged_select_files, unstaged_select_files = get_marked_files(modified_files, staged_files)
         if not staged_select_files and not unstaged_select_files:
-            print("No files selected, commit aborted.")
+            print("No files selected, the commit has been aborted.")
             return
 
         rebuild_stage_list(staged_select_files, unstaged_select_files)
