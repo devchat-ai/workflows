@@ -12,6 +12,17 @@ from chatmark import Checkbox, Form, TextEditor  # noqa: E402
 from ide_services.services import log_info
 from llm_api import chat_completion_stream  # noqa: E402
 
+diff_too_large_message_en = (
+    "Commit failed. The modified content is too long "
+    "and exceeds the model's length limit. "
+    "You can try to make partial changes to the file and submit multiple times. "
+    "Making small changes and submitting them multiple times is a better practice."
+)
+diff_too_large_message_zh = (
+    "提交失败。修改内容太长，超出模型限制长度，"
+    "可以尝试选择部分修改文件多次提交，小修改多提交是更好的做法。"
+)
+
 
 def extract_markdown_block(text):
     """
@@ -252,15 +263,12 @@ def generate_commit_message_base_diff(user_input, diff):
     prompt = PROMPT_COMMIT_MESSAGE_BY_DIFF_USER_INPUT.replace("{__DIFF__}", f"{diff}").replace(
         "{__USER_INPUT__}", f"{user_input + language_prompt}"
     )
-    # if len(str(prompt)) > 20000:
-    #     print(
-    #         "Due to the large size of the diff data, "
-    #         "generating a commit message through AI would be very costly, therefore, "
-    #         "it is not recommended to use AI for generating the description. "
-    #         "Please manually edit the commit message before submitting."
-    #     )
-    #     print(prompt, file=sys.stderr, flush=True)
-    #     return {"content": ""}
+    if len(str(prompt)) > 20000:
+        model_token_limit_error = (
+            diff_too_large_message_en if language == "en" else diff_too_large_message_zh
+        )
+        print(model_token_limit_error, flush=True)
+        sys.exit(0)
 
     messages = [{"role": "user", "content": prompt}]
     response = chat_completion_stream(messages, prompt_commit_message_by_diff_user_input_llm_config)
@@ -357,16 +365,7 @@ def main():
 
         if commit_message["content"].find("This model's maximum context length is") > 0:
             model_token_limit_error = (
-                (
-                    "Commit failed. The modified content is too long "
-                    "and exceeds the model's length limit. "
-                    "You can try to make partial changes to the file and submit multiple times. "
-                    "Making small changes and submitting them multiple times is a better practice."
-                )
-                if language != "zh"
-                else (
-                    "提交失败。修改内容太长，超出模型限制长度，可以尝试选择部分修改文件多次提交，小修改多提交是更好的做法。"
-                )
+                diff_too_large_message_en if language == "en" else diff_too_large_message_zh
             )
             print(model_token_limit_error)
             sys.exit(0)
