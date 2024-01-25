@@ -294,7 +294,7 @@ def generate_commit_message_base_diff(user_input, diff):
         print(model_token_limit_error)
         sys.exit(0)
 
-    assert_value(not response["content"], response.get("error", "")
+    assert_value(not response["content"], response.get("error", ""))
     response["content"] = extract_markdown_block(response["content"])
     return response
 
