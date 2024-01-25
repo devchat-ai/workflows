@@ -288,13 +288,13 @@ def generate_commit_message_base_diff(user_input, diff):
 
     if (
         not response["content"]
-        and response["error"]
+        and response.get("error", None)
         and f'{response["error"]}'.find("This model's maximum context length is") > 0
     ):
         print(model_token_limit_error)
         sys.exit(0)
 
-    assert_value(not response["content"], response["error"])
+    assert_value(not response["content"], response.get("error", ""))
     response["content"] = extract_markdown_block(response["content"])
     return response
 
