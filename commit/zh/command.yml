@@ -2,4 +2,4 @@ description: '为你选定的代码变更生成格式规范的提交信息，并
 hint: to close Issue #issue_number
 input: optional
 steps:
-  - run: $devchat_python $command_path/../commit.py "$input" "chinese"
+  - run: $devchat_python $command_path/../commit.py "$input" "zh"

@@ -12,6 +12,19 @@ from chatmark import Checkbox, Form, TextEditor  # noqa: E402
 from ide_services.services import log_info
 from llm_api import chat_completion_stream  # noqa: E402
 
+diff_too_large_message_en = (
+    "Commit failed. The modified content is too long "
+    "and exceeds the model's length limit. "
+    "You can try to make partial changes to the file and submit multiple times. "
+    "Making small changes and submitting them multiple times is a better practice."
+)
+diff_too_large_message_zh = (
+    "提交失败。修改内容太长，超出模型限制长度，"
+    "可以尝试选择部分修改文件多次提交，小修改多提交是更好的做法。"
+)
+
+COMMIT_PROMPT_LIMIT_SIZE = 20000
+
 
 def extract_markdown_block(text):
     """
@@ -248,26 +261,30 @@ def generate_commit_message_base_diff(user_input, diff):
 
     """
     global language
-    language_prompt = (
-        "You must response commit message in chinese。\n" if language == "chinese" else ""
-    )
+    language_prompt = "You must response commit message in chinese。\n" if language == "zh" else ""
     prompt = PROMPT_COMMIT_MESSAGE_BY_DIFF_USER_INPUT.replace("{__DIFF__}", f"{diff}").replace(
         "{__USER_INPUT__}", f"{user_input + language_prompt}"
     )
-    # if len(str(prompt)) > 20000:
-    #     print(
-    #         "Due to the large size of the diff data, "
-    #         "generating a commit message through AI would be very costly, therefore, "
-    #         "it is not recommended to use AI for generating the description. "
-    #         "Please manually edit the commit message before submitting."
-    #     )
-    #     print(prompt, file=sys.stderr, flush=True)
-    #     return {"content": ""}
+
+    model_token_limit_error = (
+        diff_too_large_message_en if language == "en" else diff_too_large_message_zh
+    )
+    if len(str(prompt)) > COMMIT_PROMPT_LIMIT_SIZE:
+        print(model_token_limit_error, flush=True)
+        sys.exit(0)
 
     messages = [{"role": "user", "content": prompt}]
     response = chat_completion_stream(messages, prompt_commit_message_by_diff_user_input_llm_config)
-    assert_value(not response, "")
 
+    if (
+        not response["content"]
+        and response["error"]
+        and f'{response["error"]}'.find("This model's maximum context length is") > 0
+    ):
+        print(model_token_limit_error)
+        sys.exit(0)
+
+    assert_value(not response["content"], response["error"])
     response["content"] = extract_markdown_block(response["content"])
     return response
 
