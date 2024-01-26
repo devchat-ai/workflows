@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 
 from openai import OpenAI, Stream
@@ -13,7 +14,10 @@ def create_chat_completion_chunks(
     """
     Create streaming responses.
     """
-    _client = client or OpenAI()
+    _client = client or OpenAI(
+        api_key=os.environ.get("OPENAI_API_KEY", None),
+        base_url=os.environ.get("OPENAI_API_BASE", None),
+    )
 
     # Force to use streaming
     kwargs["stream"] = True
@@ -36,7 +40,10 @@ def create_chat_completion_content(client: Optional[OpenAI] = None, **kwargs) ->
 
     This is a replacement of creating non-streaming chat completion.
     """
-    _client = client or OpenAI()
+    _client = client or OpenAI(
+        api_key=os.environ.get("OPENAI_API_KEY", None),
+        base_url=os.environ.get("OPENAI_API_BASE", None),
+    )
 
     # Force to use streaming
     kwargs["stream"] = True
