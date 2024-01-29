@@ -3,6 +3,10 @@ import sys
 from typing import List, Tuple
 
 import click
+
+sys.path.append(os.path.dirname(__file__))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
+
 from find_reference_tests import find_reference_tests
 from i18n import TUILanguage, get_translation
 from model import (
@@ -13,8 +17,6 @@ from model import (
 from propose_test import propose_test
 from tools.file_util import retrieve_file_content
 from write_tests import write_and_print_tests
-
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 
 from chatmark import Checkbox, Form, Step, TextEditor  # noqa: E402
 from ide_services import ide_language  # noqa: E402
