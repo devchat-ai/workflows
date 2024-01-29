@@ -53,6 +53,6 @@ def create_chat_completion_content(client: Optional[OpenAI] = None, **kwargs) ->
     for chunk in chunks:
         if chunk.choices[0].finish_reason == "stop":
             break
-        results.append(chunk.choices[0].delta.content)
+        results.append(chunk.choices[0].delta.content or "")
 
     return "".join(results)
