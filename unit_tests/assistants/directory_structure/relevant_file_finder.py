@@ -38,7 +38,7 @@ class RelevantFileFinder(DirectoryStructureBase):
             # Check if each page is within the token budget
             within_budget = True
             for p in pages:
-                tokens = len(self.encoding.encode(p))
+                tokens = len(self.encoding.encode(p, disallowed_special=()))
                 if tokens > self.dir_token_budget:
                     within_budget = False
                     break
