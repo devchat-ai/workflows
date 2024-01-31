@@ -49,7 +49,7 @@ def _mk_user_msg(
     prioritized_msgs = [msg_1, msg_2]
 
     for msg in prioritized_msgs:
-        token_count = len(encoding.encode(msg))
+        token_count = len(encoding.encode(msg, disallowed_special=()))
         if token_count <= TOKEN_BUDGET:
             return msg
 

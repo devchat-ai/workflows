@@ -67,7 +67,7 @@ def _mk_write_tests_msg(
     prioritized_msgs = [msg_1, msg_2, msg_3]
 
     for msg in prioritized_msgs:
-        tokens = len(encoding.encode(msg))
+        tokens = len(encoding.encode(msg, disallowed_special=()))
         if tokens <= TOKEN_BUDGET:
             return msg
 
