@@ -78,7 +78,7 @@ def retry_timeout(chunks):
         for chunk in chunks:
             yield chunk
     except (openai.APIConnectionError, openai.APITimeoutError) as err:
-        raise RetryException(err)
+        raise RetryException(err) from err
 
 
 def chunk_list(chunks):
@@ -120,7 +120,7 @@ def content_to_json(content):
         response_obj = json.loads(response_content)
         return response_obj
     except json.JSONDecodeError as err:
-        raise RetryException(err)
+        raise RetryException(err) from err
     except Exception as err:
         raise err
 
@@ -166,4 +166,26 @@ chat_completion_stream = exception_handle(
         "parameters": "",
         "error": err.type if isinstance(err, openai.APIError) else err,
     },
+)
+
+chat_call_completion_stream = exception_handle(
+    retry(
+        pipeline(
+            chat_completion_stream_commit,
+            retry_timeout,
+            chunk_list,
+            parallel(
+                chunks_content,
+                chunks_call
+            ),
+            to_dict_content_and_call
+        ),
+        times=3
+    ),
+    lambda err: {
+        "content": None,
+        "function_name": None,
+        "parameters": "",
+        "error": err.type if isinstance(err, openai.APIError) else err
+    }
 )
