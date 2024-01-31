@@ -1,6 +1,6 @@
 import os
 from functools import wraps
-from typing import Dict
+from typing import Dict, List
 
 import requests
 
@@ -198,7 +198,7 @@ def selected_lines() -> Dict:
 
 
 @rpc_call
-def document_symbols(abspath: str) -> list:
+def document_symbols(abspath: str) -> List:
     """
     Retrieves a list of symbols defined in a document at the given absolute path.
 
@@ -263,7 +263,7 @@ def document_symbols(abspath: str) -> list:
 
 
 @rpc_call
-def workspace_symbols(query: str) -> list:
+def workspace_symbols(query: str) -> List:
     """
     This function is a Python interface for the workspace_symbols RPC endpoint.
     It retrieves symbols from a workspace based on a given query string.
@@ -281,7 +281,7 @@ def workspace_symbols(query: str) -> list:
 
 
 @rpc_call
-def find_definition(abspath: str, line: int, col: int) -> list:
+def find_definition(abspath: str, line: int, col: int) -> List:
     """
     This function is a Python interface for the RPC 'find_definition' method. It returns
         a list of locations or location links where the definition of a symbol is found in the code.
