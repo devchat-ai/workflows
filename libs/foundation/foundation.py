@@ -1,5 +1,5 @@
-import os
 import json
+import os
 
 
 def get_devchat_site_packages_path():
@@ -7,7 +7,7 @@ def get_devchat_site_packages_path():
     Retrieve the DevChat site packages path from the environment variable.
 
     Returns:
-        str: The path stored in DEVCHAT_PYTHONPATH environment variable, 
+        str: The path stored in DEVCHAT_PYTHONPATH environment variable,
              or an empty string if the variable isn't set.
     """
     return os.environ.get("DEVCHAT_PYTHONPATH", "")
@@ -18,7 +18,7 @@ def get_llm_model():
     Retrieve the DevChat LLM model from the environment variable.
 
     Returns:
-        str: The LLM model stored in LLM_MODEL environment variable, 
+        str: The LLM model stored in LLM_MODEL environment variable,
              or an empty string if the variable isn't set.
     """
     return os.environ.get("LLM_MODEL", "gpt-3.5-turbo-1106")
@@ -28,8 +28,10 @@ def get_parent_hash():
     """@DevChatApi
     Retrieves the parent hash value from the environment variable.
 
-    This function is designed to obtain the hash value of the parent message in a sequence of chat interactions,
-    where each pair of question and response is associated with respective hash values. It helps in reconstructing
+    This function is designed to obtain the hash value of the parent message in a sequence of
+    chat interactions,
+    where each pair of question and response is associated with respective hash values.
+    It helps in reconstructing
     the order of conversation threads by providing the parent hash for the current message.
 
     Returns:
@@ -43,15 +45,19 @@ def get_context_contents():
     """@DevChatApi
     Retrieve the chat context history from an environment variable.
 
-    This function looks up the `CONTEXT_CONTENTS` environment variable, parses it as JSON, and returns the result.
+    This function looks up the `CONTEXT_CONTENTS` environment variable, parses it as JSON,
+    and returns the result.
     It's used to obtain the historical content of the chat, which is stored in a JSON array format.
     Each item in the array represents a message with a sender role and content, for example:
-    [{"role": "user", "content": "User's message"}, {"role": "assistant", "content": "Assistant's reply"}].
+    [{"role": "user", "content": "User's message"},
+     {"role": "assistant", "content": "Assistant's reply"}].
 
     Returns:
-        list: A list of dictionaries representing the chat history. Each dictionary contains the keys 'role' and
-              'content', corresponding to who sent the message and what the message was, respectively.
-              If the `CONTEXT_CONTENTS` variable is not set, an empty list is returned.
+        list: A list of dictionaries representing the chat history. Each dictionary
+              contains the keys 'role' and
+              'content', corresponding to who sent the message and what the message was,
+              respectively. If the `CONTEXT_CONTENTS` variable is not set, an empty list
+              is returned.
     """
     return json.loads(os.environ.get("CONTEXT_CONTENTS", "[]"))
 
@@ -66,7 +72,7 @@ def get_user_input_text():
     context, assuming it's from the user, returning it as a string. If the
     context is empty, an empty string is returned. This function is typically
     used to get the last input provided by the user in the chat interface.
-    
+
     Returns:
         str: The content of the most recent user input message if it exists,
              otherwise an empty string.
@@ -103,5 +109,3 @@ def get_user_input_files():
     if last_index == len(contexts):
         return []
     return [item["content"] for item in contexts[last_index:]]
-
-
