@@ -46,6 +46,7 @@ def exception_output_handle(func):
 
     return wrapper
 
+
 def exception_output_handle(func):
     def wrapper(err):
         if isinstance(err, openai.APIError):
