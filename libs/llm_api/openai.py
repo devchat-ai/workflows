@@ -6,7 +6,15 @@ from typing import Dict, List
 
 import openai
 
-from .pipeline import RetryException, exception_err, exception_handle, exception_output_handle, parallel, pipeline, retry
+from .pipeline import (
+    RetryException,
+    exception_err,
+    exception_handle,
+    exception_output_handle,
+    parallel,
+    pipeline,
+    retry,
+)
 
 
 def _try_remove_markdown_block_flag(content):
@@ -134,15 +142,10 @@ chat_completion_call = retry(
 
 chat_completion_no_stream_return_json = exception_handle(
     retry(
-        pipeline(
-            chat_completion_stream_commit,
-            retry_timeout,
-            chunks_content,
-            content_to_json
-        ),
-        times=3
+        pipeline(chat_completion_stream_commit, retry_timeout, chunks_content, content_to_json),
+        times=3,
     ),
-    exception_output_handle(lambda err: None)
+    exception_output_handle(lambda err: None),
 )
 
 chat_completion_stream = exception_handle(
@@ -159,6 +162,6 @@ chat_completion_stream = exception_handle(
         "content": None,
         "function_name": None,
         "parameters": "",
-        "error": err.type if isinstance(err, openai.APIError) else err
-    }
+        "error": err.type if isinstance(err, openai.APIError) else err,
+    },
 )
