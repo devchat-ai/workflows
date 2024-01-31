@@ -2,7 +2,9 @@
 import json
 import os
 import re
-from typing import Dict, List
+import sys
+from functools import wraps
+from typing import Dict, List, Optional
 
 import openai
 
@@ -76,7 +78,7 @@ def retry_timeout(chunks):
         for chunk in chunks:
             yield chunk
     except (openai.APIConnectionError, openai.APITimeoutError) as err:
-        raise RetryException(err)
+        raise RetryException(err) from err
 
 
 def chunk_list(chunks):
@@ -96,19 +98,22 @@ def chunks_content(chunks):
 
 
 def chunks_call(chunks):
-    function_name = None
-    parameters = ""
+    tool_calls = []
 
     for chunk in chunks:
         chunk = chunk.dict()
         delta = chunk["choices"][0]["delta"]
         if "tool_calls" in delta and delta["tool_calls"]:
             tool_call = delta["tool_calls"][0]["function"]
+            if delta["tool_calls"][0].get("index", None) is not None:
+                index = delta["tool_calls"][0]["index"]
+                if index >= len(tool_calls):
+                    tool_calls.append({"name": None, "arguments": ""})
             if tool_call.get("name", None):
-                function_name = tool_call["name"]
+                tool_calls[-1]["name"] = tool_call["name"]
             if tool_call.get("arguments", None):
-                parameters += tool_call["arguments"]
-    return {"function_name": function_name, "parameters": parameters}
+                tool_calls[-1]["arguments"] += tool_call["arguments"]
+    return tool_calls
 
 
 def content_to_json(content):
@@ -118,13 +123,18 @@ def content_to_json(content):
         response_obj = json.loads(response_content)
         return response_obj
     except json.JSONDecodeError as err:
-        raise RetryException(err)
+        raise RetryException(err) from err
     except Exception as err:
         raise err
 
 
-def to_dict_content_and_call(content, function_call):
-    return {"content": content, **function_call}
+def to_dict_content_and_call(content, tool_calls=[]):
+    return {
+        "content": content,
+        "function_name": tool_calls[0]["name"] if tool_calls else None,
+        "parameters": tool_calls[0]["arguments"] if tool_calls else "",
+        "tool_calls": tool_calls,
+    }
 
 
 chat_completion_content = retry(
@@ -153,6 +163,25 @@ chat_completion_stream = exception_handle(
         pipeline(
             chat_completion_stream_commit,
             retry_timeout,
+            chunks_content,
+            to_dict_content_and_call,
+        ),
+        times=3,
+    ),
+    lambda err: {
+        "content": None,
+        "function_name": None,
+        "parameters": "",
+        "error": err.type if isinstance(err, openai.APIError) else err,
+    },
+)
+
+chat_call_completion_stream = exception_handle(
+    retry(
+        pipeline(
+            chat_completion_stream_commit,
+            retry_timeout,
+            chunk_list,
             parallel(chunks_content, chunks_call),
             to_dict_content_and_call,
         ),
@@ -162,6 +191,7 @@ chat_completion_stream = exception_handle(
         "content": None,
         "function_name": None,
         "parameters": "",
+        "tool_calls": [],
         "error": err.type if isinstance(err, openai.APIError) else err,
     },
 )
