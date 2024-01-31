@@ -157,10 +157,9 @@ def chat_tools(prompt, memory: ChatMemory = None, model: str = os.environ.get("L
                     return response
 
                 response_content = (
-                    f"{response.get('content', '')}\n\n"
-                    "function call:\n"
-                    f"function name: {response.get('function_name', '')}\n"
-                    f"parameters: {response.get('parameters', '')}"
+                    f"{response.get('content', '') or ''}\n\n"
+                    f"call function {response.get('function_name', '')} with arguments:"
+                    f"{response.get('parameters', '')}"
                 )
                 if memory:
                     memory.append(
@@ -182,11 +181,11 @@ def chat_tools(prompt, memory: ChatMemory = None, model: str = os.environ.get("L
                     # call function
                     functions = {tool.function_name: tool for tool in tools}
                     for call in response["all_calls"]:
-                        log_info(f"try to call function tool: {call['function_name']}")
+                        log_info(f"try to call function tool: {call['function_name']} with {call['parameters']}")
                         tool = functions[call["function_name"]]
                         result = tool(**json.loads(call["parameters"]))
-                        messages.append({"role": "function", "content": f"function call result: {result}", "name": call["function_name"]})
-                        user_request = {"role": "function", "content": f"function call result: {result}", "name": call["function_name"]}
+                        messages.append({"role": "function", "content": f"function has called, this is the result: {result}", "name": call["function_name"]})
+                        user_request = {"role": "function", "content": f"function has called, this is the result: {result}", "name": call["function_name"]}
                 else:
                     # update prompt
                     messages.append({"role": "user", "content": fix_prompt})
