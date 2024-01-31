@@ -1,26 +1,21 @@
+import json
 import os
 import sys
-import json
 from functools import wraps
 
 import openai
 
-from .openai import (
-    chat_completion_stream,
-    chat_completion_no_stream_return_json,
-    chat_completion_stream_commit,
-    retry_timeout,
-    chunks_content,
-    to_dict_content_and_call,
-    stream_out_chunk
-)
-from .pipeline import (
-    exception_handle,
-    retry,
-    pipeline
-)
 from .memory.base import ChatMemory
-
+from .openai import (
+    chat_completion_no_stream_return_json,
+    chat_completion_stream,
+    chat_completion_stream_commit,
+    chunks_content,
+    retry_timeout,
+    stream_out_chunk,
+    to_dict_content_and_call,
+)
+from .pipeline import exception_handle, pipeline, retry
 
 chat_completion_stream_out = exception_handle(
     retry(
@@ -29,19 +24,26 @@ chat_completion_stream_out = exception_handle(
             retry_timeout,
             stream_out_chunk,
             chunks_content,
-            to_dict_content_and_call
+            to_dict_content_and_call,
         ),
-        times=3
+        times=3,
     ),
     lambda err: {
         "content": None,
         "function_name": None,
         "parameters": "",
-        "error": err.type if isinstance(err, openai.APIError) else err
-    }
+        "error": err.type if isinstance(err, openai.APIError) else err,
+    },
 )
 
-def chat(prompt, memory: ChatMemory = None, stream_out: bool = False, model: str = os.environ.get("LLM_MODEL", "gpt-3.5-turbo-1106"), **llm_config):
+
+def chat(
+    prompt,
+    memory: ChatMemory = None,
+    stream_out: bool = False,
+    model: str = os.environ.get("LLM_MODEL", "gpt-3.5-turbo-1106"),
+    **llm_config,
+):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -62,17 +64,25 @@ def chat(prompt, memory: ChatMemory = None, stream_out: bool = False, model: str
             if not response.get("content", None):
                 print(f"call {func.__name__} failed:", response["error"], file=sys.stderr)
                 return None
-            
+
             if memory:
                 memory.append(
                     {"role": "user", "content": prompt},
-                    {"role": "assistant", "content": response["content"]}
+                    {"role": "assistant", "content": response["content"]},
                 )
             return response["content"]
+
         return wrapper
+
     return decorator
 
-def chat_json(prompt, memory: ChatMemory = None, model: str = os.environ.get("LLM_MODEL", "gpt-3.5-turbo-1106"), **llm_config):
+
+def chat_json(
+    prompt,
+    memory: ChatMemory = None,
+    model: str = os.environ.get("LLM_MODEL", "gpt-3.5-turbo-1106"),
+    **llm_config,
+):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -86,13 +96,14 @@ def chat_json(prompt, memory: ChatMemory = None, model: str = os.environ.get("LL
             response = chat_completion_no_stream_return_json(messages, llm_config=llm_config)
             if not response:
                 print(f"call {func.__name__} failed.", file=sys.stderr)
-            
+
             if memory:
                 memory.append(
                     {"role": "user", "content": prompt},
-                    {"role": "assistant", "content": json.dumps(response)}
+                    {"role": "assistant", "content": json.dumps(response)},
                 )
             return response
-        return wrapper
-    return decorator
 
+        return wrapper
+
+    return decorator

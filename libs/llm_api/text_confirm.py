@@ -3,16 +3,16 @@ import os
 import sys
 from functools import wraps
 
-
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 
-from chatmark import TextEditor, Form, Checkbox # noqa: #402
-from ide_services.services import log_info # noqa: #402
+from chatmark import Checkbox, Form, TextEditor  # noqa: #402
+from ide_services.services import log_info  # noqa: #402
 
 
 class MissEditConfirmFieldException(Exception):
     pass
+
 
 def edit_confirm(response):
     need_regenerate = Checkbox(["Need Regenerate"])
@@ -25,7 +25,7 @@ def edit_confirm(response):
             "Need Regenerate?",
             need_regenerate,
             "Feedback if Regenerate:",
-            feedback_text
+            feedback_text,
         ]
     )
     confirmation_form.render()
@@ -52,5 +52,7 @@ def llm_edit_confirm(edit_confirm_fun=edit_confirm):
                     kwargs["__user_request__"] = {"role": "user", "content": new_response}
                 else:
                     return new_response if new_response else response
+
         return wrapper
+
     return decorator

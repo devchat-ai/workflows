@@ -1,6 +1,6 @@
+import json
 import os
 import sys
-import json
 from functools import wraps
 
 from .memory.base import ChatMemory
@@ -8,8 +8,8 @@ from .openai import chat_call_completion_stream
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from chatmark import TextEditor, Form, Radio, Checkbox # noqa: #402
-from ide_services.services import log_info, log_warn # noqa: #402
+from chatmark import Checkbox, Form, Radio, TextEditor  # noqa: #402
+from ide_services.services import log_info, log_warn  # noqa: #402
 
 
 class MissToolsFieldException(Exception):
@@ -22,40 +22,37 @@ def openai_tool_schema(name, description, parameters, required):
         "function": {
             "name": name,
             "description": description,
-            "parameters": {
-                "type": "object",
-                "properties": parameters,
-                "required": required
-            }
-        }
+            "parameters": {"type": "object", "properties": parameters, "required": required},
+        },
     }
+
 
 def openai_function_schema(name, description, properties, required):
     return {
         "name": name,
         "description": description,
-        "parameters": {
-            "type": "object",
-            "properties": properties,
-            "required": required
-        }
+        "parameters": {"type": "object", "properties": properties, "required": required},
     }
 
-def llm_func(name, description, schema_fun = openai_tool_schema):
+
+def llm_func(name, description, schema_fun=openai_tool_schema):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
 
-        if not hasattr(func, 'llm_metadata'):
+        if not hasattr(func, "llm_metadata"):
             func.llm_metadata = {"properties": {}, "required": []}
 
         wrapper.function_name = name
-        wrapper.json_schema = lambda: schema_fun(name,
-                                                 description,
-                                                 func.llm_metadata.get('properties', {}),
-                                                 func.llm_metadata.get('required', []))
+        wrapper.json_schema = lambda: schema_fun(
+            name,
+            description,
+            func.llm_metadata.get("properties", {}),
+            func.llm_metadata.get("required", []),
+        )
         return wrapper
+
     return decorator
 
 
@@ -65,7 +62,7 @@ def llm_param(name, description, dtype, **kwargs):
         def wrapper(*args, **kwargs):
             return func(*args, **kwargs)
 
-        if hasattr(func, 'llm_metadata'):
+        if hasattr(func, "llm_metadata"):
             wrapper.llm_metadata = func.llm_metadata
         else:
             wrapper.llm_metadata = {"properties": {}, "required": []}
@@ -73,11 +70,12 @@ def llm_param(name, description, dtype, **kwargs):
         wrapper.llm_metadata["properties"][name] = {
             "type": dtype,
             "description": description,
-            **kwargs  # Add any additional keyword arguments
+            **kwargs,  # Add any additional keyword arguments
         }
         wrapper.llm_metadata["required"].append(name)
 
         return wrapper
+
     return decorator
 
 
@@ -101,36 +99,47 @@ def call_confirm(response):
            the function call is allowed (True) or not (False). The string contains
            additional input from the user if the function call is not allowed.
     """
+
     def display_response_and_calls(response):
         if response["content"]:
             print(f"AI Response: {response['content']}", end="\n\n", flush=True)
         print("Function Call Requests:", end="\n\n", flush=True)
         for call_request in response["all_calls"]:
-            print(f"Function: {call_request['function_name']}, Parameters: {call_request['parameters']}", end="\n\n", flush=True)
-    
+            print(
+                f"Function: {call_request['function_name']}, "
+                f"Parameters: {call_request['parameters']}",
+                end="\n\n",
+                flush=True,
+            )
+
     def prompt_user_confirmation():
-        function_call_radio = Radio(
-            ["Allow function call", "Block function call"]
-        )
+        function_call_radio = Radio(["Allow function call", "Block function call"])
         user_feedback_input = TextEditor("")
         confirmation_form = Form(
             [
                 "Permission to proceed with function call?",
                 function_call_radio,
                 "Provide feedback if blocked:",
-                user_feedback_input
+                user_feedback_input,
             ]
         )
         confirmation_form.render()
         user_allowed_call = function_call_radio.selection == 0
         user_feedback = user_feedback_input.new_text
         return user_allowed_call, user_feedback
-    
+
     display_response_and_calls(response)
     return prompt_user_confirmation()
 
 
-def chat_tools(prompt, memory: ChatMemory = None, model: str = os.environ.get("LLM_MODEL", "gpt-3.5-turbo-1106"), tools=None, call_confirm_fun=call_confirm, **llm_config):
+def chat_tools(
+    prompt,
+    memory: ChatMemory = None,
+    model: str = os.environ.get("LLM_MODEL", "gpt-3.5-turbo-1106"),
+    tools=None,
+    call_confirm_fun=call_confirm,
+    **llm_config,
+):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -147,7 +156,6 @@ def chat_tools(prompt, memory: ChatMemory = None, model: str = os.environ.get("L
 
             llm_config["model"] = model
             llm_config["tools"] = tool_schemas
-            
 
             user_request = {"role": "user", "content": prompt}
             while True:
@@ -162,33 +170,50 @@ def chat_tools(prompt, memory: ChatMemory = None, model: str = os.environ.get("L
                     f"{response.get('parameters', '')}"
                 )
                 if memory:
-                    memory.append(
-                        user_request,
-                        {"role": "assistant", "content": response_content}
-                    )
+                    memory.append(user_request, {"role": "assistant", "content": response_content})
                 messages.append({"role": "assistant", "content": response_content})
 
                 if not response.get("function_name", None):
                     return response
                 if not response.get("all_calls", None):
-                    response["all_calls"] = [{"function_name": response["function_name"], "parameters": response["parameters"]}]
-                
+                    response["all_calls"] = [
+                        {
+                            "function_name": response["function_name"],
+                            "parameters": response["parameters"],
+                        }
+                    ]
+
                 do_call = True
                 if call_confirm_fun:
                     do_call, fix_prompt = call_confirm_fun(response)
-                    
+
                 if do_call:
                     # call function
                     functions = {tool.function_name: tool for tool in tools}
                     for call in response["all_calls"]:
-                        log_info(f"try to call function tool: {call['function_name']} with {call['parameters']}")
+                        log_info(
+                            f"try to call function tool: {call['function_name']} "
+                            f"with {call['parameters']}"
+                        )
                         tool = functions[call["function_name"]]
                         result = tool(**json.loads(call["parameters"]))
-                        messages.append({"role": "function", "content": f"function has called, this is the result: {result}", "name": call["function_name"]})
-                        user_request = {"role": "function", "content": f"function has called, this is the result: {result}", "name": call["function_name"]}
+                        messages.append(
+                            {
+                                "role": "function",
+                                "content": f"function has called, this is the result: {result}",
+                                "name": call["function_name"],
+                            }
+                        )
+                        user_request = {
+                            "role": "function",
+                            "content": f"function has called, this is the result: {result}",
+                            "name": call["function_name"],
+                        }
                 else:
                     # update prompt
                     messages.append({"role": "user", "content": fix_prompt})
                     user_request = {"role": "user", "content": fix_prompt}
+
         return wrapper
+
     return decorator

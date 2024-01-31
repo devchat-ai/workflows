@@ -108,10 +108,7 @@ def chunks_call(chunks):
             if delta["tool_calls"][0].get("index", None) is not None:
                 index = delta["tool_calls"][0]["index"]
                 if index >= len(tool_calls):
-                    tool_calls.append({
-                        "name": None,
-                        "arguments": ""
-                    })
+                    tool_calls.append({"name": None, "arguments": ""})
             if tool_call.get("name", None):
                 tool_calls[-1]["name"] = tool_call["name"]
             if tool_call.get("arguments", None):
@@ -136,7 +133,7 @@ def to_dict_content_and_call(content, tool_calls=[]):
         "content": content,
         "function_name": tool_calls[0]["name"] if tool_calls else None,
         "parameters": tool_calls[0]["arguments"] if tool_calls else "",
-        "tool_calls": tool_calls
+        "tool_calls": tool_calls,
     }
 
 
@@ -185,19 +182,16 @@ chat_call_completion_stream = exception_handle(
             chat_completion_stream_commit,
             retry_timeout,
             chunk_list,
-            parallel(
-                chunks_content,
-                chunks_call
-            ),
-            to_dict_content_and_call
+            parallel(chunks_content, chunks_call),
+            to_dict_content_and_call,
         ),
-        times=3
+        times=3,
     ),
     lambda err: {
         "content": None,
         "function_name": None,
         "parameters": "",
         "tool_calls": [],
-        "error": err.type if isinstance(err, openai.APIError) else err
-    }
+        "error": err.type if isinstance(err, openai.APIError) else err,
+    },
 )

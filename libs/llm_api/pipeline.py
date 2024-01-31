@@ -8,6 +8,7 @@ class RetryException(Exception):
     def __init__(self, err):
         self.error = err
 
+
 def retry(func, times):
     def wrapper(*args, **kwargs):
         for index in range(times):
@@ -20,7 +21,9 @@ def retry(func, times):
             except Exception as err:
                 raise err
         raise err.error
+
     return wrapper
+
 
 def exception_err(func):
     def wrapper(*args, **kwargs):
@@ -29,7 +32,9 @@ def exception_err(func):
             return True, result
         except Exception as err:
             return False, err
+
     return wrapper
+
 
 def exception_output_handle(func):
     def wrapper(err):
@@ -38,6 +43,7 @@ def exception_output_handle(func):
         else:
             print(err, file=sys.stderr, flush=True)
         return func(err)
+
     return wrapper
 
 def exception_output_handle(func):
@@ -58,7 +64,9 @@ def exception_handle(func, handler):
             return result
         except Exception as err:
             return handler(err)
+
     return wrapper
+
 
 def pipeline(*funcs):
     def wrapper(*args, **kwargs):
@@ -71,7 +79,9 @@ def pipeline(*funcs):
             else:
                 args = func(*args, **kwargs)
         return args
+
     return wrapper
+
 
 def parallel(*funcs):
     def wrapper(args):
@@ -79,4 +89,5 @@ def parallel(*funcs):
         for func in funcs:
             results["value"].append(func(args))
         return results
+
     return wrapper
