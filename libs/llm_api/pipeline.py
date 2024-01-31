@@ -1,4 +1,7 @@
+import sys
 from typing import Dict
+
+import openai
 
 
 class RetryException(Exception):
@@ -32,6 +35,14 @@ def exception_err(func):
 
     return wrapper
 
+def exception_output_handle(func):
+    def wrapper(err):
+        if isinstance(err, openai.APIError):
+            print(err.type, file=sys.stderr, flush=True)
+        else:
+            print(err, file=sys.stderr, flush=True)
+        return func(err)
+    return wrapper
 
 def exception_handle(func, handler):
     def wrapper(*args, **kwargs):
