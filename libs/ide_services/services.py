@@ -1,5 +1,5 @@
-
 from .rpc import rpc_call
+
 
 @rpc_call
 def get_lsp_brige_port():
@@ -19,6 +19,7 @@ def update_slash_commands():
 @rpc_call
 def ide_language() -> str:
     pass
+
 
 @rpc_call
 def log_info(message: str):
