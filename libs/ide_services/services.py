@@ -1,40 +1,4 @@
-import os
-from functools import wraps
-
-import requests
-
-BASE_SERVER_URL = os.environ.get("DEVCHAT_IDE_SERVICE_URL", "http://localhost:3000")
-
-
-def rpc_call(f):
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        if os.environ.get("DEVCHAT_IDE_SERVICE_URL", "") == "":
-            # maybe in a test, user don't want to mock services functions
-            return
-
-        try:
-            function_name = f.__name__
-            url = f"{BASE_SERVER_URL}/{function_name}"
-
-            data = dict(zip(f.__code__.co_varnames, args))
-            data.update(kwargs)
-            headers = {"Content-Type": "application/json"}
-
-            response = requests.post(url, json=data, headers=headers)
-
-            if response.status_code != 200:
-                raise Exception(f"Server error: {response.status_code}")
-
-            response_data = response.json()
-            if "error" in response_data:
-                raise Exception(f"Server returned an error: {response_data['error']}")
-            return response_data["result"]
-        except ConnectionError as err:
-            # TODO
-            raise err
-
-    return wrapper
+from .rpc import rpc_call
 
 
 @rpc_call
@@ -49,11 +13,6 @@ def install_python_env(command_name: str, requirements_file: str) -> str:
 
 @rpc_call
 def update_slash_commands():
-    pass
-
-
-@rpc_call
-def open_folder(folder: str):
     pass
 
 
@@ -74,54 +33,4 @@ def log_warn(message: str):
 
 @rpc_call
 def log_error(message: str):
-    pass
-
-
-@rpc_call
-def visible_lines(message: str):
-    pass
-
-
-@rpc_call
-def selected_lines(message: str):
-    pass
-
-
-@rpc_call
-def document_symbols(abspath: str):
-    pass
-
-
-@rpc_call
-def workspace_symbols(query: str):
-    pass
-
-
-@rpc_call
-def find_definition(abspath: str, line: int, col: int):
-    pass
-
-
-@rpc_call
-def find_type_definition(abspath: str, line: int, col: int):
-    pass
-
-
-@rpc_call
-def find_declaration(abspath: str, line: int, col: int):
-    pass
-
-
-@rpc_call
-def find_implementation(abspath: str, line: int, col: int):
-    pass
-
-
-@rpc_call
-def find_reference(abspath: str, line: int, col: int):
-    pass
-
-
-@rpc_call
-def diff_apply(filepath, content):
     pass
