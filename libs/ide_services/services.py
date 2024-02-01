@@ -22,15 +22,13 @@ def ide_language() -> str:
 
 
 @rpc_call
-def log_info(message: str):
+def ide_logging(level: str, message: str):
+    """
+    level: "info" | "warn" | "error" | "debug"
+    """
     pass
 
 
-@rpc_call
-def log_warn(message: str):
-    pass
-
-
-@rpc_call
-def log_error(message: str):
-    pass
+# NOTE: for compatibility, remove this after all usages are replaced with ide_logging
+def log_info(message):
+    return ide_logging("info", message)

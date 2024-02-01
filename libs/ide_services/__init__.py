@@ -1,6 +1,7 @@
 from .services import (
     get_lsp_brige_port,
     ide_language,
+    ide_logging,
     install_python_env,
     update_slash_commands,
 )
@@ -10,4 +11,5 @@ __all__ = [
     "install_python_env",
     "update_slash_commands",
     "ide_language",
+    "ide_logging",
 ]
