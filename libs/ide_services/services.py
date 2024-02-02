@@ -29,6 +29,16 @@ def ide_logging(level: str, message: str):
     pass
 
 
+@rpc_call
+def get_document_symbols(abspath: str):
+    pass
+
+
+@rpc_call
+def find_type_def_locations(abspath: str, line: int, character: int):
+    pass
+
+
 # NOTE: for compatibility, remove this after all usages are replaced with ide_logging
 def log_info(message):
     return ide_logging("info", message)
