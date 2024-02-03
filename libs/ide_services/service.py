@@ -75,12 +75,10 @@ class IDEService:
 
     @rpc_method
     def get_document_symbols(self, abspath: str) -> List[SymbolNode]:
-        # TODO: convert the result to a list of SymbolNode objects
-        return self._result
+        return [SymbolNode.parse_obj(node) for node in self._result]
 
     @rpc_method
     def find_type_def_locations(
         self, abspath: str, line: int, character: int
     ) -> List[Location]:
-        # TODO: convert the result to a list of Location objects
-        return self._result
+        return [Location.parse_obj(loc) for loc in self._result]
