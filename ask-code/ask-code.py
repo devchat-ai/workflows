@@ -6,7 +6,7 @@ from chat.ask_codebase.chains.smart_qa import SmartQA
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
 
-from ide_services import get_lsp_brige_port  # noqa: E402
+from ide_services import IDEService  # noqa: E402
 
 
 def query(question, lsp_brige_port):
@@ -59,7 +59,7 @@ def main():
             print("Usage: python index_and_query.py query [question] [port]")
             sys.exit(1)
 
-        port = get_lsp_brige_port()
+        port = IDEService().get_lsp_brige_port()
 
         question = sys.argv[2]
         query(question, port)

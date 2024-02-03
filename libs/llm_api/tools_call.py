@@ -9,7 +9,7 @@ from .openai import chat_call_completion_stream
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from chatmark import Checkbox, Form, Radio, TextEditor  # noqa: #402
-from ide_services.services import log_info, log_warn  # noqa: #402
+from ide_services import IDEService  # noqa: #402
 
 
 class MissToolsFieldException(Exception):
@@ -191,9 +191,10 @@ def chat_tools(
                     # call function
                     functions = {tool.function_name: tool for tool in tools}
                     for call in response["all_calls"]:
-                        log_info(
+                        IDEService().ide_logging(
+                            "info",
                             f"try to call function tool: {call['function_name']} "
-                            f"with {call['parameters']}"
+                            f"with {call['parameters']}",
                         )
                         tool = functions[call["function_name"]]
                         result = tool(**json.loads(call["parameters"]))

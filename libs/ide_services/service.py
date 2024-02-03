@@ -1,8 +1,10 @@
-from typing import List
 import os
 from functools import wraps
-from .types import Location, SymbolNode
+from typing import List
+
 import requests
+
+from .types import Location, SymbolNode
 
 BASE_SERVER_URL = os.environ.get("DEVCHAT_IDE_SERVICE_URL", "http://localhost:3000")
 
@@ -47,6 +49,15 @@ def rpc_method(f):
 
 
 class IDEService:
+    """
+    Client for IDE service
+
+    Usage:
+    client = IDEService()
+    res = client.ide_language()
+    res = client.ide_logging("info", "some message")
+    """
+
     def __init__(self):
         self._result = None
 
@@ -78,7 +89,5 @@ class IDEService:
         return [SymbolNode.parse_obj(node) for node in self._result]
 
     @rpc_method
-    def find_type_def_locations(
-        self, abspath: str, line: int, character: int
-    ) -> List[Location]:
+    def find_type_def_locations(self, abspath: str, line: int, character: int) -> List[Location]:
         return [Location.parse_obj(loc) for loc in self._result]

@@ -9,7 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
 sys.path.append(os.path.dirname(__file__))
 
 from chatmark import Checkbox, Form, TextEditor  # noqa: E402
-from ide_services.services import log_info
+from ide_services import IDEService  # noqa: E402
 from llm_api import chat_completion_stream  # noqa: E402
 
 diff_too_large_message_en = (
@@ -67,17 +67,19 @@ def read_prompt_from_file(filename):
     - FileNotFoundError: If the file does not exist.
     - Exception: If any other error occurs during file reading.
     """
+    s = IDEService()
     try:
         with open(filename, "r", encoding="utf-8") as file:
             return file.read().strip()
     except FileNotFoundError:
-        log_info(
+        s.ide_logging(
+            "info",
             f"File {filename} not found. "
-            "Please make sure it exists in the same directory as the script."
+            "Please make sure it exists in the same directory as the script.",
         )
         sys.exit(1)
     except Exception as e:
-        log_info(f"An error occurred while reading the file {filename}: {e}")
+        s.ide_logging("info", f"An error occurred while reading the file {filename}: {e}")
         sys.exit(1)
 
 
