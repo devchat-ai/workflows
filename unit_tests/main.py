@@ -10,7 +10,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 from chatmark import Checkbox, Form, Step, TextEditor  # noqa: E402
 from find_reference_tests import find_reference_tests
 from i18n import TUILanguage, get_translation
-from ide_services import ide_language  # noqa: E402
+from ide_services import IDEService  # noqa: E402
 from model import (
     FuncToTest,
     TokenBudgetExceededException,
@@ -214,7 +214,8 @@ def main(input: str):
     user_prompt = f"Help me write unit tests for the `{func_name}` function"
 
     repo_root = os.getcwd()
-    ide_lang = ide_language()
+    ide_lang = IDEService().ide_language()
+
     tui_lang = TUILanguage.from_str(ide_lang)
     _i = get_translation(tui_lang)
 

@@ -7,7 +7,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 
 from chatmark import Checkbox, Form, TextEditor  # noqa: #402
-from ide_services.services import log_info  # noqa: #402
 
 
 class MissEditConfirmFieldException(Exception):
