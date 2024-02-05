@@ -50,7 +50,7 @@ def chat(
             nonlocal prompt, memory, model, llm_config
             prompt = prompt.format(**kwargs)
             messages = memory.contexts() if memory else []
-            if not any(item["content"] == prompt for item in messages):
+            if not any(item["content"] == prompt for item in messages) and prompt:
                 messages.append({"role": "user", "content": prompt})
             if "__user_request__" in kwargs:
                 messages.append(kwargs["__user_request__"])
