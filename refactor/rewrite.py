@@ -1,9 +1,9 @@
-import sys
 import re
+import sys
 
-from devchat.llm import chat
 from devchat.ide.service import IDEService
-from devchat.ide.vscode_services import visible_lines, selected_lines
+from devchat.ide.vscode_services import selected_lines, visible_lines
+from devchat.llm import chat
 
 
 def get_selected_code():
@@ -24,13 +24,14 @@ def get_selected_code():
     if selected_data["text"] == "":
         print(miss_selected_error, file=sys.stderr, flush=True)
         sys.exit(-1)
-    
+
     return selected_data
+
 
 def get_visible_code():
     """
     Retrieves visible code from the visible_lines function.
-    
+
     Returns:
     visible_data: The visible code retrieved from the visible_lines function.
     """
@@ -44,18 +45,22 @@ Your task is:
 Following the task requirements, modify only the selected portion of the code. \
 Please ensure that the revised code segment maintains the same indentation as the \
 selected code to seamlessly integrate with the existing code structure and maintain \
-correct syntax. Just refactor the selected code. Keep all other information as it is. Here is the relevant context \
+correct syntax. Just refactor the selected code. Keep all other information as it is. \
+Here is the relevant context \
 information for your reference:
 1.  selected code info: {selected_text}
 2.  current visible code info: {visible_text}
 """
+
+
 @chat(prompt=REWRITE_PROMPT, stream_out=True)
 # pylint: disable=unused-argument
 def ai_rewrite(question, selected_text, visible_text):
     """
     call ai to rewrite selected code
     """
-    pass # pylint: disable=unnecessary-pass
+    pass  # pylint: disable=unnecessary-pass
+
 
 def extract_markdown_block(text):
     """
@@ -72,6 +77,7 @@ def extract_markdown_block(text):
         return block_content
     else:
         return text
+
 
 def replace_selected(new_code):
     selected_data = IDEService().get_selected_code().dict()
@@ -115,11 +121,8 @@ def main():
     visible_text = get_visible_code()
 
     # rewrite
-    response = ai_rewrite(
-        question=question,
-        selected_text=selected_text,
-        visible_text=visible_text)
-    
+    response = ai_rewrite(question=question, selected_text=selected_text, visible_text=visible_text)
+
     # apply new code to editor
     new_code = extract_markdown_block(response)
     IDEService().diff_apply("", new_code)
