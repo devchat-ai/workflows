@@ -1,5 +1,5 @@
 import json
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 from model import FuncToTest
 from openai_util import create_chat_completion_content

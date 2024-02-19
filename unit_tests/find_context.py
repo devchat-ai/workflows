@@ -1,13 +1,10 @@
-import json
 import os
 import sys
 from collections import defaultdict
-from functools import partial
-from typing import Dict, Iterable, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set
 
 from assistants.recommend_test_context import get_recommended_symbols
 from model import FuncToTest
-from tools.file_util import retrieve_file_content
 from tools.symbol_util import (
     find_symbol_nodes,
     get_symbol_content,

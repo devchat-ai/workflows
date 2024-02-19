@@ -42,7 +42,7 @@ def _mk_write_tests_msg(
 
     context_content = ""
     if symbol_context:
-        context_content += f"\n\nrelevant context\n```\n"
+        context_content += "\n\nrelevant context\n```\n"
         context_content += "\n\n".join(symbol_context)
         context_content += "\n```\n"
 

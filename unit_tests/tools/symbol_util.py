@@ -8,7 +8,7 @@ from tools.file_util import retrieve_file_content
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from libs.ide_services import IDEService, Location, Position, SymbolNode
+from libs.ide_services import Position, SymbolNode
 
 
 def split_tokens(text: str) -> Dict[str, List[int]]:
