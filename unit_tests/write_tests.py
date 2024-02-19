@@ -18,6 +18,7 @@ def _mk_write_tests_msg(
     test_cases: List[str],
     chat_language: str,
     reference_files: Optional[List[str]] = None,
+    symbol_context: Optional[List[str]] = None,
 ) -> Optional[str]:
     encoding = get_encoding(ENCODING)
 
@@ -39,6 +40,12 @@ def _mk_write_tests_msg(
     if func_to_test.container_content is not None:
         class_content = f"\nclass code\n```\n{func_to_test.container_content}\n```\n"
 
+    context_content = ""
+    if symbol_context:
+        context_content += f"\n\nrelevant context\n```\n"
+        context_content += "\n\n".join(symbol_context)
+        context_content += "\n```\n"
+
     # Prepare a list of user messages to fit the token budget
     # by adjusting the relevant content and reference content
     content_fmt = partial(
@@ -48,6 +55,13 @@ def _mk_write_tests_msg(
         test_cases_str=test_cases_str,
         chat_language=chat_language,
     )
+
+    # NOTE: adjust symbol_context content more flexibly if needed
+    msg_0 = content_fmt(
+        relevant_content="\n".join([func_content, class_content, context_content]),
+        reference_content=reference_content,
+    )
+
     # 1. func content & class content & reference file content
     msg_1 = content_fmt(
         relevant_content="\n".join([func_content, class_content]),
@@ -64,7 +78,7 @@ def _mk_write_tests_msg(
         reference_content="",
     )
 
-    prioritized_msgs = [msg_1, msg_2, msg_3]
+    prioritized_msgs = [msg_0, msg_1, msg_2, msg_3]
 
     for msg in prioritized_msgs:
         tokens = len(encoding.encode(msg, disallowed_special=()))
@@ -83,6 +97,7 @@ def write_and_print_tests(
     func_to_test: FuncToTest,
     test_cases: List[str],
     reference_files: Optional[List[str]] = None,
+    symbol_context: Optional[List[str]] = None,
     chat_language: str = "English",
 ) -> None:
     user_msg = _mk_write_tests_msg(
@@ -90,6 +105,7 @@ def write_and_print_tests(
         func_to_test=func_to_test,
         test_cases=test_cases,
         reference_files=reference_files,
+        symbol_context=symbol_context,
         chat_language=chat_language,
     )
 

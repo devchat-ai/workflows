@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 import click
 
@@ -8,6 +8,10 @@ sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 
 from chatmark import Checkbox, Form, Step, TextEditor  # noqa: E402
+from find_context import (
+    find_symbol_context_by_static_analysis,
+    find_symbol_context_of_llm_recommendation,
+)
 from find_reference_tests import find_reference_tests
 from i18n import TUILanguage, get_translation
 from ide_services import IDEService  # noqa: E402
@@ -42,7 +46,12 @@ class UnitTestsWorkflow:
 
         cases, files = self.step2_edit_cases_and_reference_files(cases, files)
 
-        self.step3_write_and_print_tests(cases, files)
+        symbol_context = self.step3_find_symbol_context()
+        context = set()
+        for _, v in symbol_context.items():
+            context.update(v)
+
+        self.step4_write_and_print_tests(cases, files, list(context))
 
     def step1_propose_cases_and_reference_files(
         self,
@@ -165,10 +174,31 @@ class UnitTestsWorkflow:
 
         return cases, valid_files
 
-    def step3_write_and_print_tests(
+    def step3_find_symbol_context(self) -> Dict[str, List[str]]:
+        symbol_context = find_symbol_context_by_static_analysis(
+            self.func_to_test, self.tui_lang.chat_language
+        )
+
+        known_context_for_llm = []
+        if self.func_to_test.container_content is not None:
+            known_context_for_llm.append(self.func_to_test.container_content)
+        known_context_for_llm += list(
+            {item for sublist in list(symbol_context.values()) for item in sublist}
+        )
+
+        recommended_context = find_symbol_context_of_llm_recommendation(
+            self.func_to_test, known_context_for_llm
+        )
+
+        symbol_context.update(recommended_context)
+
+        return symbol_context
+
+    def step4_write_and_print_tests(
         self,
         cases: List[str],
         ref_files: List[str],
+        symbol_context: List[str],
     ):
         """
         Write and print tests.
@@ -179,6 +209,7 @@ class UnitTestsWorkflow:
             func_to_test=self.func_to_test,
             test_cases=cases,
             reference_files=ref_files,
+            symbol_context=symbol_context,
             chat_language=self.tui_lang.chat_language,
         )
 
