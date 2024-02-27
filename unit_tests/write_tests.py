@@ -18,6 +18,7 @@ def _mk_write_tests_msg(
     test_cases: List[str],
     chat_language: str,
     reference_files: Optional[List[str]] = None,
+    # context_files: Optional[List[str]] = None,
     symbol_context: Optional[List[str]] = None,
 ) -> Optional[str]:
     encoding = get_encoding(ENCODING)
@@ -45,6 +46,13 @@ def _mk_write_tests_msg(
         context_content += "\n\nrelevant context\n```\n"
         context_content += "\n\n".join(symbol_context)
         context_content += "\n```\n"
+
+    # if context_files:
+    #     context_content += "\n\nrelevant context files\n\n"
+    #     for i, fp in enumerate(context_files, 1):
+    #         context_file_content = retrieve_file_content(fp, root_path)
+    #         context_content += f"{i}. {fp}\n\n"
+    #         context_content += f"```{context_file_content}```\n\n"
 
     # Prepare a list of user messages to fit the token budget
     # by adjusting the relevant content and reference content
