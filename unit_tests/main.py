@@ -42,19 +42,22 @@ class UnitTestsWorkflow:
         """
         Run the workflow to generate unit tests.
         """
-        cases, files = self.step1_propose_cases_and_reference_files()
-
-        cases, files = self.step2_edit_cases_and_reference_files(cases, files)
-
-        symbol_context = self.step3_find_symbol_context()
+        symbol_context = self.step1_find_symbol_context()
         context = set()
         for _, v in symbol_context.items():
             context.update(v)
+    
+        cases, files = self.step2_propose_cases_and_reference_files(list(context))
+
+        res = self.step3_edit_cases_and_reference_files(cases, files)
+        cases = res[0] 
+        files = res[1]
 
         self.step4_write_and_print_tests(cases, files, list(context))
 
-    def step1_propose_cases_and_reference_files(
+    def step2_propose_cases_and_reference_files(
         self,
+        context: List[str],
     ) -> Tuple[List[str], List[str]]:
         """
         Propose test cases and reference files for a specified function.
@@ -72,6 +75,7 @@ class UnitTestsWorkflow:
             test_cases = propose_test(
                 user_prompt=self.user_prompt,
                 func_to_test=self.func_to_test,
+                context=context,
                 chat_language=self.tui_lang.chat_language,
             )
 
@@ -87,7 +91,7 @@ class UnitTestsWorkflow:
 
         return test_cases, reference_files
 
-    def step2_edit_cases_and_reference_files(
+    def step3_edit_cases_and_reference_files(
         self, test_cases: List[str], reference_files: List[str]
     ) -> Tuple[List[str], List[str]]:
         """
@@ -174,7 +178,7 @@ class UnitTestsWorkflow:
 
         return cases, valid_files
 
-    def step3_find_symbol_context(self) -> Dict[str, List[str]]:
+    def step1_find_symbol_context(self) -> Dict[str, List[str]]:
         symbol_context = find_symbol_context_by_static_analysis(
             self.func_to_test, self.tui_lang.chat_language
         )
