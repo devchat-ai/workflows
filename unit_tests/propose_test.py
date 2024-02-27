@@ -74,7 +74,7 @@ def _mk_user_msg(
 def propose_test(
     user_prompt: str,
     func_to_test: FuncToTest,
-    context:Optional[List[str]]=None,
+    context: Optional[List[str]] = None,
     chat_language: str = "English",
 ) -> List[str]:
     """Propose test cases for a specified function based on a user prompt

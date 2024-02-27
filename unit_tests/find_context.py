@@ -51,9 +51,7 @@ def _extract_referenced_symbols_context(
     return referenced_symbols_context
 
 
-def _find_children_symbols_type_def_context(
-    func_to_test: FuncToTest, func_symbol: SymbolNode
-):
+def _find_children_symbols_type_def_context(func_to_test: FuncToTest, func_symbol: SymbolNode):
     """
     Find the type definitions of the symbols in the function.
     """
@@ -128,9 +126,7 @@ def _extract_recommended_symbols_context(
         positions = locate_symbol_by_name(last_token, abs_path)
 
         for pos in positions:
-            type_locations = client.find_type_def_locations(
-                abs_path, pos.line, pos.character
-            )
+            type_locations = client.find_type_def_locations(abs_path, pos.line, pos.character)
             def_locations = client.find_def_locations(abs_path, pos.line, pos.character)
             locations = type_locations + def_locations
             for loc in locations:
@@ -184,9 +180,7 @@ def find_symbol_context_by_static_analysis(
     context_by_reference = _extract_referenced_symbols_context(
         func_to_test, doc_symbols, depth=func_depth
     )
-    context_by_type_def = _find_children_symbols_type_def_context(
-        func_to_test, func_symbol
-    )
+    context_by_type_def = _find_children_symbols_type_def_context(func_to_test, func_symbol)
 
     symbol_context.update(context_by_reference)
     symbol_context.update(context_by_type_def)
@@ -202,8 +196,6 @@ def find_symbol_context_of_llm_recommendation(
     """
     recommended_symbols = get_recommended_symbols(func_to_test, known_context)
 
-    recommended_context = _extract_recommended_symbols_context(
-        func_to_test, recommended_symbols
-    )
+    recommended_context = _extract_recommended_symbols_context(func_to_test, recommended_symbols)
 
     return recommended_context

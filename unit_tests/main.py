@@ -46,11 +46,11 @@ class UnitTestsWorkflow:
         context = set()
         for _, v in symbol_context.items():
             context.update(v)
-    
+
         cases, files = self.step2_propose_cases_and_reference_files(list(context))
 
         res = self.step3_edit_cases_and_reference_files(cases, files)
-        cases = res[0] 
+        cases = res[0]
         files = res[1]
 
         self.step4_write_and_print_tests(cases, files, list(context))
