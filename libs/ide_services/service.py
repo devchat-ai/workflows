@@ -91,3 +91,7 @@ class IDEService:
     @rpc_method
     def find_type_def_locations(self, abspath: str, line: int, character: int) -> List[Location]:
         return [Location.parse_obj(loc) for loc in self._result]
+
+    @rpc_method
+    def find_def_locations(self, abspath: str, line: int, character: int) -> List[Location]:
+        return [Location.parse_obj(loc) for loc in self._result]
