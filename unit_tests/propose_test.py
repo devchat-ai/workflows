@@ -1,6 +1,6 @@
 import json
 from functools import partial
-from typing import List
+from typing import List, Optional
 
 from model import FuncToTest, TokenBudgetExceededException
 from openai_util import create_chat_completion_content
@@ -16,6 +16,7 @@ TOKEN_BUDGET = int(16000 * 0.9)
 def _mk_user_msg(
     user_prompt: str,
     func_to_test: FuncToTest,
+    context: List[str],
     chat_language: str,
 ) -> str:
     """
@@ -28,6 +29,12 @@ def _mk_user_msg(
     if func_to_test.container_content is not None:
         class_content = f"class code\n```\n{func_to_test.container_content}\n```\n"
 
+    context_content = ""
+    if context:
+        context_content = "\n\nrelevant context\n```\n"
+        context_content += "\n\n".join(context)
+        context_content += "\n```\n"
+
     # Prepare a list of user messages to fit the token budget
     # by adjusting the relevant content
     relevant_content_fmt = partial(
@@ -36,6 +43,10 @@ def _mk_user_msg(
         function_name=func_to_test.func_name,
         file_path=func_to_test.file_path,
         chat_language=chat_language,
+    )
+    # 0. func content & class content & context content
+    msg_0 = relevant_content_fmt(
+        relevant_content="\n".join([func_content, class_content, context_content]),
     )
     # 1. func content & class content
     msg_1 = relevant_content_fmt(
@@ -46,7 +57,7 @@ def _mk_user_msg(
         relevant_content=func_content,
     )
 
-    prioritized_msgs = [msg_1, msg_2]
+    prioritized_msgs = [msg_0, msg_1, msg_2]
 
     for msg in prioritized_msgs:
         token_count = len(encoding.encode(msg, disallowed_special=()))
@@ -63,6 +74,7 @@ def _mk_user_msg(
 def propose_test(
     user_prompt: str,
     func_to_test: FuncToTest,
+    context:Optional[List[str]]=None,
     chat_language: str = "English",
 ) -> List[str]:
     """Propose test cases for a specified function based on a user prompt
@@ -76,9 +88,11 @@ def propose_test(
     Returns:
         List[str]: A list of test case descriptions.
     """
+    context = context or []
     user_msg = _mk_user_msg(
         user_prompt=user_prompt,
         func_to_test=func_to_test,
+        context=context,
         chat_language=chat_language,
     )
 
