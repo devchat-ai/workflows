@@ -50,11 +50,12 @@ class UnitTestsWorkflow:
 
         cases, files = self.step2_propose_cases_and_reference_files(list(contexts))
 
-        res = self.step3_edit_cases_and_reference_files(cases, files)
+        res = self.step3_user_interaction(cases, files)
         cases = res[0]
         files = res[1]
+        requirements = res[2]
 
-        self.step4_write_and_print_tests(cases, files, list(contexts))
+        self.step4_write_and_print_tests(cases, files, list(contexts), requirements)
 
     def step2_propose_cases_and_reference_files(
         self,
@@ -92,13 +93,16 @@ class UnitTestsWorkflow:
 
         return test_cases, reference_files
 
-    def step3_edit_cases_and_reference_files(
+    def step3_user_interaction(
         self, test_cases: List[str], reference_files: List[str]
-    ) -> Tuple[List[str], List[str]]:
+    ) -> Tuple[List[str], List[str], str]:
         """
         Edit test cases and reference files by user.
 
-        Return the updated cases and valid reference files.
+        Return:
+        - the updated cases 
+        - valid reference files
+        - customized requirements(prompts)
         """
         _i = get_translation(self.tui_lang)
 
@@ -118,7 +122,12 @@ class UnitTestsWorkflow:
             title=_i("Edit reference test file\n(Multiple files can be separated by line breaks)"),
         )
 
-        form = Form(components=[checkbox, case_editor, ref_editor])
+        requirements_editor = TextEditor(
+            text = "",
+            title = _i("Write your customized requirements(prompts) for tests here.\n(For example, what testing framework to use.)"),
+        )
+
+        form = Form(components=[checkbox, case_editor, ref_editor, requirements_editor])
         form.render()
 
         # Check test cases
@@ -148,6 +157,9 @@ class UnitTestsWorkflow:
             except Exception:
                 invalid_files.append(ref_file)
 
+        # Get customized requirements
+        requirements: str = requirements_editor.new_text.strip() if requirements_editor.new_text else ""
+
         # Print summary
         title = _i("Will generate tests for the following cases.")
         lines = []
@@ -174,10 +186,13 @@ class UnitTestsWorkflow:
             width = len(str(len(invalid_files)))
             lines.extend([f"{(i+1):>{width}}. {f}" for i, f in enumerate(invalid_files)])
 
+        lines.append(_i("\nCustomized requirements(prompts):"))
+        lines.append(requirements)
+
         with Step(title):
             print("\n".join(lines), flush=True)
 
-        return cases, valid_files
+        return cases, valid_files, requirements
 
     def step1_find_symbol_context(self) -> Dict[str, List[Context]]:
         symbol_context = find_symbol_context_by_static_analysis(
@@ -221,6 +236,7 @@ class UnitTestsWorkflow:
         cases: List[str],
         ref_files: List[str],
         symbol_contexts: List[Context],
+        user_requirements: str,
     ):
         """
         Write and print tests.
@@ -232,6 +248,7 @@ class UnitTestsWorkflow:
             test_cases=cases,
             reference_files=ref_files,
             symbol_contexts=symbol_contexts,
+            user_requirements=user_requirements,
             chat_language=self.tui_lang.chat_language,
         )
 
