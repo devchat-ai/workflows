@@ -58,7 +58,7 @@ def explain(selected_text, visible_text):
 
 
 def main():
-    explain(get_selected_code(), get_visible_code())
+    explain(selected_text=get_selected_code(), visible_text=get_visible_code())
     sys.exit(0)
 
 
