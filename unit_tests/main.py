@@ -9,6 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 
 from chatmark import Checkbox, Form, Step, TextEditor  # noqa: E402
 from find_context import (
+    Context,
     find_symbol_context_by_static_analysis,
     find_symbol_context_of_llm_recommendation,
 )
@@ -43,21 +44,21 @@ class UnitTestsWorkflow:
         Run the workflow to generate unit tests.
         """
         symbol_context = self.step1_find_symbol_context()
-        context = set()
+        contexts = set()
         for _, v in symbol_context.items():
-            context.update(v)
+            contexts.update(v)
 
-        cases, files = self.step2_propose_cases_and_reference_files(list(context))
+        cases, files = self.step2_propose_cases_and_reference_files(list(contexts))
 
         res = self.step3_edit_cases_and_reference_files(cases, files)
         cases = res[0]
         files = res[1]
 
-        self.step4_write_and_print_tests(cases, files, list(context))
+        self.step4_write_and_print_tests(cases, files, list(contexts))
 
     def step2_propose_cases_and_reference_files(
         self,
-        context: List[str],
+        contexts: List[Context],
     ) -> Tuple[List[str], List[str]]:
         """
         Propose test cases and reference files for a specified function.
@@ -75,7 +76,7 @@ class UnitTestsWorkflow:
             test_cases = propose_test(
                 user_prompt=self.user_prompt,
                 func_to_test=self.func_to_test,
-                context=context,
+                contexts=contexts,
                 chat_language=self.tui_lang.chat_language,
             )
 
@@ -178,14 +179,25 @@ class UnitTestsWorkflow:
 
         return cases, valid_files
 
-    def step1_find_symbol_context(self) -> Dict[str, List[str]]:
+    def step1_find_symbol_context(self) -> Dict[str, List[Context]]:
         symbol_context = find_symbol_context_by_static_analysis(
             self.func_to_test, self.tui_lang.chat_language
         )
 
-        known_context_for_llm = []
+        # with Step("Symbol context"):
+        #     for k, v in symbol_context.items():
+        #         print(f"\n- {k}: ")
+        #         for item in v:
+        #             print(f"{item.file_path}\n{item.content}")
+
+        known_context_for_llm: List[Context] = []
         if self.func_to_test.container_content is not None:
-            known_context_for_llm.append(self.func_to_test.container_content)
+            known_context_for_llm.append(
+                Context(
+                    file_path=self.func_to_test.file_path,
+                    content=self.func_to_test.container_content,
+                )
+            )
         known_context_for_llm += list(
             {item for sublist in list(symbol_context.values()) for item in sublist}
         )
@@ -193,6 +205,12 @@ class UnitTestsWorkflow:
         recommended_context = find_symbol_context_of_llm_recommendation(
             self.func_to_test, known_context_for_llm
         )
+
+        # with Step("Recommended context"):
+        #     for k, v in recommended_context.items():
+        #         print(f"\n- {k}: ")
+        #         for item in v:
+        #             print(f"{item.file_path}\n{item.content}")
 
         symbol_context.update(recommended_context)
 
@@ -202,7 +220,7 @@ class UnitTestsWorkflow:
         self,
         cases: List[str],
         ref_files: List[str],
-        symbol_context: List[str],
+        symbol_contexts: List[Context],
     ):
         """
         Write and print tests.
@@ -213,7 +231,7 @@ class UnitTestsWorkflow:
             func_to_test=self.func_to_test,
             test_cases=cases,
             reference_files=ref_files,
-            symbol_context=symbol_context,
+            symbol_contexts=symbol_contexts,
             chat_language=self.tui_lang.chat_language,
         )
 

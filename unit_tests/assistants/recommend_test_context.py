@@ -25,9 +25,9 @@ Here is the source code of the function:
 
 And here are some context information that might help you write the test cases:
 
-```
+
 {context_content}
-```
+
 
 Do you think the context information is enough?
 If the information is insufficient, recommend which symbols or types you need to know more about.
@@ -46,10 +46,10 @@ JSON Format Example:
 
 
 def get_recommended_symbols(
-    func_to_test: FuncToTest, known_context: Optional[List[str]] = None
+    func_to_test: FuncToTest, known_context: Optional[List] = None
 ) -> List[str]:
     known_context = known_context or []
-    context_content = "\n\n".join(known_context)
+    context_content = "\n\n".join([str(c) for c in known_context])
 
     msg = recommend_symbol_context_prompt.format(
         function_content=func_to_test.func_content,

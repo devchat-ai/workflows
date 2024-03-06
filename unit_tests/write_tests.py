@@ -1,6 +1,7 @@
 from functools import partial
 from typing import List, Optional
 
+from find_context import Context
 from model import FuncToTest, TokenBudgetExceededException
 from openai_util import create_chat_completion_chunks
 from prompts import WRITE_TESTS_PROMPT
@@ -19,7 +20,7 @@ def _mk_write_tests_msg(
     chat_language: str,
     reference_files: Optional[List[str]] = None,
     # context_files: Optional[List[str]] = None,
-    symbol_context: Optional[List[str]] = None,
+    symbol_contexts: Optional[List[Context]] = None,
 ) -> Optional[str]:
     encoding = get_encoding(ENCODING)
 
@@ -42,10 +43,10 @@ def _mk_write_tests_msg(
         class_content = f"\nclass code\n```\n{func_to_test.container_content}\n```\n"
 
     context_content = ""
-    if symbol_context:
-        context_content += "\n\nrelevant context\n```\n"
-        context_content += "\n\n".join(symbol_context)
-        context_content += "\n```\n"
+    if symbol_contexts:
+        context_content += "\n\nrelevant context\n\n"
+        context_content += "\n\n".join([str(c) for c in symbol_contexts])
+        context_content += "\n\n"
 
     # if context_files:
     #     context_content += "\n\nrelevant context files\n\n"
@@ -105,7 +106,7 @@ def write_and_print_tests(
     func_to_test: FuncToTest,
     test_cases: List[str],
     reference_files: Optional[List[str]] = None,
-    symbol_context: Optional[List[str]] = None,
+    symbol_contexts: Optional[List[Context]] = None,
     chat_language: str = "English",
 ) -> None:
     user_msg = _mk_write_tests_msg(
@@ -113,7 +114,7 @@ def write_and_print_tests(
         func_to_test=func_to_test,
         test_cases=test_cases,
         reference_files=reference_files,
-        symbol_context=symbol_context,
+        symbol_contexts=symbol_contexts,
         chat_language=chat_language,
     )
 

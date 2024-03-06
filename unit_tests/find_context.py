@@ -1,6 +1,7 @@
 import os
 import sys
 from collections import defaultdict
+from dataclasses import dataclass
 from typing import Dict, List, Optional, Set
 
 from assistants.recommend_test_context import get_recommended_symbols
@@ -17,9 +18,21 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from libs.ide_services import IDEService, Location, SymbolNode
 
 
+@dataclass
+class Context:
+    file_path: str  # relative path to repo root
+    content: str
+
+    def __hash__(self) -> int:
+        return hash((self.file_path, self.content))
+
+    def __str__(self) -> str:
+        return f"file path:`{self.file_path}`\n```\n{self.content}\n```"
+
+
 def _extract_referenced_symbols_context(
     func_to_test: FuncToTest, symbols: List[SymbolNode], depth: int = 0
-) -> Dict[str, List[str]]:
+) -> Dict[str, List[Context]]:
     """
     Extract context of the document symbols referenced in the function.
     Exclude the function itself and symbols whose depth is greater than the specified depth.
@@ -47,15 +60,18 @@ def _extract_referenced_symbols_context(
     # Get the content of the symbols
     for s in referenced_symbols:
         content = get_symbol_content(s, file_content=func_to_test.file_content)
-        referenced_symbols_context[s.name].append(content)
+        context = Context(file_path=func_to_test.file_path, content=content)
+        referenced_symbols_context[s.name].append(context)
     return referenced_symbols_context
 
 
-def _find_children_symbols_type_def_context(func_to_test: FuncToTest, func_symbol: SymbolNode):
+def _find_children_symbols_type_def_context(
+    func_to_test: FuncToTest, func_symbol: SymbolNode
+) -> Dict[str, List[Context]]:
     """
     Find the type definitions of the symbols in the function.
     """
-    type_defs: Dict[str, List[str]] = defaultdict(list)
+    type_defs: Dict[str, List[Context]] = defaultdict(list)
 
     client = IDEService()
     abs_path = os.path.join(func_to_test.repo_root, func_to_test.file_path)
@@ -89,22 +105,24 @@ def _find_children_symbols_type_def_context(func_to_test: FuncToTest, func_symbo
             targets = find_symbol_nodes(symbols, line=loc.range.start.line)
             for t, _ in targets:
                 content = get_symbol_content(t, abspath=loc.abspath)
-                type_defs[symbol_name].append(content)
+                relpath = os.path.relpath(loc.abspath, func_to_test.repo_root)
+                context = Context(file_path=relpath, content=content)
+                type_defs[symbol_name].append(context)
 
     return type_defs
 
 
 def _extract_recommended_symbols_context(
     func_to_test: FuncToTest, symbol_names: List[str]
-) -> Dict[str, List[str]]:
+) -> Dict[str, List[Context]]:
     """
     Extract context of the given symbol names.
     """
     abs_path = os.path.join(func_to_test.repo_root, func_to_test.file_path)
     client = IDEService()
 
-    # symbol name -> a list of context content (source code)
-    recommended_symbols: Dict[str, List[str]] = defaultdict(list)
+    # symbol name -> a list of context
+    recommended_symbols: Dict[str, List[Context]] = defaultdict(list)
 
     # Will try to find both Definition and Type Definition for a symbol
     symbol_def_locations: Dict[str, Set[Location]] = {}
@@ -149,22 +167,24 @@ def _extract_recommended_symbols_context(
 
             for t, _ in targets:
                 content = get_symbol_content(t, abspath=loc.abspath)
-                recommended_symbols[symbol_name].append(content)
+                relpath = os.path.relpath(loc.abspath, func_to_test.repo_root)
+                context = Context(file_path=relpath, content=content)
+                recommended_symbols[symbol_name].append(context)
 
     return recommended_symbols
 
 
 def find_symbol_context_by_static_analysis(
     func_to_test: FuncToTest, chat_language: str
-) -> Dict[str, List[str]]:
+) -> Dict[str, List[Context]]:
     """
     Find the context of symbols in the function to test by static analysis.
     """
     abs_path = os.path.join(func_to_test.repo_root, func_to_test.file_path)
     client = IDEService()
 
-    # symbol name -> a list of  context content (code)
-    symbol_context: Dict[str, List[str]] = defaultdict(list)
+    # symbol name -> a list of context
+    symbol_context: Dict[str, List[Context]] = defaultdict(list)
 
     # Get all symbols in the file
     doc_symbols = client.get_document_symbols(abs_path)
@@ -189,8 +209,8 @@ def find_symbol_context_by_static_analysis(
 
 
 def find_symbol_context_of_llm_recommendation(
-    func_to_test: FuncToTest, known_context: Optional[List[str]] = None
-) -> List[str]:
+    func_to_test: FuncToTest, known_context: Optional[List[Context]] = None
+) -> Dict[str, List[Context]]:
     """
     Find the context of symbols recommended by LLM.
     """

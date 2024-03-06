@@ -2,6 +2,7 @@ import json
 from functools import partial
 from typing import List, Optional
 
+from find_context import Context
 from model import FuncToTest, TokenBudgetExceededException
 from openai_util import create_chat_completion_content
 from prompts import PROPOSE_TEST_PROMPT
@@ -16,7 +17,7 @@ TOKEN_BUDGET = int(16000 * 0.9)
 def _mk_user_msg(
     user_prompt: str,
     func_to_test: FuncToTest,
-    context: List[str],
+    contexts: List[Context],
     chat_language: str,
 ) -> str:
     """
@@ -30,10 +31,10 @@ def _mk_user_msg(
         class_content = f"class code\n```\n{func_to_test.container_content}\n```\n"
 
     context_content = ""
-    if context:
-        context_content = "\n\nrelevant context\n```\n"
-        context_content += "\n\n".join(context)
-        context_content += "\n```\n"
+    if contexts:
+        context_content = "\n\nrelevant context\n\n"
+        context_content += "\n\n".join([str(c) for c in contexts])
+        context_content += "\n\n"
 
     # Prepare a list of user messages to fit the token budget
     # by adjusting the relevant content
@@ -74,7 +75,7 @@ def _mk_user_msg(
 def propose_test(
     user_prompt: str,
     func_to_test: FuncToTest,
-    context: Optional[List[str]] = None,
+    contexts: Optional[List[Context]] = None,
     chat_language: str = "English",
 ) -> List[str]:
     """Propose test cases for a specified function based on a user prompt
@@ -88,11 +89,11 @@ def propose_test(
     Returns:
         List[str]: A list of test case descriptions.
     """
-    context = context or []
+    contexts = contexts or []
     user_msg = _mk_user_msg(
         user_prompt=user_prompt,
         func_to_test=func_to_test,
-        context=context,
+        contexts=contexts,
         chat_language=chat_language,
     )
 
