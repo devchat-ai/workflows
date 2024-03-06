@@ -111,7 +111,7 @@ def write_and_print_tests(
     test_cases: List[str],
     reference_files: Optional[List[str]] = None,
     symbol_contexts: Optional[List[Context]] = None,
-    user_requirements:str = "",
+    user_requirements: str = "",
     chat_language: str = "English",
 ) -> None:
     user_msg = _mk_write_tests_msg(

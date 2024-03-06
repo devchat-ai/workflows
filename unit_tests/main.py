@@ -7,6 +7,7 @@ import click
 sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
 
+from cache import LocalCache
 from chatmark import Checkbox, Form, Step, TextEditor  # noqa: E402
 from find_context import (
     Context,
@@ -25,6 +26,8 @@ from propose_test import propose_test
 from tools.file_util import retrieve_file_content
 from write_tests import write_and_print_tests
 
+CHAT_WORKFLOW_DIR_PATH = [".chat", "workflows"]
+
 
 class UnitTestsWorkflow:
     def __init__(
@@ -33,11 +36,13 @@ class UnitTestsWorkflow:
         func_to_test: FuncToTest,
         repo_root: str,
         tui_lang: TUILanguage,
+        local_cache: LocalCache,
     ):
         self.user_prompt = user_prompt
         self.func_to_test = func_to_test
         self.repo_root = repo_root
         self.tui_lang = tui_lang
+        self.local_cache = local_cache
 
     def run(self):
         """
@@ -100,7 +105,7 @@ class UnitTestsWorkflow:
         Edit test cases and reference files by user.
 
         Return:
-        - the updated cases 
+        - the updated cases
         - valid reference files
         - customized requirements(prompts)
         """
@@ -122,9 +127,12 @@ class UnitTestsWorkflow:
             title=_i("Edit reference test file\n(Multiple files can be separated by line breaks)"),
         )
 
+        cached_requirements = self.local_cache.get("user_requirements") or ""
         requirements_editor = TextEditor(
-            text = "",
-            title = _i("Write your customized requirements(prompts) for tests here.\n(For example, what testing framework to use.)"),
+            text=cached_requirements,
+            title=_i(
+                "Write your customized requirements(prompts) for tests here.\n(For example, what testing framework to use.)"
+            ),
         )
 
         form = Form(components=[checkbox, case_editor, ref_editor, requirements_editor])
@@ -158,7 +166,10 @@ class UnitTestsWorkflow:
                 invalid_files.append(ref_file)
 
         # Get customized requirements
-        requirements: str = requirements_editor.new_text.strip() if requirements_editor.new_text else ""
+        requirements: str = (
+            requirements_editor.new_text.strip() if requirements_editor.new_text else ""
+        )
+        self.local_cache.set("user_requirements", requirements)
 
         # Print summary
         title = _i("Will generate tests for the following cases.")
@@ -285,6 +296,7 @@ def main(input: str):
 
     repo_root = os.getcwd()
     ide_lang = IDEService().ide_language()
+    local_cache = LocalCache("unit_tests", os.path.join(repo_root, *CHAT_WORKFLOW_DIR_PATH))
 
     tui_lang = TUILanguage.from_str(ide_lang)
     _i = get_translation(tui_lang)
@@ -304,7 +316,13 @@ def main(input: str):
     )
 
     try:
-        workflow = UnitTestsWorkflow(user_prompt, func_to_test, repo_root, tui_lang)
+        workflow = UnitTestsWorkflow(
+            user_prompt,
+            func_to_test,
+            repo_root,
+            tui_lang,
+            local_cache,
+        )
         workflow.run()
 
     except TokenBudgetExceededException as e:
