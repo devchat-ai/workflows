@@ -47,8 +47,21 @@ information for your reference:
 2.  current visible code info: {visible_text}
 """
 
+EXPLAIN_PROMPT_ZH = prompt = """
+你的任务是：
+解释代码。
+根据任务要求，解释被选中部分的代码。你可以参考的 context 有：
+1. 编辑器中被选中的代码：{selected_text}
+2. 当前编辑器中可见代码：{visible_text}
+"""
 
-@chat(prompt=EXPLAIN_PROMPT, stream_out=True)
+
+def get_prompt():
+    ide_language = IDEService().ide_language()
+    return EXPLAIN_PROMPT_ZH if ide_language == "zh" else EXPLAIN_PROMPT
+
+
+@chat(prompt=get_prompt(), stream_out=True)
 # pylint: disable=unused-argument
 def explain(selected_text, visible_text):
     """
