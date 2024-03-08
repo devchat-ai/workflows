@@ -41,19 +41,25 @@ def get_visible_code():
 
 PROMPT = prompt = """
 Your task is:
-Add necessary line comments to the selected code. And output only the selected code with comments.
-Following the task requirements, modify only the selected portion of the code. \
-Please ensure that the revised code segment maintains the same indentation as the \
-selected code to seamlessly integrate with the existing code structure and maintain correct syntax.
+Add necessary line comments to the selected lines of code. Please keep in mind to ensure:
+1. Just add comments only for the selected portion of the code, \
+do not modify any thing beyond the selected portion;
+2. Add these comments above the corresponding lines of code;
+3. Output only the selected portion of the code with comments added;
+4. Maintains the same indentation as the selected portion of the code;
+5. Do not show any code beyond the selected portion;
+Following the task requirements, please ensure that the revised code segment \
+maintains the same indentation as the selected code to seamlessly integrate with \
+the existing code structure and maintain correct syntax.
 Here is the relevant context information for your reference:
 1. Selected portion of the code: {selected_text}
-2. Current visible portion of the code: {visible_text}
+2. Visible portion of the code: {visible_text}
 """
 
 
 PROMPT_ZH = prompt = """
 你的任务是：
-使用中文给被选中的代码添加必要的行注释。
+使用中文给被选中的代码添加必要的注释。
 根据任务要求，仅修改被选中部分的代码。请确保修改后的代码段与所选代码保持相同的缩进，\
 以与现有代码结构无缝集成并保持正确的语法。保留所有其他信息不变。
 以下是你可以参考的 context 信息：
