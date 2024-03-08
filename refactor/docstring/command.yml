@@ -1,3 +1,0 @@
-description: Automatically add or refine docstrings to enhance readability and clarity. Select a function or method and execute this command to optimize its documentation.
-steps:
-  - run: $devchat_python $command_path/../rewrite.py "add doc comment"
