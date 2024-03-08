@@ -1,0 +1,3 @@
+description: Automatically add doc comments. Select some code and execute this command to generate comments.
+steps:
+  - run: $devchat_python $command_path/main.py
