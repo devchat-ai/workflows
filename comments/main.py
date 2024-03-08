@@ -42,13 +42,15 @@ def get_visible_code():
 PROMPT = prompt = """
 Your task is:
 Add necessary line comments to the selected lines of code. Please keep in mind to ensure:
-1. Just add comments only for the selected portion of the code, do not modify any thing beyond the selected portion;
+1. Just add comments only for the selected portion of the code, \
+do not modify any thing beyond the selected portion;
 2. Add these comments above the corresponding lines of code;
 3. Output only the selected portion of the code with comments added;
 4. Maintains the same indentation as the selected portion of the code;
 5. Do not show any code beyond the selected portion;
-Following the task requirements, please ensure that the revised code segment maintains the same indentation as the \
-selected code to seamlessly integrate with the existing code structure and maintain correct syntax.
+Following the task requirements, please ensure that the revised code segment \
+maintains the same indentation as the selected code to seamlessly integrate with \
+the existing code structure and maintain correct syntax.
 Here is the relevant context information for your reference:
 1. Selected portion of the code: {selected_text}
 2. Visible portion of the code: {visible_text}
