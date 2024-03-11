@@ -131,7 +131,8 @@ class UnitTestsWorkflow:
         requirements_editor = TextEditor(
             text=cached_requirements,
             title=_i(
-                "Write your customized requirements(prompts) for tests here.\n(For example, what testing framework to use.)"
+                "Write your customized requirements(prompts) for tests here."
+                "\n(For example, what testing framework to use.)"
             ),
         )
 

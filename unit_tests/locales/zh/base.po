@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-18 15:29+0800\n"
+"POT-Creation-Date: 2024-03-11 22:42+0800\n"
 "PO-Revision-Date: 2023-12-24 16:51+0800\n"
 "Last-Translator: kagami <mingjing@merico.dev>\n"
 "Language-Team: Chinese\n"
@@ -16,15 +16,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: main.py:53
+#: main.py:79
 msgid "Analyzing the function and current unit tests..."
 msgstr "正在分析目标函数和项目中现有的单元测试……"
 
-#: main.py:84
+#: main.py:116
 msgid "Select test cases to generate"
 msgstr "选择测试用例以生成单元测试"
 
-#: main.py:89
+#: main.py:121
 msgid ""
 "You can add more test cases here\n"
 "(Multiple cases can be separated by line breaks)"
@@ -32,7 +32,7 @@ msgstr ""
 "可在输入框中添加更多测试用例\n"
 "（多个测试用例用换行分隔）"
 
-#: main.py:95
+#: main.py:127
 msgid ""
 "Edit reference test file\n"
 "(Multiple files can be separated by line breaks)"
@@ -40,34 +40,48 @@ msgstr ""
 "参考的测试文件\n"
 "（多个文件路径用换行分隔）"
 
-#: main.py:112
+#: main.py:134
+msgid ""
+"Write your customized requirements(prompts) for tests here.\n"
+"(For example, what testing framework to use.)"
+msgstr ""
+"可在以下输入框中填写自定义的测试需求（提示词）\n"
+"（例如指定特定的测试框架）"
+
+#: main.py:153
 msgid "No test case is selected. Quit generating tests."
 msgstr "未选择测试用例，退出生成单元测试。"
 
-#: main.py:129
+#: main.py:176
 msgid "Will generate tests for the following cases."
 msgstr "将为以下用例生成测试。"
 
-#: main.py:132
+#: main.py:179
 msgid ""
 "\n"
 "Test cases:"
-msgstr "\n测试用例："
+msgstr ""
+"\n"
+"测试用例："
 
-#: main.py:139
+#: main.py:186
 msgid ""
 "\n"
 "No valid reference file is provided. Will not use reference to generate "
 "tests."
-msgstr "\n没有提供合法的文件，生成单元测试时将不使用参考。"
+msgstr ""
+"\n"
+"没有提供合法的文件，生成单元测试时将不使用参考。"
 
-#: main.py:144
+#: main.py:191
 msgid ""
 "\n"
 "Will use the following reference files to generate tests."
-msgstr "\n将参考以下文件生成单元测试。"
+msgstr ""
+"\n"
+"将参考以下文件生成单元测试。"
 
-#: main.py:145
+#: main.py:192
 msgid ""
 "\n"
 "Valid reference files:"
@@ -75,7 +89,7 @@ msgstr ""
 "\n"
 "参考文件："
 
-#: main.py:150
+#: main.py:197
 msgid ""
 "\n"
 "Invalid files:"
@@ -83,7 +97,15 @@ msgstr ""
 "\n"
 "不合法的文件："
 
-#: main.py:232
+#: main.py:201
+msgid ""
+"\n"
+"Customized requirements(prompts):"
+msgstr ""
+"\n"
+"自定义测试需求（提示词）："
+
+#: main.py:330
 msgid "The function's size surpasses AI's context capacity."
 msgstr "由于当前函数过大，AI暂时无法处理。"
 
