@@ -1,7 +1,14 @@
 import json
 from typing import List, Tuple
 
+from devchat.llm.openai import chat_completion_no_stream_return_json
+from llm_conf import (
+    USE_USER_MODEL,
+    USER_LLM_MODEL,
+)
 from openai_util import create_chat_completion_content
+
+MODEL = USER_LLM_MODEL if USE_USER_MODEL else "gpt-3.5-turbo"
 
 # ruff: noqa: E501
 
@@ -28,8 +35,6 @@ Accumulated Knowledge: {accumulated_knowledge}
 Answer:
 """
 
-RERANK_MODEL = "gpt-3.5-turbo-1106"
-
 
 def rerank_files(
     question: str,
@@ -47,7 +52,9 @@ def rerank_files(
 
     files_str = ""
     for file in items:
-        assert isinstance(file, str), "items must be a list of str when item_type is 'file'"
+        assert isinstance(
+            file, str
+        ), "items must be a list of str when item_type is 'file'"
         files_str += f"- {file}\n"
 
     user_msg = rerank_file_prompt.format(
@@ -56,19 +63,37 @@ def rerank_files(
         accumulated_knowledge=knowledge,
     )
 
-    response = create_chat_completion_content(
-        model=RERANK_MODEL,
-        messages=[
-            {
-                "role": "user",
-                "content": user_msg,
+    result = None
+    if USE_USER_MODEL:
+        # Use the wrapped api parameters
+        result = chat_completion_no_stream_return_json(
+            messages=[
+                {
+                    "role": "user",
+                    "content": user_msg,
+                },
+            ],
+            llm_config={
+                "model": MODEL,
+                "temperature": 0.1,
             },
-        ],
-        response_format={"type": "json_object"},
-        temperature=0.1,
-    )
+        )
 
-    result = json.loads(response)
+    else:
+        # Use the openai api parameters
+        response = create_chat_completion_content(
+            model=MODEL,
+            messages=[
+                {
+                    "role": "user",
+                    "content": user_msg,
+                },
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.1,
+        )
+        result = json.loads(response)
+
     reranked = [(i["item"], i["relevance"]) for i in result["result"]]
 
     return reranked

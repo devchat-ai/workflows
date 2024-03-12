@@ -4,16 +4,28 @@ from typing import Callable, List
 
 from assistants.directory_structure.base import DirectoryStructureBase
 from assistants.rerank_files import rerank_files
+from devchat.llm.openai import chat_completion_no_stream_return_json
+from llm_conf import (
+    CONTEXT_SIZE,
+    DEFAULT_CONTEXT_SIZE,
+    DEFAULT_ENCODING,
+    USE_USER_MODEL,
+    USER_LLM_MODEL,
+)
 from openai_util import create_chat_completion_content
 from tools.directory_viewer import ListViewer
 from tools.tiktoken_util import get_encoding
 
+MODEL = USER_LLM_MODEL if USE_USER_MODEL else "gpt-3.5-turbo"
+ENCODING = (
+    get_encoding(DEFAULT_ENCODING)  # Use default encoding as an approximation
+    if USE_USER_MODEL
+    else get_encoding("cl100k_base")
+)
+TOKEN_BUDGET = int(CONTEXT_SIZE.get(MODEL, DEFAULT_CONTEXT_SIZE) * 0.95)
+
 
 class RelevantFileFinder(DirectoryStructureBase):
-    model_name = "gpt-3.5-turbo-1106"
-    dir_token_budget = 16000 * 0.95
-    encoding = get_encoding("cl100k_base")
-
     def _paginate_dir_structure(
         self, criteria: Callable[[Path], bool], style: str = "list"
     ) -> List[str]:
@@ -38,8 +50,8 @@ class RelevantFileFinder(DirectoryStructureBase):
             # Check if each page is within the token budget
             within_budget = True
             for p in pages:
-                tokens = len(self.encoding.encode(p, disallowed_special=()))
-                if tokens > self.dir_token_budget:
+                tokens = len(ENCODING.encode(p, disallowed_special=()))
+                if tokens > TOKEN_BUDGET:
                     within_budget = False
                     break
 
@@ -82,16 +94,28 @@ class RelevantFileFinder(DirectoryStructureBase):
         for dir_structure in dir_structure_pages:
             user_msg = self._mk_message(objective, dir_structure)
 
-            response = create_chat_completion_content(
-                model=self.model_name,
-                messages=[
-                    {"role": "user", "content": user_msg},
-                ],
-                response_format={"type": "json_object"},
-                temperature=0.1,
-            )
+            json_res = {}
+            if USE_USER_MODEL:
+                # Use the wrapped api parameters
+                json_res = chat_completion_no_stream_return_json(
+                    messages=[{"role": "user", "content": user_msg}],
+                    llm_config={
+                        "model": MODEL,
+                        "temperature": 0.1,
+                    },
+                )
 
-            json_res = json.loads(response)
+            else:
+                # Use the openai api parameters
+                response = create_chat_completion_content(
+                    model=MODEL,
+                    messages=[
+                        {"role": "user", "content": user_msg},
+                    ],
+                    response_format={"type": "json_object"},
+                    temperature=0.1,
+                )
+                json_res = json.loads(response)
 
             files.extend(json_res.get("files", []))
 
