@@ -50,7 +50,6 @@ selected code to seamlessly integrate with the existing code structure and maint
 correct syntax. Keep all other information as it is. \
 Here is the relevant context information for your reference:
 1. Selected portion of the code: {selected_text}
-2. Current visible portion of the code: {visible_text}
 """
 
 
@@ -61,7 +60,6 @@ PROMPT_ZH = prompt = """
 以与现有代码结构无缝集成并保持正确的语法。保留所有其他信息不变。
 以下是你可以参考的 context 信息：
 1. 编辑器中被选中的代码：{selected_text}
-2. 当前编辑器中可见代码：{visible_text}
 """
 
 
