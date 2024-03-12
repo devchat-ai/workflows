@@ -21,8 +21,11 @@ def _mk_write_tests_msg(
     reference_files: Optional[List[str]] = None,
     # context_files: Optional[List[str]] = None,
     symbol_contexts: Optional[List[Context]] = None,
+    user_requirements: str = "",
 ) -> Optional[str]:
     encoding = get_encoding(ENCODING)
+
+    additional_requirements = user_requirements
 
     test_cases_str = ""
     for i, test_case in enumerate(test_cases, 1):
@@ -63,6 +66,7 @@ def _mk_write_tests_msg(
         file_path=func_to_test.file_path,
         test_cases_str=test_cases_str,
         chat_language=chat_language,
+        additional_requirements=additional_requirements,
     )
 
     # NOTE: adjust symbol_context content more flexibly if needed
@@ -107,6 +111,7 @@ def write_and_print_tests(
     test_cases: List[str],
     reference_files: Optional[List[str]] = None,
     symbol_contexts: Optional[List[Context]] = None,
+    user_requirements: str = "",
     chat_language: str = "English",
 ) -> None:
     user_msg = _mk_write_tests_msg(
@@ -115,6 +120,7 @@ def write_and_print_tests(
         test_cases=test_cases,
         reference_files=reference_files,
         symbol_contexts=symbol_contexts,
+        user_requirements=user_requirements,
         chat_language=chat_language,
     )
 

@@ -1,3 +1,5 @@
+.PHONY: setup-dev check fix
+
 div = $(shell printf '=%.0s' {1..120})
 
 setup-dev:

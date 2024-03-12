@@ -55,6 +55,8 @@ Each test case should be self-contained and executable.
 Use the content of the reference test cases as a model, ensuring you use the same test framework and mock library,
 and apply comparable mocking strategies and best practices.
 
+{additional_requirements}
+
 
 The target function is {function_name}, located in the file {file_path}.
 Here's the relevant source code of the function:

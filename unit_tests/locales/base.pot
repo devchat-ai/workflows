@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-18 15:29+0800\n"
+"POT-Creation-Date: 2024-03-11 22:42+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,65 +17,77 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: main.py:53
+#: main.py:79
 msgid "Analyzing the function and current unit tests..."
 msgstr ""
 
-#: main.py:84
+#: main.py:116
 msgid "Select test cases to generate"
 msgstr ""
 
-#: main.py:89
+#: main.py:121
 msgid ""
 "You can add more test cases here\n"
 "(Multiple cases can be separated by line breaks)"
 msgstr ""
 
-#: main.py:95
+#: main.py:127
 msgid ""
 "Edit reference test file\n"
 "(Multiple files can be separated by line breaks)"
 msgstr ""
 
-#: main.py:112
+#: main.py:134
+msgid ""
+"Write your customized requirements(prompts) for tests here.\n"
+"(For example, what testing framework to use.)"
+msgstr ""
+
+#: main.py:153
 msgid "No test case is selected. Quit generating tests."
 msgstr ""
 
-#: main.py:129
+#: main.py:176
 msgid "Will generate tests for the following cases."
 msgstr ""
 
-#: main.py:132
+#: main.py:179
 msgid ""
 "\n"
 "Test cases:"
 msgstr ""
 
-#: main.py:139
+#: main.py:186
 msgid ""
 "\n"
 "No valid reference file is provided. Will not use reference to generate "
 "tests."
 msgstr ""
 
-#: main.py:144
+#: main.py:191
 msgid ""
 "\n"
 "Will use the following reference files to generate tests."
 msgstr ""
 
-#: main.py:145
+#: main.py:192
 msgid ""
 "\n"
 "Valid reference files:"
 msgstr ""
 
-#: main.py:150
+#: main.py:197
 msgid ""
 "\n"
 "Invalid files:"
 msgstr ""
 
-#: main.py:232
+#: main.py:201
+msgid ""
+"\n"
+"Customized requirements(prompts):"
+msgstr ""
+
+#: main.py:330
 msgid "The function's size surpasses AI's context capacity."
 msgstr ""
