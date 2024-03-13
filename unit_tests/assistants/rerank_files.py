@@ -1,7 +1,14 @@
 import json
 from typing import List, Tuple
 
+from devchat.llm.openai import chat_completion_no_stream_return_json
+from llm_conf import (
+    USE_USER_MODEL,
+    USER_LLM_MODEL,
+)
 from openai_util import create_chat_completion_content
+
+MODEL = USER_LLM_MODEL if USE_USER_MODEL else "gpt-3.5-turbo"
 
 # ruff: noqa: E501
 
@@ -27,8 +34,6 @@ Question: {question}
 Accumulated Knowledge: {accumulated_knowledge}
 Answer:
 """
-
-RERANK_MODEL = "gpt-3.5-turbo-1106"
 
 
 def rerank_files(
@@ -56,19 +61,40 @@ def rerank_files(
         accumulated_knowledge=knowledge,
     )
 
-    response = create_chat_completion_content(
-        model=RERANK_MODEL,
-        messages=[
-            {
-                "role": "user",
-                "content": user_msg,
-            },
-        ],
-        response_format={"type": "json_object"},
-        temperature=0.1,
-    )
+    result = {}
+    if USE_USER_MODEL:
+        # Use the wrapped api parameters
+        result = (
+            chat_completion_no_stream_return_json(
+                messages=[
+                    {
+                        "role": "user",
+                        "content": user_msg,
+                    },
+                ],
+                llm_config={
+                    "model": MODEL,
+                    "temperature": 0.1,
+                },
+            )
+            or {}
+        )
 
-    result = json.loads(response)
-    reranked = [(i["item"], i["relevance"]) for i in result["result"]]
+    else:
+        # Use the openai api parameters
+        response = create_chat_completion_content(
+            model=MODEL,
+            messages=[
+                {
+                    "role": "user",
+                    "content": user_msg,
+                },
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.1,
+        )
+        result = json.loads(response)
+
+    reranked = [(i["item"], i["relevance"]) for i in result.get("result", [])]
 
     return reranked

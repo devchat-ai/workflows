@@ -2,16 +2,27 @@ import json
 from functools import partial
 from typing import List, Optional
 
+from devchat.llm.openai import chat_completion_no_stream_return_json
 from find_context import Context
+from llm_conf import (
+    CONTEXT_SIZE,
+    DEFAULT_CONTEXT_SIZE,
+    DEFAULT_ENCODING,
+    USE_USER_MODEL,
+    USER_LLM_MODEL,
+)
 from model import FuncToTest, TokenBudgetExceededException
 from openai_util import create_chat_completion_content
 from prompts import PROPOSE_TEST_PROMPT
 from tools.tiktoken_util import get_encoding
 
-MODEL = "gpt-3.5-turbo-1106"
-# MODEL = "gpt-4-1106-preview"
-ENCODING = "cl100k_base"
-TOKEN_BUDGET = int(16000 * 0.9)
+MODEL = USER_LLM_MODEL if USE_USER_MODEL else "gpt-3.5-turbo"
+ENCODING = (
+    get_encoding(DEFAULT_ENCODING)  # Use default encoding as an approximation
+    if USE_USER_MODEL
+    else get_encoding("cl100k_base")
+)
+TOKEN_BUDGET = int(CONTEXT_SIZE.get(MODEL, DEFAULT_CONTEXT_SIZE) * 0.9)
 
 
 def _mk_user_msg(
@@ -23,7 +34,6 @@ def _mk_user_msg(
     """
     Create a user message to be sent to the model within the token budget.
     """
-    encoding = get_encoding(ENCODING)
 
     func_content = f"function code\n```\n{func_to_test.func_content}\n```\n"
     class_content = ""
@@ -61,7 +71,7 @@ def _mk_user_msg(
     prioritized_msgs = [msg_0, msg_1, msg_2]
 
     for msg in prioritized_msgs:
-        token_count = len(encoding.encode(msg, disallowed_special=()))
+        token_count = len(ENCODING.encode(msg, disallowed_special=()))
         if token_count <= TOKEN_BUDGET:
             return msg
 
@@ -97,14 +107,31 @@ def propose_test(
         chat_language=chat_language,
     )
 
-    content = create_chat_completion_content(
-        model=MODEL,
-        messages=[{"role": "user", "content": user_msg}],
-        response_format={"type": "json_object"},
-        temperature=0.1,
-    )
+    json_res = {}
+    if USE_USER_MODEL:
+        # Use the wrapped api parameters
+        json_res = (
+            chat_completion_no_stream_return_json(
+                messages=[{"role": "user", "content": user_msg}],
+                llm_config={
+                    "model": MODEL,
+                    "temperature": 0.1,
+                },
+            )
+            or {}
+        )
 
-    cases = json.loads(content).get("test_cases", [])
+    else:
+        # Use the openai api parameters
+        content = create_chat_completion_content(
+            model=MODEL,
+            messages=[{"role": "user", "content": user_msg}],
+            response_format={"type": "json_object"},
+            temperature=0.1,
+        )
+        json_res = json.loads(content)
+
+    cases = json_res.get("test_cases", [])
 
     descriptions = []
     for case in cases:

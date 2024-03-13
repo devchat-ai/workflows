@@ -1,16 +1,28 @@
 from functools import partial
 from typing import List, Optional
 
+from devchat.llm.openai import chat_completion_stream
 from find_context import Context
+from llm_conf import (
+    CONTEXT_SIZE,
+    DEFAULT_CONTEXT_SIZE,
+    DEFAULT_ENCODING,
+    USE_USER_MODEL,
+    USER_LLM_MODEL,
+)
 from model import FuncToTest, TokenBudgetExceededException
 from openai_util import create_chat_completion_chunks
 from prompts import WRITE_TESTS_PROMPT
 from tools.file_util import retrieve_file_content
 from tools.tiktoken_util import get_encoding
 
-MODEL = "gpt-4-1106-preview"
-ENCODING = "cl100k_base"
-TOKEN_BUDGET = int(128000 * 0.9)
+MODEL = USER_LLM_MODEL if USE_USER_MODEL else "gpt-4-turbo-preview"
+ENCODING = (
+    get_encoding(DEFAULT_ENCODING)  # Use default encoding as an approximation
+    if USE_USER_MODEL
+    else get_encoding("cl100k_base")
+)
+TOKEN_BUDGET = int(CONTEXT_SIZE.get(MODEL, DEFAULT_CONTEXT_SIZE) * 0.9)
 
 
 def _mk_write_tests_msg(
@@ -23,8 +35,6 @@ def _mk_write_tests_msg(
     symbol_contexts: Optional[List[Context]] = None,
     user_requirements: str = "",
 ) -> Optional[str]:
-    encoding = get_encoding(ENCODING)
-
     additional_requirements = user_requirements
 
     test_cases_str = ""
@@ -94,7 +104,7 @@ def _mk_write_tests_msg(
     prioritized_msgs = [msg_0, msg_1, msg_2, msg_3]
 
     for msg in prioritized_msgs:
-        tokens = len(encoding.encode(msg, disallowed_special=()))
+        tokens = len(ENCODING.encode(msg, disallowed_special=()))
         if tokens <= TOKEN_BUDGET:
             return msg
 
@@ -124,13 +134,26 @@ def write_and_print_tests(
         chat_language=chat_language,
     )
 
-    chunks = create_chat_completion_chunks(
-        model=MODEL,
-        messages=[{"role": "user", "content": user_msg}],
-        temperature=0.1,
-    )
+    if USE_USER_MODEL:
+        # Use the wrapped api
+        res = chat_completion_stream(
+            messages=[{"role": "user", "content": user_msg}],
+            llm_config={"model": MODEL, "temperature": 0.1},
+        )
+        if res:
+            print(res.get("content", ""))
 
-    for chunk in chunks:
-        if chunk.choices[0].finish_reason == "stop":
-            break
-        print(chunk.choices[0].delta.content, flush=True, end="")
+    else:
+        # Use the openai api parameters
+        chunks = create_chat_completion_chunks(
+            model=MODEL,
+            messages=[{"role": "user", "content": user_msg}],
+            temperature=0.1,
+        )
+        for chunk in chunks:
+            if chunk.choices[0].finish_reason == "stop":
+                break
+
+            content = chunk.choices[0].delta.content
+            if content is not None:
+                print(content, flush=True, end="")
