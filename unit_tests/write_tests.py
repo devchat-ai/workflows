@@ -139,9 +139,9 @@ def write_and_print_tests(
         res = chat_completion_stream(
             messages=[{"role": "user", "content": user_msg}],
             llm_config={"model": MODEL, "temperature": 0.1},
-            stream_out=True,
         )
-        # print(res)
+        if res:
+            print(res.get("content", ""))
 
     else:
         # Use the openai api parameters
@@ -153,4 +153,7 @@ def write_and_print_tests(
         for chunk in chunks:
             if chunk.choices[0].finish_reason == "stop":
                 break
-            print(chunk.choices[0].delta.content, flush=True, end="")
+
+            content = chunk.choices[0].delta.content
+            if content is not None:
+                print(content, flush=True, end="")

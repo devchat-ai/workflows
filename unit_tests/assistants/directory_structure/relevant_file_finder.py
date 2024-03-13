@@ -97,12 +97,15 @@ class RelevantFileFinder(DirectoryStructureBase):
             json_res = {}
             if USE_USER_MODEL:
                 # Use the wrapped api parameters
-                json_res = chat_completion_no_stream_return_json(
-                    messages=[{"role": "user", "content": user_msg}],
-                    llm_config={
-                        "model": MODEL,
-                        "temperature": 0.1,
-                    },
+                json_res = (
+                    chat_completion_no_stream_return_json(
+                        messages=[{"role": "user", "content": user_msg}],
+                        llm_config={
+                            "model": MODEL,
+                            "temperature": 0.1,
+                        },
+                    )
+                    or {}
                 )
 
             else:

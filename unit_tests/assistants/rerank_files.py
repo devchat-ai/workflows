@@ -52,9 +52,7 @@ def rerank_files(
 
     files_str = ""
     for file in items:
-        assert isinstance(
-            file, str
-        ), "items must be a list of str when item_type is 'file'"
+        assert isinstance(file, str), "items must be a list of str when item_type is 'file'"
         files_str += f"- {file}\n"
 
     user_msg = rerank_file_prompt.format(
@@ -63,20 +61,23 @@ def rerank_files(
         accumulated_knowledge=knowledge,
     )
 
-    result = None
+    result = {}
     if USE_USER_MODEL:
         # Use the wrapped api parameters
-        result = chat_completion_no_stream_return_json(
-            messages=[
-                {
-                    "role": "user",
-                    "content": user_msg,
+        result = (
+            chat_completion_no_stream_return_json(
+                messages=[
+                    {
+                        "role": "user",
+                        "content": user_msg,
+                    },
+                ],
+                llm_config={
+                    "model": MODEL,
+                    "temperature": 0.1,
                 },
-            ],
-            llm_config={
-                "model": MODEL,
-                "temperature": 0.1,
-            },
+            )
+            or {}
         )
 
     else:
@@ -94,6 +95,6 @@ def rerank_files(
         )
         result = json.loads(response)
 
-    reranked = [(i["item"], i["relevance"]) for i in result["result"]]
+    reranked = [(i["item"], i["relevance"]) for i in result.get("result", [])]
 
     return reranked

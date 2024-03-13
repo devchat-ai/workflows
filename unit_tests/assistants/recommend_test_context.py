@@ -80,7 +80,7 @@ def get_recommended_symbols(
                 "model": MODEL,
                 "temperature": 0.1,
             },
-        )
+        ) or {}
 
     else:
         response = create_chat_completion_content(
