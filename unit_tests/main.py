@@ -246,7 +246,7 @@ class UnitTestsWorkflow:
         if requirements.strip():
             lines.append(requirements)
         else:
-            lines.append(_i("No customized requirments."))
+            lines.append(_i("No customized requirements."))
 
         if contexts:
             lines.append(_i("\nAdditional context:"))
