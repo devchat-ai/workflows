@@ -1,0 +1,5 @@
+description: 创建一个feature-request类型的issue
+hint: question
+input: required
+steps:
+  - run: $devchat_python $command_path/../command.py ".devchat/information/issue/feature-request.txt$input"
