@@ -15,14 +15,14 @@ from tools.symbol_util import (
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from libs.ide_services import IDEService, Location, SymbolNode, Range
+from libs.ide_services import IDEService, Location, Range, SymbolNode
 
 
 @dataclass
 class Context:
     file_path: str  # relative path to repo root
     content: str
-    range: Range 
+    range: Range
 
     def __hash__(self) -> int:
         return hash((self.file_path, self.content))
