@@ -15,13 +15,14 @@ from tools.symbol_util import (
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from libs.ide_services import IDEService, Location, SymbolNode
+from libs.ide_services import IDEService, Location, Range, SymbolNode
 
 
 @dataclass
 class Context:
     file_path: str  # relative path to repo root
     content: str
+    range: Range
 
     def __hash__(self) -> int:
         return hash((self.file_path, self.content))
@@ -39,7 +40,7 @@ def _extract_referenced_symbols_context(
     """
     referenced_symbols_context = defaultdict(list)
     func_content = func_to_test.func_content
-    referenced_symbols = []
+    referenced_symbols: List[SymbolNode] = []
     stack = [(s, 0) for s in symbols]
 
     while stack:
@@ -60,7 +61,7 @@ def _extract_referenced_symbols_context(
     # Get the content of the symbols
     for s in referenced_symbols:
         content = get_symbol_content(s, file_content=func_to_test.file_content)
-        context = Context(file_path=func_to_test.file_path, content=content)
+        context = Context(file_path=func_to_test.file_path, content=content, range=s.range)
         referenced_symbols_context[s.name].append(context)
     return referenced_symbols_context
 
@@ -106,7 +107,7 @@ def _find_children_symbols_type_def_context(
             for t, _ in targets:
                 content = get_symbol_content(t, abspath=loc.abspath)
                 relpath = os.path.relpath(loc.abspath, func_to_test.repo_root)
-                context = Context(file_path=relpath, content=content)
+                context = Context(file_path=relpath, content=content, range=t.range)
                 type_defs[symbol_name].append(context)
 
     return type_defs
@@ -168,7 +169,7 @@ def _extract_recommended_symbols_context(
             for t, _ in targets:
                 content = get_symbol_content(t, abspath=loc.abspath)
                 relpath = os.path.relpath(loc.abspath, func_to_test.repo_root)
-                context = Context(file_path=relpath, content=content)
+                context = Context(file_path=relpath, content=content, range=t.range)
                 recommended_symbols[symbol_name].append(context)
 
     return recommended_symbols

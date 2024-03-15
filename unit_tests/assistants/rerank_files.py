@@ -8,7 +8,7 @@ from llm_conf import (
 )
 from openai_util import create_chat_completion_content
 
-MODEL = USER_LLM_MODEL if USE_USER_MODEL else "gpt-3.5-turbo"
+MODEL = USER_LLM_MODEL if USE_USER_MODEL else "gpt-4-turbo-preview"
 
 # ruff: noqa: E501
 
