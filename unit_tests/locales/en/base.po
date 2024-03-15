@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-11 22:42+0800\n"
+"POT-Creation-Date: 2024-03-15 16:39+0800\n"
 "PO-Revision-Date: 2023-12-24 16:51+0800\n"
 "Last-Translator: kagami <mingjing@merico.dev>\n"
 "Language-Team: English\n"
@@ -17,78 +17,76 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: main.py:79
+#: main.py:107
 msgid "Analyzing the function and current unit tests..."
 msgstr ""
 
-#: main.py:116
+#: main.py:146
 msgid "Select test cases to generate"
 msgstr ""
 
-#: main.py:121
+#: main.py:151
 msgid ""
 "You can add more test cases here\n"
 "(Multiple cases can be separated by line breaks)"
 msgstr ""
 
-#: main.py:127
+#: main.py:157
 msgid ""
 "Edit reference test file\n"
 "(Multiple files can be separated by line breaks)"
 msgstr ""
 
-#: main.py:134
+#: main.py:164
 msgid ""
 "Write your customized requirements(prompts) for tests here.\n"
 "(For example, what testing framework to use.)"
 msgstr ""
 
-#: main.py:153
+#: main.py:183
 msgid "No test case is selected. Quit generating tests."
 msgstr ""
 
-#: main.py:176
+#: main.py:220
 msgid "Will generate tests for the following cases."
 msgstr ""
 
-#: main.py:179
+#: main.py:223
 msgid ""
 "\n"
 "Test cases:"
 msgstr ""
 
-#: main.py:186
+#: main.py:230
 msgid ""
 "\n"
 "No valid reference file is provided. Will not use reference to generate "
 "tests."
 msgstr ""
 
-#: main.py:191
+#: main.py:235
 msgid ""
 "\n"
 "Will use the following reference files to generate tests."
 msgstr ""
 
-#: main.py:192
-msgid ""
-"\n"
-"Valid reference files:"
-msgstr ""
-
-#: main.py:197
-msgid ""
-"\n"
-"Invalid files:"
-msgstr ""
-
-#: main.py:201
+#: main.py:245
 msgid ""
 "\n"
 "Customized requirements(prompts):"
 msgstr ""
 
-#: main.py:330
+#: main.py:249
+msgid "No customized requirments."
+msgstr ""
+
+#: main.py:252
+msgid ""
+"\n"
+"Additional context:"
+msgstr ""
+
+#: main.py:348
 msgid "The function's size surpasses AI's context capacity."
 msgstr ""
 
