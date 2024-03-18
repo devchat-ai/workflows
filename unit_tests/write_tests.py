@@ -35,7 +35,9 @@ def _mk_write_tests_msg(
     symbol_contexts: Optional[List[Context]] = None,
     user_requirements: str = "",
 ) -> Optional[str]:
-    additional_requirements = user_requirements
+    additional_requirements = ""
+    if user_requirements:
+        additional_requirements = f"Additional requirements\n\n{user_requirements}\n\n"
 
     test_cases_str = ""
     for i, test_case in enumerate(test_cases, 1):

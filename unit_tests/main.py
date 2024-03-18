@@ -11,6 +11,8 @@ from cache import LocalCache
 from chatmark import Checkbox, Form, Step, TextEditor  # noqa: E402
 from find_context import (
     Context,
+    Position,
+    Range,
     find_symbol_context_by_static_analysis,
     find_symbol_context_of_llm_recommendation,
 )
@@ -76,6 +78,10 @@ class UnitTestsWorkflow:
                 Context(
                     file_path=self.func_to_test.file_path,
                     content=self.func_to_test.container_content,
+                    range=Range(
+                        start=Position(line=self.func_to_test.container_start_line, character=0),
+                        end=Position(line=self.func_to_test.container_end_line, character=0),
+                    ),
                 )
             )
         known_context_for_llm += list(
