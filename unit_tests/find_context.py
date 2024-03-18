@@ -15,7 +15,7 @@ from tools.symbol_util import (
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from libs.ide_services import IDEService, Location, Range, SymbolNode
+from libs.ide_services import IDEService, Location, Position, Range, SymbolNode
 
 
 @dataclass

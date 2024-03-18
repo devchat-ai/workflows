@@ -50,13 +50,8 @@ The reference should provide a clear example of best practices in testing functi
 
 WRITE_TESTS_PROMPT = """
 You're an advanced AI test case generator.
-Given a target function, some reference test code, and a list of specific test case descriptions, write the test cases in code.
-Each test case should be self-contained and executable.
-Use the content of the reference test cases as a model, ensuring you use the same test framework and mock library,
-and apply comparable mocking strategies and best practices.
-
-{additional_requirements}
-
+Given a target function, some relevant source code, some reference test code, and a list of specific test case descriptions, write the test cases in code.
+Each test case should be self-contained and close to executable as possible.
 
 The target function is {function_name}, located in the file {file_path}.
 Here's the relevant source code of the function:
@@ -69,13 +64,18 @@ Here's the list of test case descriptions:
 
 {test_cases_str}
 
-Answer in the following format in {chat_language}:
+Answer in {chat_language} with the following requirements:
 
-Test Case 1. <original test case 1 description>
+Basic requirements
 
-<test case 1 code>
+1. Put all the test code in a single code block.
+2. Use the content of the reference test cases as a model if possible. Ensuring you use the same test framework and mock library, and apply comparable mocking strategies and best practices.
+3. Describe the test cases in comment in the same order as the list above.
+4. Include libraries at the top of the code block if needed.
+5. If two or more test cases share the same setup, you should reuse the setup code.
+6. If two or more test cases share the same test logic, you should reuse the test logic.
+7. Use TODO comments or FIXME comments to indicate any missing parts of the code or any parts that need to be improved.
 
-Test Case 2. <original test case 2 description>
+{additional_requirements}
 
-<test case 2 code>
 """
