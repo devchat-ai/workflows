@@ -20,6 +20,7 @@ For each test case, provide a description that includes:
 - A brief explanation of the test's purpose
 - The specific conditions being tested.
 - The expected outcome the test is verifying.
+Each description should be a single sentence, as concise as possible.
 
 Categorize each test case as:
 - 'happy path': Tests the function with typical inputs and standard conditions, ensuring it performs as expected in normal use.
