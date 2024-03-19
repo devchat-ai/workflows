@@ -16,7 +16,7 @@ from openai_util import create_chat_completion_content
 from prompts import PROPOSE_TEST_PROMPT
 from tools.tiktoken_util import get_encoding
 
-MODEL = USER_LLM_MODEL if USE_USER_MODEL else "gpt-4-turbo-preview"
+MODEL = USER_LLM_MODEL if USE_USER_MODEL else "gpt-4-turbo-preview"  # "gpt-3.5-turbo"
 ENCODING = (
     get_encoding(DEFAULT_ENCODING)  # Use default encoding as an approximation
     if USE_USER_MODEL
