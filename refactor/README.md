@@ -1,9 +1,8 @@
-
 需要输入参数，使用指南如下：
 
 ## 1.选中代码
 
-选中你需要重构的代码，在 DevChat 聊天窗口，键入/refactor.names 发起代码重构工作流。
+选中你需要重构的代码，在 DevChat 聊天窗口，键入/refactor 发起代码重构工作流。
 ![图片](https://deploy-script.merico.cn/devchat/workflow/refactor.name_1.png)
 
 ## 2.生成代码
