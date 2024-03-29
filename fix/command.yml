@@ -1,3 +1,4 @@
 description: Try to find out potential bugs in the selected code and try fixing these bugs automaticly.
+input: required
 steps:
   - run: $devchat_python $command_path/main.py
