@@ -1,3 +1,4 @@
 description: Explain selected code.
+input: required
 steps:
   - run: $devchat_python $command_path/explain.py

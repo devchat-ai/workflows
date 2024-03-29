@@ -1,3 +1,4 @@
 description: Automatically add docstrings. Select a function or method and execute this command to generate docstring.
+input: required
 steps:
   - run: $devchat_python $command_path/main.py
