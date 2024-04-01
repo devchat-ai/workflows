@@ -1,4 +1,5 @@
 import re
+import os
 import sys
 
 from devchat.ide.service import IDEService
@@ -22,6 +23,13 @@ def get_selected_code():
 
     miss_selected_error = "Please select some text."
     if selected_data["text"] == "":
+        readme_path = os.path.join(os.path.dirname(__file__), "README.md")
+        if os.path.exists(readme_path):
+            with open(readme_path, "r", encoding="utf-8") as f:
+                readme_text = f.read()
+                print(readme_text)
+                sys.exit(0)
+
         print(miss_selected_error, file=sys.stderr, flush=True)
         sys.exit(-1)
 
