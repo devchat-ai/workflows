@@ -22,7 +22,7 @@ def get_selected_code():
     selected_data = IDEService().get_selected_range().dict()
 
     miss_selected_error = "Please select some text."
-    if selected_data["text"] == "":
+    if selected_data["range"]["start"] == selected_data["range"]["end"]:
         readme_path = os.path.join(os.path.dirname(__file__), "README.md")
         if os.path.exists(readme_path):
             with open(readme_path, "r", encoding="utf-8") as f:
