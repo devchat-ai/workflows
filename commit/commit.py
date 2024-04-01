@@ -39,7 +39,6 @@ def _T(en_text, zh_text):
         return en_text
 
 
-
 def extract_markdown_block(text):
     """
     Extracts the first Markdown code block from the given text without the language specifier.
@@ -417,12 +416,14 @@ def main():
         commit_result = display_commit_message_and_commit(commit_message["content"])
         if not commit_result:
             commit_abort_msg = _T(
-                "Commit aborted.", "提交已中止。",
+                "Commit aborted.",
+                "提交已中止。",
             )
             print(commit_abort_msg, flush=True)
         else:
             commit_completed_msg = _T(
-                "Commit completed.", "提交已完成。",
+                "Commit completed.",
+                "提交已完成。",
             )
             print(commit_completed_msg, flush=True)
         sys.exit(0)
