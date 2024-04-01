@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 
 from devchat.ide.service import IDEService
 from devchat.llm import chat
