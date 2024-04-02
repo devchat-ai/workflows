@@ -8,4 +8,5 @@
 4. 自动弹出Diff View，选择是否接受修改。
 
 如图所示：
+
 ![图片](https://deploy-script.merico.cn/devchat/workflow/readme_docstring.gif)
