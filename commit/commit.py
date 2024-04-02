@@ -26,6 +26,19 @@ diff_too_large_message_zh = (
 COMMIT_PROMPT_LIMIT_SIZE = 20000
 
 
+def _T(en_text, zh_text):
+    """
+    Returns a text in the current language.
+    :param en_text: The English version of the text
+    :param zh_text: The Chinese version of the text
+    :return: The text in the current language
+    """
+    if IDEService().ide_language() == "zh":
+        return zh_text
+    else:
+        return en_text
+
+
 def extract_markdown_block(text):
     """
     Extracts the first Markdown code block from the given text without the language specifier.
@@ -343,24 +356,25 @@ def check_git_installed():
 def main():
     global language
     try:
-        print("Let's follow the steps below.\n\n")
+        start_msg = _T("Let's follow the steps below.\n\n", "开始按步骤操作。\n\n")
+        print(start_msg)
         # Ensure enough command line arguments are provided
-        if len(sys.argv) < 3:
-            print("Usage: python script.py <user_input> <language>", file=sys.stderr, flush=True)
+        if len(sys.argv) < 2:
+            print("Usage: python script.py <user_input>", file=sys.stderr, flush=True)
             sys.exit(-1)
 
         user_input = sys.argv[1]
-        language = sys.argv[2]
+        language = IDEService().ide_language()
 
         if not check_git_installed():
             sys.exit(-1)
 
-        print(
+        step1_msg = _T(
             "Step 1/2: Select the files you've changed that you wish to include in this commit, "
             "then click 'Submit'.",
-            end="\n\n",
-            flush=True,
+            "第一步/2：选择您希望包含在这次提交中的文件，然后点击“提交”。",
         )
+        print(step1_msg, end="\n\n", flush=True)
         modified_files, staged_files = get_modified_files()
         if len(modified_files) == 0:
             print("There are no files to commit.", flush=True)
@@ -368,18 +382,22 @@ def main():
 
         staged_select_files, unstaged_select_files = get_marked_files(modified_files, staged_files)
         if not staged_select_files and not unstaged_select_files:
-            print("No files selected, the commit has been aborted.")
+            no_files_msg = _T(
+                "No files selected, the commit has been aborted.",
+                "没有选择任何文件，提交已中止。",
+            )
+            print(no_files_msg)
             return
 
         rebuild_stage_list(staged_select_files, unstaged_select_files)
 
-        print(
+        step2_msg = _T(
             "Step 2/2: Review the commit message I've drafted for you. "
             "Edit it below if needed. Then click 'Commit' to proceed with "
             "the commit using this message.",
-            end="\n\n",
-            flush=True,
+            "第二步/2：查看我为您起草的提交消息。如果需要，请在下面编辑它。然后单击“提交”以使用此消息进行提交。",
         )
+        print(step2_msg, end="\n\n", flush=True)
         diff = get_diff()
         branch_name = get_current_branch()
         if branch_name:
@@ -397,9 +415,17 @@ def main():
 
         commit_result = display_commit_message_and_commit(commit_message["content"])
         if not commit_result:
-            print("Commit aborted.", flush=True)
+            commit_abort_msg = _T(
+                "Commit aborted.",
+                "提交已中止。",
+            )
+            print(commit_abort_msg, flush=True)
         else:
-            print("Commit completed.", flush=True)
+            commit_completed_msg = _T(
+                "Commit completed.",
+                "提交已完成。",
+            )
+            print(commit_completed_msg, flush=True)
         sys.exit(0)
     except Exception as err:
         print("Exception:", err, file=sys.stderr, flush=True)
