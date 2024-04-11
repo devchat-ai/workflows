@@ -49,6 +49,8 @@ EXPLAIN_PROMPT = prompt = """
 Your task is:
 Explain the code.
 Following the task requirements, explain the selected portion of the code. \
+Note that you only explain the logic of the selected code. \
+The visible code only serves as the context for you to understand the code. \
 Here is the relevant context \
 information for your reference:
 1.  selected code info: {selected_text}
@@ -57,8 +59,9 @@ information for your reference:
 
 EXPLAIN_PROMPT_ZH = prompt = """
 你的任务是：
-解释代码。
-根据任务要求，解释被选中部分的代码。你可以参考的 context 有：
+使用中文解释代码。
+根据任务要求，解释被选中部分的代码。注意只解释被选中的代码逻辑，\
+可见代码只是作为你理解代码的 context，你可以参考的 context 有：
 1. 编辑器中被选中的代码：{selected_text}
 2. 当前编辑器中可见代码：{visible_text}
 """
