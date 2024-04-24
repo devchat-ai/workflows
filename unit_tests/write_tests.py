@@ -1,7 +1,7 @@
 from functools import partial
 from typing import List, Optional
 
-from devchat.llm.openai import chat_completion_stream
+from devchat.llm.chat import chat_completion_stream_out
 from find_context import Context
 from llm_conf import (
     CONTEXT_SIZE,
@@ -138,12 +138,10 @@ def write_and_print_tests(
 
     if USE_USER_MODEL:
         # Use the wrapped api
-        res = chat_completion_stream(
+        _ = chat_completion_stream_out(
             messages=[{"role": "user", "content": user_msg}],
             llm_config={"model": MODEL, "temperature": 0.1},
         )
-        if res:
-            print(res.get("content", ""))
 
     else:
         # Use the openai api parameters
