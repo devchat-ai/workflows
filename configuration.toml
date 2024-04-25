@@ -1,2 +1,0 @@
-[recommend]
-workflows = ["unit_tests", "commit", "docstring", "comments", "fix", "explain", "refactor"]
