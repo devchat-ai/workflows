@@ -1,5 +1,0 @@
-description: 解释当前代码仓库的目录结构
-hint: 请帮助我理解当前仓库的目录结构
-input: optional
-steps:
-  - run: $command_python $command_path/../main.py "$input" -lang zh
