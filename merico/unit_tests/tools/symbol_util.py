@@ -1,14 +1,10 @@
-import os
 import re
-import sys
 from collections import defaultdict
 from typing import Dict, List, Optional, Tuple
 
 from tools.file_util import retrieve_file_content
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
-
-from libs.ide_services import Position, SymbolNode
+from lib.ide_service import Position, SymbolNode
 
 
 def split_tokens(text: str) -> Dict[str, List[int]]:

@@ -1,14 +1,8 @@
 import os
-import sys
 from typing import Dict, List, Tuple
 
 import click
-
-sys.path.append(os.path.dirname(__file__))
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
-
 from cache import LocalCache
-from chatmark import Checkbox, Form, Step, TextEditor  # noqa: E402
 from find_context import (
     Context,
     Position,
@@ -18,7 +12,6 @@ from find_context import (
 )
 from find_reference_tests import find_reference_tests
 from i18n import TUILanguage, get_translation
-from ide_services import IDEService  # noqa: E402
 from model import (
     FuncToTest,
     TokenBudgetExceededException,
@@ -27,6 +20,9 @@ from model import (
 from propose_test import propose_test
 from tools.file_util import retrieve_file_content
 from write_tests import write_and_print_tests
+
+from lib.chatmark import Checkbox, Form, Step, TextEditor
+from lib.ide_service import IDEService
 
 CHAT_WORKFLOW_DIR_PATH = [".chat", "workflows"]
 

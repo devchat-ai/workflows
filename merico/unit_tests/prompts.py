@@ -44,7 +44,7 @@ Answer in JSON format:
 
 FIND_REFERENCE_PROMPT = """
 Identify a suitable reference test file that can be used as a guide for writing test cases
-for the function {function_name}, located in the file {file_path}. 
+for the function {function_name}, located in the file {file_path}.
 The reference should provide a clear example of best practices in testing functions of a similar nature.
 """
 

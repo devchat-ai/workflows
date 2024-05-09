@@ -1,5 +1,4 @@
 import os
-import sys
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Set
@@ -13,9 +12,13 @@ from tools.symbol_util import (
     split_tokens,
 )
 
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
-from libs.ide_services import IDEService, Location, Position, Range, SymbolNode
+from lib.ide_service import (
+    IDEService,
+    Location,
+    Position,
+    Range,
+    SymbolNode,
+)
 
 
 @dataclass
@@ -142,7 +145,7 @@ def _extract_recommended_symbols_context(
                     last_token = s
 
         # locate the symbol in the file
-        positions = locate_symbol_by_name(last_token, abs_path)
+        positions: List[Position] = locate_symbol_by_name(last_token, abs_path)
 
         for pos in positions:
             type_locations = client.find_type_def_locations(abs_path, pos.line, pos.character)
