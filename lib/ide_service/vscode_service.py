@@ -1,7 +1,7 @@
 import os
-import sys
 
 from .rpc import rpc_call
+from .types import LocationWithText
 
 
 @rpc_call
@@ -99,16 +99,34 @@ def visible_lines():
     end_line = active_document["visibleRanges"][0][1]["line"]
 
     # read file lines from start_line to end_line
-    with open(file_path, "r") as file:
-        lines = file.readlines()
-        selected_lines = lines[start_line : end_line + 1]
+    with open(file_path, "r", encoding="utf-8") as file:
+        _lines = file.readlines()
+        _visible_lines = _lines[start_line : end_line + 1]
 
     # continue with the rest of the function
     return {
         "filePath": file_path,
-        "visibleText": "".join(selected_lines),
+        "visibleText": "".join(_visible_lines),
         "visibleRange": [start_line, end_line],
     }
+
+
+def visible_range() -> LocationWithText:
+    visible_range_text = visible_lines()
+    return LocationWithText(
+        text=visible_range_text["visibleText"],
+        abspath=visible_range_text["filePath"],
+        range={
+            "start": {
+                "line": visible_range_text["visibleRange"][0],
+                "character": 0,
+            },
+            "end": {
+                "line": visible_range_text["visibleRange"][1],
+                "character": 0,
+            },
+        },
+    )
 
 
 def selected_lines():
@@ -131,13 +149,31 @@ def selected_lines():
     end_col = active_document["selection"]["end"]["character"]
 
     # read file lines from start_line to end_line
-    with open(file_path, "r") as file:
-        lines = file.readlines()
-        selected_lines = lines[start_line : end_line + 1]
+    with open(file_path, "r", encoding="utf-8") as file:
+        _lines = file.readlines()
+        _selected_lines = _lines[start_line : end_line + 1]
 
     # continue with the rest of the function
     return {
-        "filePath": "",
-        "selectedText": "".join(selected_lines),
+        "filePath": file_path,
+        "selectedText": "".join(_selected_lines),
         "selectedRange": [start_line, start_col, end_line, end_col],
     }
+
+
+def selected_range() -> LocationWithText:
+    selected_range_text = selected_lines()
+    return LocationWithText(
+        text=selected_range_text["selectedText"],
+        abspath=selected_range_text["filePath"],
+        range={
+            "start": {
+                "line": selected_range_text["selectedRange"][0],
+                "character": selected_range_text["selectedRange"][1],
+            },
+            "end": {
+                "line": selected_range_text["selectedRange"][2],
+                "character": selected_range_text["selectedRange"][3],
+            },
+        },
+    )

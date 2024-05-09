@@ -7,6 +7,7 @@ __all__ = [
     "Range",
     "Location",
     "SymbolNode",
+    "LocationWithText",
 ]
 
 
@@ -48,3 +49,15 @@ class SymbolNode(BaseModel):
     kind: str
     range: Range
     children: List["SymbolNode"]
+
+
+class LocationWithText(BaseModel):
+    abspath: str
+    range: Range
+    text: str
+
+    def __repr__(self):
+        return f"{self.abspath}::{self.range}::{self.text}"
+
+    def __hash__(self):
+        return hash(self.__repr__())
