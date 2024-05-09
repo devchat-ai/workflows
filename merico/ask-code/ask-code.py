@@ -3,10 +3,7 @@ import sys
 
 from chat.ask_codebase.chains.smart_qa import SmartQA
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
-
-from ide_services import IDEService  # noqa: E402
+from lib.ide_service import IDEService
 
 
 def query(question, lsp_brige_port):

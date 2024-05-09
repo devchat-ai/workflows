@@ -1,4 +1,8 @@
 description: Ask questions about the current project's codebase, which requires proactive acquisition of additional context information to answer.
 input: required
+workflow_python:
+  env_name: ask-code-123
+  version: 3.11.0
+  dependencies: requirements.txt
 steps:
-  - run: $command_python $command_path/ask-code.py query "$input"
+  - run: $workflow_python $command_path/ask-code.py query "$input"
