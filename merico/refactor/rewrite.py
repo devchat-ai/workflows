@@ -2,9 +2,9 @@ import os
 import re
 import sys
 
-from devchat.ide.service import IDEService
-from devchat.ide.vscode_services import selected_lines, visible_lines
 from devchat.llm import chat
+
+from lib.ide_service import IDEService
 
 
 def get_selected_code():
