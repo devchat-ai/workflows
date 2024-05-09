@@ -1,0 +1,5 @@
+external_workflow_python:
+  - env_name: foo-env
+    python_bin: path/to/a/python
+  - env_name: bar-env
+    python_bin: path/to/another/python
