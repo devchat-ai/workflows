@@ -3,22 +3,12 @@ import os
 import sys
 
 import requests
+from devchat.llm import chat_completion_stream
 
 
 def get_script_path():
     """Return the directory path of the current script."""
     return os.path.dirname(__file__)
-
-
-def update_sys_path():
-    """Extend system path to include library directories."""
-    libs_path = os.path.join(get_script_path(), "..", "..", "..", "libs")
-    root_path = os.path.join(get_script_path(), "..", "..", "libs")
-    sys.path.extend([libs_path, root_path])
-
-
-update_sys_path()
-from llm_api import chat_completion_stream  # noqa: E402
 
 
 def load_commit_cache():

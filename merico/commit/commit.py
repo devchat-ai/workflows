@@ -4,13 +4,11 @@ import re
 import subprocess
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "libs"))
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "libs"))
-sys.path.append(os.path.dirname(__file__))
+# from llm_api import chat_completion_stream  # noqa: E402
+from devchat.llm import chat_completion_stream
 
-from chatmark import Checkbox, Form, TextEditor  # noqa: E402
-from ide_services import IDEService  # noqa: E402
-from llm_api import chat_completion_stream  # noqa: E402
+from lib.chatmark import Checkbox, Form, TextEditor
+from lib.ide_service import IDEService
 
 diff_too_large_message_en = (
     "Commit failed. The modified content is too long "
