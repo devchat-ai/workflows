@@ -2,9 +2,9 @@ name: Dev CI
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ main, scripts ]
   push:
-    branches: [ main ]
+    branches: [ main, scripts ]
 
 jobs:
   lint-and-test:
@@ -15,9 +15,6 @@ jobs:
     - uses: actions/setup-python@v4
       with:
         python-version: "3.11.4"
-    - name: install workflows-command dependencies
-      run: |
-        pip install -r requirements.txt
     - name: install dev dependencies
       run: |
         pip install -r requirements-dev.txt
