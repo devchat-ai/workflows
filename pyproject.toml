@@ -1,6 +1,13 @@
 [tool.ruff]
+target-version = "py38"
 line-length = 100
 
 [tool.ruff.lint]
-select = ["I"]           # Enable the isort rules
-extend-select = ["E501"] # explicitly adding the rules
+select = [
+    "E",  # Error
+    "W",  # Warning
+    "F",  # pyflakes
+    "I",  # isort
+]
+fixable = ["ALL"]
+extend-select = ["E501"]  # Line too long
