@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - scripts
 
 jobs:
   sync:
@@ -30,4 +31,4 @@ jobs:
           max_attempts: 3
           command: |
             git fetch gitlab &&
-            git push gitlab --force main:main
+            git push gitlab --force $GITHUB_REF_NAME:$GITHUB_REF_NAME
