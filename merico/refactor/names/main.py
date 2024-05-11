@@ -2,8 +2,8 @@ import os
 import re
 import sys
 
-from devchat.ide.service import IDEService
-from devchat.ide.vscode_services import selected_lines, visible_lines
+from lib.ide_service import IDEService
+
 from devchat.llm import chat
 from devchat.memory import FixSizeChatMemory
 

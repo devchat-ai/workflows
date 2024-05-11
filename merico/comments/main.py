@@ -2,6 +2,7 @@ import os
 import re
 import sys
 
+from lib.ide_service import IDEService
 from devchat.llm import chat
 from devchat.memory import FixSizeChatMemory
 
@@ -34,7 +35,7 @@ To add comments, you need to follow the following rules:
 5. don't change string value in code block;
 
 there are a examples with correct outputs:
-input: 
+input:
 file: a1.py
 ```
 # print("hello")
@@ -190,8 +191,6 @@ file: t2.ts
 """,
     },
 ]
-
-from lib.ide_service import IDEService
 
 
 def get_selected_code():

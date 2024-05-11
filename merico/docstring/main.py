@@ -2,6 +2,8 @@ import os
 import re
 import sys
 
+from lib.ide_service import IDEService
+
 from devchat.llm import chat
 from devchat.memory import FixSizeChatMemory
 
@@ -141,8 +143,6 @@ def content_to_json(content):
 """,
     },
 ]
-
-from lib.ide_service import IDEService
 
 
 def get_selected_code():
