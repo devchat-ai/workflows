@@ -36,17 +36,6 @@ def get_selected_code():
     return selected_data
 
 
-def get_visible_code():
-    """
-    Retrieves visible code from the visible_lines function.
-
-    Returns:
-    visible_data: The visible code retrieved from the visible_lines function.
-    """
-    visible_data = IDEService().get_visible_range().dict()
-    return visible_data
-
-
 REWRITE_PROMPT = prompt = """
 Your task is:
 {question}
@@ -57,13 +46,12 @@ correct syntax. Just refactor the selected code. Keep all other information as i
 Here is the relevant context \
 information for your reference:
 1.  selected code info: {selected_text}
-2.  current visible code info: {visible_text}
 """
 
 
 @chat(prompt=REWRITE_PROMPT, stream_out=True)
 # pylint: disable=unused-argument
-def ai_rewrite(question, selected_text, visible_text):
+def ai_rewrite(question, selected_text):
     """
     call ai to rewrite selected code
     """
@@ -84,6 +72,9 @@ def extract_markdown_block(text):
         block_content = match.group(1)
         return block_content
     else:
+        # whether exist ```language?
+        if text.find("```"):
+            return None
         return text
 
 
@@ -126,13 +117,19 @@ def main():
     question = sys.argv[1]
     # prepare code
     selected_text = get_selected_code()
-    visible_text = get_visible_code()
 
     # rewrite
-    response = ai_rewrite(question=question, selected_text=selected_text, visible_text=visible_text)
+    response = ai_rewrite(question=question, selected_text=selected_text)
 
     # apply new code to editor
     new_code = extract_markdown_block(response)
+    if not new_code:
+        if IDEService().ide_language() == "zh":
+            print("\n\n大模型输出不完整，不能进行代码操作。\n\n")
+        else:
+            print("\n\nThe output of the LLM is incomplete and cannot perform code operations.\n\n")
+        sys.exit(0)
+
     IDEService().diff_apply("", new_code)
 
     sys.exit(0)
