@@ -2,10 +2,10 @@ import os
 import re
 import sys
 
-from lib.ide_service import IDEService
-
 from devchat.llm import chat
 from devchat.memory import FixSizeChatMemory
+
+from lib.ide_service import IDEService
 
 PROMPT = prompt = """
 file: {file_path}
