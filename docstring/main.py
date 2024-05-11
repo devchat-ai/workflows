@@ -7,7 +7,6 @@ from devchat.ide.vscode_services import selected_lines, visible_lines
 from devchat.llm import chat
 from devchat.memory import FixSizeChatMemory
 
-
 PROMPT = prompt = """
 file: {file_path}
 ```
@@ -23,6 +22,7 @@ PROMPT_ZH = prompt = """
 
 输出内容使用中文，我的母语为中文。
 """
+
 
 def get_prompt():
     ide_language = IDEService().ide_language()
@@ -40,10 +40,12 @@ And just add the documents for the selected portion of the code.
 Output documentation comment is format as code block.\
 
 You must follow the following rules:
-1. Output documentation comment in ```comment <documentation comments without code lines> ``` format.
-2. Different languages have different comment symbols, please choose the correct comment symbol according to the file name.
+1. Output documentation comment in ```comment <documentation comments without code lines> ``` \
+    format.
+2. Different languages have different comment symbols, please choose the correct comment symbol \
+    according to the file name.
 3. You must output ... to indicate the remaining code, output all code block can make more errors.
-"""
+""",
     },
     {
         "role": "user",
@@ -54,7 +56,7 @@ file: a1.py
         print("hello")
         print("world")
 ```
-"""
+""",
     },
     {
         "role": "assistant",
@@ -73,7 +75,7 @@ file: a1.py
         print("hello")
         ...
 ```
-"""
+""",
     },
     {
         "role": "user",
@@ -84,7 +86,7 @@ file: t1.java
         System.out.println("Hello, World!");
     }
 ```
-"""
+""",
     },
     {
         "role": "assistant",
@@ -99,7 +101,7 @@ file: t1.java
     public static void main(String[] args) {
         ...
 ```
-"""
+""",
     },
     {
         "role": "user",
@@ -116,7 +118,7 @@ def content_to_json(content):
     except Exception as err:
         raise err
 ```
-"""
+""",
     },
     {
         "role": "assistant",
@@ -138,8 +140,8 @@ def content_to_json(content):
     try:
         ...
 ```
-"""
-    }    
+""",
+    },
 ]
 
 
@@ -174,6 +176,7 @@ def get_selected_code():
 
 memory = FixSizeChatMemory(max_size=20, messages=MESSAGES_A)
 
+
 @chat(prompt=get_prompt(), stream_out=True, memory=memory)
 # pylint: disable=unused-argument
 def add_docstring(selected_text, file_path):
@@ -202,6 +205,7 @@ def extract_markdown_block(text):
             return None
         return text
 
+
 def get_indent_level(text):
     """
     Returns the indentation level of the given text.
@@ -218,6 +222,7 @@ def get_indent_level(text):
         else:
             break
     return indent_level
+
 
 def offset_indent_level(text, indent_level):
     """
@@ -236,6 +241,7 @@ def offset_indent_level(text, indent_level):
             new_lines.append(" " * offset_indent + line)
         text = "\n".join(new_lines)
     return text
+
 
 def merge_code(selected_text, docstring):
     user_selected_lines = selected_text.split("\n")
@@ -264,11 +270,14 @@ def merge_code(selected_text, docstring):
         for index_doc, line_doc in enumerate(docstring_trim_lines):
             if line_doc == "...":
                 break
-            if line.strip().find(line_doc.strip())!= -1 or line_doc.strip().find(line.strip())!= -1:
+            if (
+                line.strip().find(line_doc.strip()) != -1
+                or line_doc.strip().find(line.strip()) != -1
+            ):
                 break
-        if ((line.strip().find(line_doc.strip()) == -1 and
-                line_doc.strip().find(line.strip()) == -1) or
-                index == index_doc):
+        if (
+            line.strip().find(line_doc.strip()) == -1 and line_doc.strip().find(line.strip()) == -1
+        ) or index == index_doc:
             continue
         return "\n".join(docstring_lines[:index_doc] + user_selected_lines[index:])
     return docstring + "\n" + selected_text
@@ -280,12 +289,11 @@ def main():
 
     # Rewrite
     response = add_docstring(
-        selected_text=selected_text.get('text', ''),
-        file_path=selected_text.get('abspath', '')
+        selected_text=selected_text.get("text", ""), file_path=selected_text.get("abspath", "")
     )
 
     # Get indent level
-    indent = get_indent_level(selected_text.get('text', ''))
+    indent = get_indent_level(selected_text.get("text", ""))
 
     # Apply new code to editor
     new_code = extract_markdown_block(response)
@@ -298,11 +306,12 @@ def main():
     new_code = offset_indent_level(new_code, indent)
 
     # Merge code
-    docstring_code = merge_code(selected_text.get('text', ''), new_code)
+    docstring_code = merge_code(selected_text.get("text", ""), new_code)
     # Apply diff
     IDEService().diff_apply("", docstring_code)
 
     sys.exit(0)
+
 
 def print_message(language):
     if language == "zh":

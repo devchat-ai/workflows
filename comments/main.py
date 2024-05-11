@@ -62,7 +62,6 @@ here is an error example:
         // const posOffset = document.offsetAt(position);
         // await outputAst(filepath, fileContent, posOffset);
         // // await testTreesitterQuery(filepath, fileContent);
-        // const result2 = await findSimilarCodeBlock(filepath, fileContent, position.line, position.character);
         // logger.channel()?.info("Result:", result2);
         // if (1) {
         //     return [];
@@ -89,7 +88,7 @@ output is :
 In this example, string in code is changed, so this output is bad.
 
 Output should format as code block.
-"""
+""",
     },
     {
         "role": "user",
@@ -98,7 +97,7 @@ file: a1.py
 ```
     print("hello")
 ```
-"""
+""",
     },
     {
         "role": "assistant",
@@ -107,7 +106,7 @@ file: a1.py
     # print hello
     print("hello")
 ```
-"""
+""",
     },
     {
         "role": "user",
@@ -116,7 +115,7 @@ file: a1.py
 ```
     print("hell\\nworld")
 ```
-"""
+""",
     },
     {
         "role": "assistant",
@@ -125,7 +124,7 @@ file: a1.py
     # print hello world
     print("hell\\nworld")
 ```
-"""
+""",
     },
     {
         "role": "user",
@@ -140,7 +139,7 @@ file: t2.ts
                     length: response!.code.length
                 });
 ```
-"""
+""",
     },
     {
         "role": "assistant",
@@ -159,7 +158,7 @@ file: t2.ts
                     length: response!.code.length
                 });
 ```
-"""
+""",
     },
     {
         "role": "user",
@@ -174,7 +173,7 @@ file: t2.ts
         console.log("a is 2");
     }
 ```
-"""
+""",
     },
     {
         "role": "assistant",
@@ -190,8 +189,8 @@ file: t2.ts
         console.log("a is 2");
     }
 ```
-"""
-    }
+""",
+    },
 ]
 
 
@@ -209,17 +208,21 @@ def get_selected_code():
         sys.exit(-1)
     return selected_data
 
+
 memory = FixSizeChatMemory(max_size=20, messages=MESSAGES_FEW_SHOT)
+
 
 def get_prompt():
     ide_language = IDEService().ide_language()
     return PROMPT_ZH if ide_language == "zh" else PROMPT
+
 
 @chat(prompt=get_prompt(), stream_out=True, memory=memory)
 # pylint: disable=unused-argument
 def add_comments(selected_text, file_path):
     """Call AI to rewrite selected code"""
     pass  # pylint: disable=unnecessary-pass
+
 
 def extract_markdown_block(text):
     """Extracts the first Markdown code block from the given text without the language specifier."""
@@ -233,20 +236,22 @@ def extract_markdown_block(text):
             return None
         return text
 
+
 def remove_unnecessary_escapes(code_a, code_b):
     code_copy = code_b  # Create a copy of the original code
     escape_chars = re.finditer(r"\\(.)", code_b)
     remove_char_index = []
     for match in escape_chars:
-        before = code_b[max(0, match.start()-4):match.start()]
-        after = code_b[match.start()+1:match.start()+5]
+        before = code_b[max(0, match.start() - 4) : match.start()]
+        after = code_b[match.start() + 1 : match.start() + 5]
         substr = before + after
         if substr in code_a:
             remove_char_index.append(match.start())
     remove_char_index.reverse()
     for index in remove_char_index:
-        code_copy = code_copy[:index] + code_copy[index+1:]
+        code_copy = code_copy[:index] + code_copy[index + 1 :]
     return code_copy
+
 
 def main():
     selected_text = get_selected_code()
@@ -260,13 +265,16 @@ def main():
         ide_lang = IDEService().ide_language()
         error_msg = (
             "\n\nThe output of the LLM is incomplete and cannot perform code operations.\n\n"
-            if ide_lang != "zh" else "\n\n大模型输出不完整，不能进行代码操作。\n\n")
+            if ide_lang != "zh"
+            else "\n\n大模型输出不完整，不能进行代码操作。\n\n"
+        )
         print(error_msg)
         sys.exit(0)
 
     new_code = remove_unnecessary_escapes(code_text, new_code)
     IDEService().diff_apply("", new_code)
     sys.exit(0)
+
 
 if __name__ == "__main__":
     main()
