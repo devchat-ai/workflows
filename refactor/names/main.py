@@ -16,12 +16,10 @@ file: {file_path}
 
 
 PROMPT_ZH = prompt = """
-文件: {file_path}
+fiel: {file_path}
 ```
 {selected_text}
 ```
-
-输出内容使用中文，我的母语为中文。
 """
 
 
