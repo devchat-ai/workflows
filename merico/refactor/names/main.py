@@ -16,7 +16,7 @@ file: {file_path}
 
 
 PROMPT_ZH = prompt = """
-fiel: {file_path}
+file: {file_path}
 ```
 {selected_text}
 ```
