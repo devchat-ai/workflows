@@ -1,5 +1,5 @@
 description: Automatically rename poorly-named local variables for improved readability. Select the code segment and execute this command to optimize variable names.
 help: ../README.md
 steps:
-  - run: $devchat_python $command_path/../rewrite.py "Refine internal variable and function names within the code to achieve concise and meaningful identifiers that comply with English naming conventions."
+  - run: $devchat_python $command_path/main.py
 
