@@ -72,7 +72,6 @@ Bugs and fixes:
 
 Here is the relevant context information for your reference:
 1. Selected portion of the code: {selected_text}
-2. Visible portion of the code: {visible_text}
 """
 
 
@@ -101,7 +100,6 @@ PROMPT_ZH = prompt = """
 
 以下是相关上下文信息，供您参考：
 1. 编辑器中被选中的代码：{selected_text}
-2. 当前编辑器中可见代码：{visible_text}
 """
 
 
