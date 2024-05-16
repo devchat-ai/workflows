@@ -298,25 +298,33 @@ def main(input: str):
     "/unit_tests {a}:::{b}:::{c}:::{d}:::{e}:::{f}"
     """
     # Parse input
-    params = input.strip().split(":::")
-    assert len(params) == 6, f"Invalid input: {input}, number of params: {len(params)}"
-
-    (
-        file_path,
-        func_name,
-        func_start_line,  # 0-based, inclusive
-        func_end_line,  # 0-based, inclusive
-        container_start_line,  # 0-based, inclusive
-        container_end_line,  # 0-based, inclusive
-    ) = params
-
     try:
+        params = input.strip().split(":::")
+        assert len(params) == 6, f"Invalid input: {input}, number of params: {len(params)}"
+
+        (
+            file_path,
+            func_name,
+            func_start_line,  # 0-based, inclusive
+            func_end_line,  # 0-based, inclusive
+            container_start_line,  # 0-based, inclusive
+            container_end_line,  # 0-based, inclusive
+        ) = params
+
         func_start_line = int(func_start_line)
         func_end_line = int(func_end_line)
         container_start_line = int(container_start_line)
         container_end_line = int(container_end_line)
     except Exception as e:
-        raise Exception(f"Invalid input: {input}, error: {e}")
+        readme = os.path.join(os.path.dirname(__file__), "README.md")
+        if os.path.exists(readme):
+            with open(readme, "r", encoding="utf-8") as f:
+                readme_text = f.read()
+                print(readme_text)
+            return
+
+        else:
+            raise Exception(f"Invalid input: {input}, error: {e}")
 
     user_prompt = f"Help me write unit tests for the `{func_name}` function"
 
