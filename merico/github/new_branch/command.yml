@@ -1,0 +1,4 @@
+description: 'Create new branch based current branch, and checkout new branch.'
+input: required
+steps:
+  - run: $devchat_python $command_path/command.py "$input"
