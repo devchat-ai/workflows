@@ -1,7 +1,8 @@
-from contextlib import AbstractContextManager
 import time
+from contextlib import AbstractContextManager
 
 from lib.ide_service import IDEService
+
 
 class Step(AbstractContextManager):
     """
@@ -30,7 +31,6 @@ class Step(AbstractContextManager):
         # close the step
         end_time = time.time()
         IDEService().ide_logging(
-            "debug",
-            f"Step {self.title} took {end_time - self.enter_time:.2f} seconds"
+            "debug", f"Step {self.title} took {end_time - self.enter_time:.2f} seconds"
         )
         print("\n```", flush=True)
