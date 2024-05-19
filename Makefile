@@ -8,15 +8,16 @@ setup-dev:
 	@pip install -r requirements-dev.txt
 	@echo "Done!"
 
+T="."
 check:
 	@echo ${div}
-	ruff check .
-	ruff format . --check
+	ruff check $(T)
+	ruff format $(T) --check
 	@echo "Done!"
 
 fix:
 	@echo ${div}
-	ruff format .
+	ruff format $(T)
 	@echo ${div}
-	ruff check . --fix
+	ruff check $(T) --fix
 	@echo "Done!"
