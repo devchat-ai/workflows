@@ -7,6 +7,7 @@ import time
 import requests
 
 from lib.chatmark import TextEditor
+from lib.ide_service import IDEService
 
 
 def read_github_token():
@@ -188,7 +189,7 @@ def get_github_repo(issue_repo=False):
         repo = parts[-1].replace(".git", "")
         username = parts[-2].split(":")[-1]
         github_repo = f"{username}/{repo}"
-        print("current github repo:", github_repo, end="\n\n", file=sys.stderr, flush=True)
+        IDEService().ide_logging("debug", f"current github repo: {github_repo}")
         return github_repo
     except subprocess.CalledProcessError as e:
         print(e)
