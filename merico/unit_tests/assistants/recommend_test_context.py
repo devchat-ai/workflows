@@ -12,6 +12,7 @@ from llm_conf import (
 from model import FuncToTest
 from openai_util import create_chat_completion_content
 from tools.tiktoken_util import get_encoding
+from tools.time_util import print_exec_time
 
 MODEL = USER_LLM_MODEL if USE_USER_MODEL else "gpt-4-turbo-preview"
 ENCODING = (
@@ -82,6 +83,7 @@ def _mk_user_msg(func_to_test: FuncToTest, contexts: List) -> str:
     return msg
 
 
+@print_exec_time("Model response time")
 def get_recommended_symbols(
     func_to_test: FuncToTest, known_context: Optional[List] = None
 ) -> List[str]:

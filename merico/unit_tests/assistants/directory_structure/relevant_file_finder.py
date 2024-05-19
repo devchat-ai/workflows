@@ -15,6 +15,7 @@ from llm_conf import (
 from openai_util import create_chat_completion_content
 from tools.directory_viewer import ListViewer
 from tools.tiktoken_util import get_encoding
+from tools.time_util import print_exec_time
 
 MODEL = USER_LLM_MODEL if USE_USER_MODEL else "gpt-4-turbo-preview"  # "gpt-3.5-turbo"
 ENCODING = (
@@ -89,6 +90,7 @@ class RelevantFileFinder(DirectoryStructureBase):
 
         return message
 
+    @print_exec_time("Model response time")
     def _find_relevant_files(self, objective: str, dir_structure_pages: List[str]) -> List[str]:
         files: List[str] = []
         for dir_structure in dir_structure_pages:
