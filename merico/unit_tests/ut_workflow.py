@@ -6,7 +6,6 @@ from find_context import (
     Position,
     Range,
     find_symbol_context_by_static_analysis,
-    find_symbol_context_of_llm_recommendation,
 )
 from find_reference_tests import find_reference_tests
 from i18n import TUILanguage, get_translation
@@ -52,8 +51,10 @@ class UnitTestsWorkflow:
                 contexts.update(v)
             contexts = list(contexts)
 
-            print("- Finding reference files...", flush=True)
-            reference_files = self.step_2_find_reference_files()
+            reference_files = []
+            # TODO: Restore this feature after checking the performance issue
+            # print("- Finding reference files...", flush=True)
+            # reference_files = self.step_2_find_reference_files()
 
             print("- Proposing test cases...", flush=True)
             cases = self.step_3_propose_cases(contexts)
@@ -88,11 +89,12 @@ class UnitTestsWorkflow:
             {item for sublist in list(symbol_context.values()) for item in sublist}
         )
 
-        recommended_context = find_symbol_context_of_llm_recommendation(
-            self.func_to_test, known_context_for_llm
-        )
+        # TODO: Restore this feature after checking the performance issue
+        # recommended_context = find_symbol_context_of_llm_recommendation(
+        #     self.func_to_test, known_context_for_llm
+        # )
 
-        symbol_context.update(recommended_context)
+        # symbol_context.update(recommended_context)
 
         return symbol_context
 
