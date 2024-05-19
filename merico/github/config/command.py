@@ -1,6 +1,6 @@
-import sys
 import json
 import os
+import sys
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
@@ -16,19 +16,21 @@ def read_issue_url():
                 return config_data["issue_repo"]
     return ""
 
+
 def save_issue_url(issue_url):
     config_path = os.path.join(os.getcwd(), ".chat", ".workflow_config.json")
     # make dirs
     os.makedirs(os.path.dirname(config_path), exist_ok=True)
-    
+
     config_data = {}
     if os.path.exists(config_path):
         with open(config_path, "r", encoding="utf-8") as f:
             config_data = json.load(f)
-    
+
     config_data["issue_repo"] = issue_url
     with open(config_path, "w+", encoding="utf-8") as f:
         json.dump(config_data, f, indent=4)
+
 
 def read_github_token():
     config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
@@ -39,6 +41,7 @@ def read_github_token():
                 return config_data["github_token"]
     return ""
 
+
 def save_github_token(github_token):
     config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
 
@@ -46,15 +49,17 @@ def save_github_token(github_token):
     if os.path.exists(config_path):
         with open(config_path, "r", encoding="utf-8") as f:
             config_data = json.load(f)
-    
+
     config_data["github_token"] = github_token
     with open(config_path, "w+", encoding="utf-8") as f:
         json.dump(config_data, f, indent=4)
 
 
-@editor("Please specify the issue's repository, "
-        "If the issue is within this repository, no need to specify. "
-        "Otherwise, format as: username/repository-name")
+@editor(
+    "Please specify the issue's repository, "
+    "If the issue is within this repository, no need to specify. "
+    "Otherwise, format as: username/repository-name"
+)
 @editor("Input your github TOKEN to access github api:")
 def edit_issue(issue_url, github_token):
     pass

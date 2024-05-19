@@ -1,5 +1,5 @@
-import os
 import json
+import os
 import sys
 
 from lib.chatmark import TextEditor
@@ -14,6 +14,7 @@ def read_custom_suggestions():
                 return config_data["custom_suggestions"]
     return ""
 
+
 def save_custom_suggestions(custom_suggestions):
     config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
 
@@ -21,7 +22,7 @@ def save_custom_suggestions(custom_suggestions):
     if os.path.exists(config_path):
         with open(config_path, "r", encoding="utf-8") as f:
             config_data = json.load(f)
-    
+
     config_data["custom_suggestions"] = custom_suggestions
     with open(config_path, "w+", encoding="utf-8") as f:
         json.dump(config_data, f, indent=4)
@@ -32,8 +33,7 @@ def read_custom_suggestions_with_input():
     if not custom_suggestions:
         # Input your github TOKEN to access github api:
         custom_suggestions_editor = TextEditor(
-            "- make sure the code is efficient\n",
-            "Please input your custom suggestions:"
+            "- make sure the code is efficient\n", "Please input your custom suggestions:"
         )
         custom_suggestions_editor.render()
 
@@ -50,7 +50,8 @@ def get_custom_suggestions_system_prompt():
         print("Command has been canceled.", flush=True)
         sys.exit(0)
 
-    system_prompt = """You are PR-Reviewer, a language model that specializes in suggesting ways to improve for a Pull Request (PR) code.
+    system_prompt = (
+        """You are PR-Reviewer, a language model that specializes in suggesting ways to improve for a Pull Request (PR) code.
 Your task is to provide meaningful and actionable code suggestions, to improve the new code presented in a PR diff.
 
 
@@ -96,7 +97,9 @@ Specific instructions for generating code suggestions:
 
 
 Instructions from the user, that should be taken into account with high priority:
-""" + custom_suggestions + """
+"""
+        + custom_suggestions
+        + """
 
 
 {%- if extra_instructions %}
@@ -151,4 +154,5 @@ code_suggestions:
 
 Each YAML output MUST be after a newline, indented, with block scalar indicator ('|').
 """
+    )
     return system_prompt

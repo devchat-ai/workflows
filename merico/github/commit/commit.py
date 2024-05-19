@@ -4,15 +4,15 @@ import re
 import subprocess
 import sys
 
+from devchat.llm import chat_completion_stream
+
 from lib.chatmark import Checkbox, Form, TextEditor
 from lib.ide_service import IDEService
-from devchat.llm import chat_completion_stream
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 from common_util import assert_exit  # noqa: E402
 from git_api import get_issue_info
-
 
 diff_too_large_message_en = (
     "Commit failed. The modified content is too long "
@@ -264,9 +264,11 @@ def generate_commit_message_base_diff(user_input, diff, issue):
     """
     global language
     language_prompt = "You must response commit message in chinese。\n" if language == "zh" else ""
-    prompt = PROMPT_COMMIT_MESSAGE_BY_DIFF_USER_INPUT.replace("{__DIFF__}", f"{diff}").replace(
-        "{__USER_INPUT__}", f"{user_input + language_prompt}"
-    ).replace("{__ISSUE__}", f"{issue}")
+    prompt = (
+        PROMPT_COMMIT_MESSAGE_BY_DIFF_USER_INPUT.replace("{__DIFF__}", f"{diff}")
+        .replace("{__USER_INPUT__}", f"{user_input + language_prompt}")
+        .replace("{__ISSUE__}", f"{issue}")
+    )
 
     model_token_limit_error = (
         diff_too_large_message_en if language == "en" else diff_too_large_message_zh
@@ -322,7 +324,12 @@ def get_issue_json(issue_id):
     if issue_id:
         issue = get_issue_info(issue_id)
         assert_exit(not issue, "Failed to retrieve issue with ID: {issue_id}", exit_code=-1)
-        issue = {"id": issue_id, "html_url": issue["html_url"], "title": issue["title"], "body": issue["body"]}
+        issue = {
+            "id": issue_id,
+            "html_url": issue["html_url"],
+            "title": issue["title"],
+            "body": issue["body"],
+        }
     return issue
 
 
@@ -392,8 +399,6 @@ def main():
         if branch_name:
             user_input += "\ncurrent repo branch name is:" + branch_name
         commit_message = generate_commit_message_base_diff(user_input, diff, issue)
-        
-        
 
         # TODO
         # remove Closes #IssueNumber in commit message

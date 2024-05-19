@@ -1,10 +1,10 @@
-
-import subprocess
-import requests
-import time
 import json
 import os
+import subprocess
 import sys
+import time
+
+import requests
 
 from lib.chatmark import TextEditor
 
@@ -18,10 +18,7 @@ def read_github_token():
                 return config_data["github_token"]
 
     # ask user to input github token
-    server_access_token_editor = TextEditor(
-        "",
-        f"Please input your GITHUB access TOKEN to access:"
-    )
+    server_access_token_editor = TextEditor("", "Please input your GITHUB access TOKEN to access:")
     server_access_token_editor.render()
 
     server_access_token = server_access_token_editor.new_text
@@ -54,10 +51,11 @@ def create_issue(title, body):
         print(f"Failed to create issue: {response.content}", file=sys.stderr, end="\n\n")
         return None
 
+
 def update_issue_body(issue_url, issue_body):
     """
     Update the body text of a GitHub issue.
-    
+
     :param issue_url: The API URL of the issue to update.
     :param issue_body: The new body text for the issue.
     """
@@ -69,17 +67,17 @@ def update_issue_body(issue_url, issue_body):
         "body": issue_body,
     }
 
-
     issue_api_url = f"https://api.github.com/repos/{get_github_repo(True)}/issues"
     api_url = f"{issue_api_url}/{issue_url.split('/')[-1]}"
     response = requests.patch(api_url, headers=headers, data=json.dumps(data))
-    
+
     if response.status_code == 200:
         print("Issue updated successfully!")
         return response.json()
     else:
         print(f"Failed to update issue: {response.status_code}")
         return None
+
 
 # parse sub tasks in issue body
 def parse_sub_tasks(body):
@@ -90,29 +88,29 @@ def parse_sub_tasks(body):
             sub_tasks.append(line[2:])
     return sub_tasks
 
+
 def update_sub_tasks(body, tasks):
     # remove all existing tasks
     lines = body.split("\n")
     updated_body = "\n".join(line for line in lines if not line.startswith("- ["))
-    
+
     # add new tasks
     updated_body += "\n" + "\n".join(f"- {task}" for task in tasks)
-    
+
     return updated_body
 
+
 def update_task_issue_url(body, task, issue_url):
-    # task is like: 
-    #[ ] task name 
-    #[x] task name
+    # task is like:
+    # [ ] task name
+    # [x] task name
     # replace task name with issue url, like:
-    #[ ] [task name](url)
-    #[x] [task name](url)
-    if task.find('] ') == -1:
+    # [ ] [task name](url)
+    # [x] [task name](url)
+    if task.find("] ") == -1:
         return None
-    task = task[task.find('] ')+2 : ]
+    task = task[task.find("] ") + 2 :]
     return body.replace(task, f"[{task}]({issue_url})")
-
-
 
 
 def check_git_installed():
@@ -132,6 +130,7 @@ def check_git_installed():
     except subprocess.CalledProcessError:
         print("Git is not installed on your system.")
         return False
+
 
 def create_and_checkout_branch(branch_name):
     subprocess.run(["git", "checkout", "-b", branch_name], check=True)
@@ -169,7 +168,13 @@ def get_github_repo(issue_repo=False):
             with open(config_path, "r", encoding="utf-8") as f:
                 config_data = json.load(f)
                 if "issue_repo" in config_data:
-                    print("current issue repo:", config_data["issue_repo"], end="\n\n", file=sys.stderr, flush=True)
+                    print(
+                        "current issue repo:",
+                        config_data["issue_repo"],
+                        end="\n\n",
+                        file=sys.stderr,
+                        flush=True,
+                    )
                     return config_data["issue_repo"]
 
         # 使用git命令获取当前仓库的URL
@@ -193,6 +198,7 @@ def get_github_repo(issue_repo=False):
         # 如果未找到git命令，可能是没有安装git或者不在PATH中
         print("==> File not found...")
         return None
+
 
 # 获取当前分支名称
 def get_current_branch():
@@ -229,7 +235,8 @@ def get_parent_branch():
             return None
         # 使用git命令获取父分支的名称
         result = subprocess.check_output(
-            ["git", "name-rev", "--name-only", "--exclude=tags/*", parent_branch_ref], stderr=subprocess.STDOUT
+            ["git", "name-rev", "--name-only", "--exclude=tags/*", parent_branch_ref],
+            stderr=subprocess.STDOUT,
         ).strip()
         parent_branch_name = result.decode("utf-8")
         return parent_branch_name
@@ -260,12 +267,14 @@ def get_issue_info(issue_id):
     else:
         return None
 
+
 def get_issue_info_by_url(issue_url):
     # get issue id from issue_url
     def get_issue_id(issue_url):
         # Extract the issue id from the issue_url
         issue_id = issue_url.split("/")[-1]
         return issue_id
+
     return get_issue_info(get_issue_id(issue_url))
 
 
@@ -315,7 +324,6 @@ def create_pull_request(title, body, head, base, repo_name):
     return None
 
 
-
 def run_command_with_retries(command, retries=3, delay=5):
     for attempt in range(retries):
         try:
@@ -341,12 +349,17 @@ def check_unpushed_commits():
         print(f"Error checking for unpushed commits: {e}")
         return True
 
+
 def auto_push():
     # 获取当前分支名
     if not check_unpushed_commits():
         return True
     try:
-        branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"]).strip().decode("utf-8")
+        branch = (
+            subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+            .strip()
+            .decode("utf-8")
+        )
     except subprocess.CalledProcessError as e:
         print(f"Error getting current branch: {e}")
         return False
@@ -366,21 +379,25 @@ def auto_push():
 
 def get_recently_pr(repo):
     url = f"{GITHUB_API_URL}/repos/{repo}/pulls?state=open&sort=updated"
-    headers = {"Authorization": f"token {GITHUB_ACCESS_TOKEN}", "Accept": "application/vnd.github.v3+json"}
+    headers = {
+        "Authorization": f"token {GITHUB_ACCESS_TOKEN}",
+        "Accept": "application/vnd.github.v3+json",
+    }
     response = requests.get(url, headers=headers)
     print("=>:", url)
-    
+
     branch_name = get_current_branch()
 
     if response.status_code == 200:
         prs = response.json()
         for pr in prs:
-            if pr['head']['ref'] == branch_name:
+            if pr["head"]["ref"] == branch_name:
                 return pr
         return None
     else:
         return None
-    
+
+
 def update_pr(pr_number, title, body, repo_name):
     url = f"{GITHUB_API_URL}/repos/{repo_name}/pulls/{pr_number}"
     headers = {"Authorization": f"token {GITHUB_ACCESS_TOKEN}", "Content-Type": "application/json"}
@@ -393,7 +410,3 @@ def update_pr(pr_number, title, body, repo_name):
     else:
         print("Failed to update PR.")
         return None
-
-
-
-

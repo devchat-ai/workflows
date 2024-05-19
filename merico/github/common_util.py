@@ -1,10 +1,7 @@
-
 import functools
 import sys
-import os
 
-
-from lib.chatmark import TextEditor, Form, Radio, Checkbox
+from lib.chatmark import Checkbox, Form, Radio, TextEditor
 
 
 def create_ui_objs(ui_decls, args):
@@ -24,7 +21,7 @@ def edit_form(uis, args):
     ui_objs, editors = create_ui_objs(uis, args)
     form = Form(editors)
     form.render()
-    
+
     values = []
     for obj in ui_objs:
         if isinstance(obj, TextEditor):
@@ -35,7 +32,7 @@ def edit_form(uis, args):
             # TODO
             pass
     return values
-    
+
 
 def editor(description):
     def decorator_edit(func):
@@ -43,14 +40,16 @@ def editor(description):
         def wrapper(*args, **kwargs):
             uis = wrapper.uis[::-1]
             return edit_form(uis, args)
-        
+
         if hasattr(func, "uis"):
             wrapper.uis = func.uis
         else:
             wrapper.uis = []
         wrapper.uis.append((TextEditor, description))
         return wrapper
+
     return decorator_edit
+
 
 def ui_edit(ui_type, description):
     def decorator_edit(func):
@@ -58,21 +57,19 @@ def ui_edit(ui_type, description):
         def wrapper(*args, **kwargs):
             uis = wrapper.uis[::-1]
             return edit_form(uis, args)
-        
+
         if hasattr(func, "uis"):
             wrapper.uis = func.uis
         else:
             wrapper.uis = []
-        ui_type_class = {
-            "editor": TextEditor,
-            "radio": Radio,
-            "checkbox": Checkbox
-        }[ui_type]
+        ui_type_class = {"editor": TextEditor, "radio": Radio, "checkbox": Checkbox}[ui_type]
         wrapper.uis.append((ui_type_class, description))
         return wrapper
+
     return decorator_edit
 
-def assert_exit(condition, message, exit_code = -1):
+
+def assert_exit(condition, message, exit_code=-1):
     if condition:
         if exit_code == 0:
             print(message, end="\n\n", flush=True)

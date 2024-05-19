@@ -1,12 +1,18 @@
-import sys
 import os
+import sys
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 
+# noqa: E402
+from common_util import assert_exit, editor, ui_edit  # noqa: E402
 from devchat.llm import chat_json  # noqa: E402
-from git_api import create_issue, parse_sub_tasks, update_task_issue_url, update_issue_body, get_issue_info_by_url  # noqa: E402
-from common_util import editor, assert_exit, ui_edit  # noqa: E402
-
+from git_api import (
+    create_issue,
+    get_issue_info_by_url,
+    parse_sub_tasks,
+    update_issue_body,
+    update_task_issue_url,
+)
 
 # Function to generate issue title and body using LLM
 PROMPT = (
@@ -14,7 +20,10 @@ PROMPT = (
     "{issue_content}\n\n"
     "Based on the following issue task: {task}"
     "suggest a title and a detailed body for a GitHub issue:\n\n"
-    "Output format: {{\"title\": \"<title>\", \"body\": \"<body>\"}} ")
+    'Output format: {{"title": "<title>", "body": "<body>"}} '
+)
+
+
 @chat_json(prompt=PROMPT)
 def generate_issue_content(issue_content, task):
     pass
@@ -30,16 +39,22 @@ def edit_issue(title, body):
 def select_task(tasks):
     pass
 
+
 def get_issue_json(issue_url):
     issue = get_issue_info_by_url(issue_url)
     assert_exit(not issue, "Failed to retrieve issue with ID: {issue_id}", exit_code=-1)
-    return {"id": issue["number"], "html_url": issue["html_url"], "title": issue["title"], "body": issue["body"]}
+    return {
+        "id": issue["number"],
+        "html_url": issue["html_url"],
+        "title": issue["title"],
+        "body": issue["body"],
+    }
 
 
 # Main function
 def main():
     print("start new_issue ...", end="\n\n", flush=True)
-    
+
     assert_exit(len(sys.argv) < 2, "Missing argument.", exit_code=-1)
     issue_url = sys.argv[1]
 
@@ -48,17 +63,16 @@ def main():
     tasks = parse_sub_tasks(old_issue["body"])
     assert_exit(not tasks, "No tasks in issue body.")
 
-
     # select task from tasks
     [task] = select_task(tasks)
     assert_exit(task is None, "No task selected.")
     task = tasks[task]
     print("task:", task, end="\n\n", flush=True)
-    
+
     print("Generating issue content ...", end="\n\n", flush=True)
     issue_json_ob = generate_issue_content(issue_content=old_issue, task=task)
     assert_exit(not issue_json_ob, "Failed to generate issue content.", exit_code=-1)
-    
+
     issue_title, issue_body = edit_issue(issue_json_ob["title"], issue_json_ob["body"])
     assert_exit(not issue_title, "Issue creation cancelled.", exit_code=0)
     print("New Issue:", issue_title, "body:", issue_body, end="\n\n", flush=True)
