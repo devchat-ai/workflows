@@ -1,6 +1,7 @@
 """
 /pr.describe https://github.com/devchat-ai/devchat-vscode/pull/25
 """
+# ruff: noqa: E402
 
 import logging
 import os

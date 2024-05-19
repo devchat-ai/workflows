@@ -7,7 +7,7 @@ from devchat.llm import chat_json
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 from common_util import assert_exit, ui_edit  # noqa: E402
-from git_api import (
+from git_api import (  # noqa: E402
     check_git_installed,
     get_current_branch,
     get_github_repo,
@@ -25,9 +25,9 @@ def extract_issue_id(branch_name):
 
 # Function to generate a random branch name
 PROMPT = (
-    "You are a coding engineer, required to summarize the ISSUE description into a coding task description of no more than 50 words. \n"
-    "The ISSUE description is as follows: {issue_body}, please summarize the corresponding coding task description.\n"
-    'The coding task description should be output in JSON format, in the form of: {{"summary": "code task summary"}}\n'
+    "You are a coding engineer, required to summarize the ISSUE description into a coding task description of no more than 50 words. \n"  # noqa: E501
+    "The ISSUE description is as follows: {issue_body}, please summarize the corresponding coding task description.\n"  # noqa: E501
+    'The coding task description should be output in JSON format, in the form of: {{"summary": "code task summary"}}\n'  # noqa: E501
 )
 
 

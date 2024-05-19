@@ -6,10 +6,10 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 
 from common_util import assert_exit, ui_edit  # noqa: E402
-from devchat.llm import (
-    chat_json,  # noqa: E402
+from devchat.llm import (  # noqa: E402
+    chat_json,
 )
-from git_api import (
+from git_api import (  # noqa: E402
     auto_push,
     get_commit_messages,
     get_current_branch,

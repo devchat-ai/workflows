@@ -3,10 +3,9 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 
-# noqa: E402
 from common_util import assert_exit, editor, ui_edit  # noqa: E402
 from devchat.llm import chat_json  # noqa: E402
-from git_api import (
+from git_api import (  # noqa: E402
     create_issue,
     get_issue_info_by_url,
     parse_sub_tasks,

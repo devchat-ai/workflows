@@ -12,7 +12,7 @@ PROMPT = (
     "Based on the following description, "
     "suggest a title and a detailed body for a GitHub issue:\n\n"
     "Description: {description}\n\n"
-    'Output as valid JSON format: {{"title": "<title>", "body": "<body> use \\n as new line flag."}} '
+    'Output as valid JSON format: {{"title": "<title>", "body": "<body> use \\n as new line flag."}} '  # noqa: E501
 )
 
 
