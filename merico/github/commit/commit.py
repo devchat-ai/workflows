@@ -73,13 +73,16 @@ def read_prompt_from_file(filename):
         with open(filename, "r", encoding="utf-8") as file:
             return file.read().strip()
     except FileNotFoundError:
-        IDEService().log_info(
+        IDEService().ide_logging(
+            "error",
             f"File {filename} not found. "
-            "Please make sure it exists in the same directory as the script."
+            "Please make sure it exists in the same directory as the script.",
         )
         sys.exit(1)
     except Exception as e:
-        IDEService().log_info(f"An error occurred while reading the file {filename}: {e}")
+        IDEService().ide_logging(
+            "error", f"An error occurred while reading the file {filename}: {e}"
+        )
         sys.exit(1)
 
 
