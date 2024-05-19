@@ -15,6 +15,7 @@ from model import FuncToTest, TokenBudgetExceededException
 from openai_util import create_chat_completion_content
 from prompts import PROPOSE_TEST_PROMPT
 from tools.tiktoken_util import get_encoding
+from tools.time_util import print_exec_time
 
 MODEL = USER_LLM_MODEL if USE_USER_MODEL else "gpt-4-turbo-preview"  # "gpt-3.5-turbo"
 ENCODING = (
@@ -82,6 +83,7 @@ def _mk_user_msg(
     )
 
 
+@print_exec_time("Model response time")
 def propose_test(
     user_prompt: str,
     func_to_test: FuncToTest,
