@@ -1,6 +1,5 @@
-import os
 import json
-import sys
+import os
 
 from lib.chatmark import TextEditor
 
@@ -26,6 +25,7 @@ def get_repo_type(url):
     else:
         return ""
 
+
 def read_github_token():
     config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
     if os.path.exists(config_path):
@@ -34,6 +34,7 @@ def read_github_token():
             if "github_token" in config_data:
                 return config_data["github_token"]
     return ""
+
 
 def read_server_access_token(repo_type):
     config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
@@ -44,6 +45,7 @@ def read_server_access_token(repo_type):
                 return config_data[repo_type]["access_token"]
     return ""
 
+
 def save_github_token(github_token):
     config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
 
@@ -51,10 +53,11 @@ def save_github_token(github_token):
     if os.path.exists(config_path):
         with open(config_path, "r", encoding="utf-8") as f:
             config_data = json.load(f)
-    
+
     config_data["github_token"] = github_token
     with open(config_path, "w+", encoding="utf-8") as f:
         json.dump(config_data, f, indent=4)
+
 
 def save_server_access_token(repo_type, access_token):
     config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
@@ -63,26 +66,25 @@ def save_server_access_token(repo_type, access_token):
     if os.path.exists(config_path):
         with open(config_path, "r", encoding="utf-8") as f:
             config_data = json.load(f)
-    
+
     if repo_type not in config_data:
         config_data[repo_type] = {}
     config_data[repo_type]["access_token"] = access_token
     with open(config_path, "w+", encoding="utf-8") as f:
         json.dump(config_data, f, indent=4)
 
+
 def read_github_token_with_input():
     github_token = read_github_token()
     if not github_token:
         # Input your github TOKEN to access github api:
-        github_token_editor = TextEditor(
-            "",
-            "Please input your github TOKEN to access:"
-        )
+        github_token_editor = TextEditor("", "Please input your github TOKEN to access:")
         github_token = github_token_editor.new_text
         if not github_token:
             return github_token
         save_github_token(github_token)
     return github_token
+
 
 def read_server_access_token_with_input(pr_url):
     repo_type = get_repo_type(pr_url)
@@ -93,8 +95,7 @@ def read_server_access_token_with_input(pr_url):
     if not server_access_token:
         # Input your server access TOKEN to access server api:
         server_access_token_editor = TextEditor(
-            "",
-            f"Please input your {repo_type} access TOKEN to access:"
+            "", f"Please input your {repo_type} access TOKEN to access:"
         )
         server_access_token_editor.render()
 

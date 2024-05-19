@@ -1,22 +1,22 @@
 """
 /pr.describe https://github.com/devchat-ai/devchat-vscode/pull/25
 """
+# ruff: noqa: E402
 
+import logging
 import os
 import sys
-import logging
-import json
-import argparse
-import asyncio
+
+# add the current directory to the path
+from os.path import abspath, dirname
 
 from lib.ide_service import IDEService
 
-# add the current directory to the path
-from os.path import dirname, abspath
 sys.path.append(dirname(dirname(abspath(__file__))))
 
 # add new model configs to algo.MAX_TOKENS
 import pr_agent.algo as algo
+
 algo.MAX_TOKENS["gpt-4-turbo-preview"] = 128000
 algo.MAX_TOKENS["claude-3-opus"] = 100000
 algo.MAX_TOKENS["claude-3-sonnet"] = 100000
@@ -44,49 +44,68 @@ algo.MAX_TOKENS["sentence-transformers/msmarco-bert-base-dot-v5"] = 512
 algo.MAX_TOKENS["bert-base-uncased"] = 512
 if os.environ.get("LLM_MODEL", "gpt-3.5-turbo-1106") not in algo.MAX_TOKENS:
     current_model = os.environ.get("LLM_MODEL", "gpt-3.5-turbo-1106")
-    IDEService().ide_logging("info", f"{current_model}'s max tokens is not config, we use it as default 16000")
+    IDEService().ide_logging(
+        "info", f"{current_model}'s max tokens is not config, we use it as default 16000"
+    )
     algo.MAX_TOKENS[os.environ.get("LLM_MODEL", "gpt-3.5-turbo-1106")] = 16000
+
 
 # add new git provider
 def get_git_provider():
     from pr_agent.config_loader import get_settings
+
     _git_provider_old_ = get_settings().config.git_provider
     get_settings().config.git_provider = "devchat"
     provider = _get_git_provider_old()
     get_settings().config.git_provider = _git_provider_old_
     return provider
 
+
 import pr_agent.git_providers as git_providers
 from providers.devchat_provider import DevChatProvider
-git_providers._GIT_PROVIDERS['devchat'] = DevChatProvider
+
+git_providers._GIT_PROVIDERS["devchat"] = DevChatProvider
 _get_git_provider_old = git_providers.get_git_provider
 git_providers.get_git_provider = get_git_provider
 
 
-from pr_agent.config_loader import get_settings
 from pr_agent.cli import run
+from pr_agent.config_loader import get_settings
 
 # mock logging method, to redirect log to IDE
-from pr_agent.log import setup_logger, inv_analytics_filter
+from pr_agent.log import inv_analytics_filter, setup_logger
+
 from lib.ide_service import IDEService
+
+
 class CustomOutput:
     def __init__(self):
         pass
+
     def write(self, message):
         IDEService().ide_logging("info", message.strip())
+
     def flush(self):
         pass
+
     def close(self):
         pass
+
 
 log_level = os.environ.get("LOG_LEVEL", "INFO")
 logger = setup_logger(log_level)
 
 logger.remove(None)
-logger.add(CustomOutput(), level=logging.INFO, format="{message}", colorize=False, filter=inv_analytics_filter)
+logger.add(
+    CustomOutput(),
+    level=logging.INFO,
+    format="{message}",
+    colorize=False,
+    filter=inv_analytics_filter,
+)
 
 
-from config_util import read_server_access_token_with_input, get_repo_type
+from config_util import get_repo_type, read_server_access_token_with_input
 from custom_suggestions_config import get_custom_suggestions_system_prompt
 
 # set openai key and api base
@@ -107,7 +126,12 @@ if repo_type == "github":
 elif repo_type == "gitlab":
     get_settings().set("GITLAB.PERSONAL_ACCESS_TOKEN", access_token)
 else:
-    print("Unsupported git hosting service, input pr url is:", sys.argv[1], file=sys.stderr, flush=True)
+    print(
+        "Unsupported git hosting service, input pr url is:",
+        sys.argv[1],
+        file=sys.stderr,
+        flush=True,
+    )
     sys.exit(1)
 
 
@@ -143,7 +167,7 @@ language_prompt = "\n\n输出内容使用中文输出。\n" if language == "zh" 
 get_settings().pr_code_suggestions_prompt.system += language_prompt
 get_settings().pr_review_prompt.system += language_prompt
 get_settings().pr_description_prompt.system += language_prompt
-#get_settings().pr_reviewer.inline_code_comments = True
+# get_settings().pr_reviewer.inline_code_comments = True
 
 # config for find similar issues
 get_settings().set("PR_SIMILAR_ISSUE.VECTORDB", "lancedb")
@@ -152,17 +176,17 @@ get_settings().set("LANCEDB.URI", "data/lancedb")
 # set git provider type, devchat provider will create actual repo provider based on this type
 pr_provider_type = get_repo_type(sys.argv[1])
 if not pr_provider_type:
-    print("Unsupported git hosting service, input pr url is:", sys.argv[1], file=sys.stderr, flush=True)
+    print(
+        "Unsupported git hosting service, input pr url is:",
+        sys.argv[1],
+        file=sys.stderr,
+        flush=True,
+    )
     sys.exit(1)
 get_settings().set("CONFIG.GIT_PROVIDER", pr_provider_type)
-os.environ['CONFIG.GIT_PROVIDER_TYPE'] = pr_provider_type
+os.environ["CONFIG.GIT_PROVIDER_TYPE"] = pr_provider_type
 # os.environ['ENABLE_PUBLISH_LABELS'] = "1"
 
-if __name__ == '__main__':
-    sys.argv = [
-        sys.executable,
-        '--pr_url',
-        sys.argv[1].strip(),
-        sys.argv[2].strip()
-    ]
+if __name__ == "__main__":
+    sys.argv = [sys.executable, "--pr_url", sys.argv[1].strip(), sys.argv[2].strip()]
     run()

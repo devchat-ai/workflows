@@ -1,12 +1,16 @@
-import sys
 import os
+import sys
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
+from common_util import assert_exit, editor  # noqa: E402
 from devchat.llm import chat_json  # noqa: E402
-from git_api import get_issue_info_by_url, parse_sub_tasks, update_sub_tasks, update_issue_body  # noqa: E402
-from common_util import editor, assert_exit  # noqa: E402
-
+from git_api import (  # noqa: E402
+    get_issue_info_by_url,
+    parse_sub_tasks,
+    update_issue_body,
+    update_sub_tasks,
+)
 
 TASKS_PROMPT = (
     "Following is my git issue content.\n"
@@ -18,9 +22,12 @@ TASKS_PROMPT = (
     "Please output all tasks in JSON format as:"
     '{{"tasks": ["[ ] task1", "[ ] task2"]}}'
 )
+
+
 @chat_json(prompt=TASKS_PROMPT)
 def generate_issue_tasks(issue_data, user_input):
     pass
+
 
 def to_task_str(tasks):
     task_str = ""
@@ -34,24 +41,32 @@ def to_task_str(tasks):
 def edit_issue_tasks(old_tasks, new_tasks):
     pass
 
+
 @editor("Input ISSUE url:")
 def input_issue_url(url):
     pass
+
 
 @editor("How to update tasks:")
 def update_tasks_input(user_input):
     pass
 
+
 def get_issue_json(issue_url):
     issue = get_issue_info_by_url(issue_url)
     assert_exit(not issue, "Failed to retrieve issue with ID: {issue_id}", exit_code=-1)
-    return {"id": issue["number"], "html_url": issue["html_url"], "title": issue["title"], "body": issue["body"]}
+    return {
+        "id": issue["number"],
+        "html_url": issue["html_url"],
+        "title": issue["title"],
+        "body": issue["body"],
+    }
 
 
 # Main function
 def main():
     print("start issue tasks update ...", end="\n\n", flush=True)
-    
+
     [issue_url] = input_issue_url("")
     assert_exit(not issue_url, "No issue url.")
     print("issue url:", issue_url, end="\n\n", flush=True)
@@ -64,7 +79,7 @@ def main():
     [user_input] = update_tasks_input("")
     assert_exit(not user_input, "No user input")
 
-    new_tasks = generate_issue_tasks(issue_data=issue,  user_input=user_input)
+    new_tasks = generate_issue_tasks(issue_data=issue, user_input=user_input)
     assert_exit(not new_tasks, "No new tasks.")
     print("new_tasks:", new_tasks, end="\n\n", flush=True)
     assert_exit(not new_tasks.get("tasks", []), "No new tasks.")
