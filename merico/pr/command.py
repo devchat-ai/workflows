@@ -75,8 +75,6 @@ from pr_agent.config_loader import get_settings
 # mock logging method, to redirect log to IDE
 from pr_agent.log import inv_analytics_filter, setup_logger
 
-from lib.ide_service import IDEService
-
 
 class CustomOutput:
     def __init__(self):
@@ -105,7 +103,7 @@ logger.add(
 )
 
 
-from config_util import get_repo_type, read_server_access_token_with_input
+from config_util import get_repo_type, gitlab_host, read_server_access_token_with_input
 from custom_suggestions_config import get_custom_suggestions_system_prompt
 
 # set openai key and api base
@@ -121,10 +119,15 @@ if not access_token:
     sys.exit(0)
 
 repo_type = get_repo_type(sys.argv[1])
+IDEService().ide_logging("debug", f"repo type: {repo_type}")
 if repo_type == "github":
     get_settings().set("GITHUB.USER_TOKEN", access_token)
 elif repo_type == "gitlab":
     get_settings().set("GITLAB.PERSONAL_ACCESS_TOKEN", access_token)
+    host = gitlab_host()
+    if host:
+        IDEService().ide_logging("debug", f"gitlab host: {host}")
+        get_settings().set("GITLAB.URL", host)
 else:
     print(
         "Unsupported git hosting service, input pr url is:",
