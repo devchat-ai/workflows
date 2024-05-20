@@ -10,7 +10,7 @@ def get_repo_type(url):
     # 根据URL的特征判断仓库管理类型
     if "github.com" in url:
         return "github"
-    elif "gitlab.com" in url or "/gitlab/" in url:
+    elif "gitlab.com" in url or "gitlab" in url:
         return "gitlab"
     elif "bitbucket.org" in url:
         return "bitbucket"
