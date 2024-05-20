@@ -46,6 +46,16 @@ def read_server_access_token(repo_type):
     return ""
 
 
+def read_gitlab_host():
+    config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
+    if os.path.exists(config_path):
+        with open(config_path, "r", encoding="utf-8") as f:
+            config_data = json.load(f)
+            if "gitlab_host" in config_data:
+                return config_data["gitlab_host"]
+    return ""
+
+
 def save_github_token(github_token):
     config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
 
@@ -55,6 +65,19 @@ def save_github_token(github_token):
             config_data = json.load(f)
 
     config_data["github_token"] = github_token
+    with open(config_path, "w+", encoding="utf-8") as f:
+        json.dump(config_data, f, indent=4)
+
+
+def save_gitlab_host(github_token):
+    config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
+
+    config_data = {}
+    if os.path.exists(config_path):
+        with open(config_path, "r", encoding="utf-8") as f:
+            config_data = json.load(f)
+
+    config_data["gitlab_host"] = github_token
     with open(config_path, "w+", encoding="utf-8") as f:
         json.dump(config_data, f, indent=4)
 
@@ -104,3 +127,18 @@ def read_server_access_token_with_input(pr_url):
             return server_access_token
         save_server_access_token(repo_type, server_access_token)
     return server_access_token
+
+
+def gitlab_host():
+    host = read_gitlab_host()
+    if host:
+        return host
+
+    gitlab_host_editor = TextEditor(
+        "", "Please input your gitlab host(for example: https://www.gitlab.com):"
+    )
+    gitlab_host_editor.render()
+    host = gitlab_host_editor.new_text
+    if host:
+        save_gitlab_host(host)
+    return host
