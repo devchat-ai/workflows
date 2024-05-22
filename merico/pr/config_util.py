@@ -1,7 +1,9 @@
 import json
 import os
 
-from lib.chatmark import TextEditor
+from lib.chatmark import Radio, TextEditor
+
+cache_repo_types = {}
 
 
 # 根据PR URL获取不同的仓库管理类型
@@ -22,8 +24,27 @@ def get_repo_type(url):
         return "codecommit"
     elif "gerrit" in url:
         return "gerrit"
+    elif url in cache_repo_types:
+        return cache_repo_types[url]
     else:
-        return ""
+        radio = Radio(
+            ["github", "gitlab", "bitbucket", "bitbucket_server", "azure", "codecommit", "gerrit"],
+        )
+        radio.render()
+        if radio.selection is None:
+            return ""
+
+        rtype = [
+            "github",
+            "gitlab",
+            "bitbucket",
+            "bitbucket_server",
+            "azure",
+            "codecommit",
+            "gerrit",
+        ][radio.selection]
+        cache_repo_types[url] = rtype
+        return rtype
 
 
 def read_github_token():
@@ -131,11 +152,9 @@ def read_server_access_token_with_input(pr_url):
 
 def gitlab_host():
     host = read_gitlab_host()
-    if host:
-        return host
 
     gitlab_host_editor = TextEditor(
-        "", "Please input your gitlab host(for example: https://www.gitlab.com):"
+        host, "Please input your gitlab host(for example: https://www.gitlab.com):"
     )
     gitlab_host_editor.render()
     host = gitlab_host_editor.new_text

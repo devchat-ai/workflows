@@ -96,7 +96,7 @@ logger = setup_logger(log_level)
 logger.remove(None)
 logger.add(
     CustomOutput(),
-    level=logging.INFO,
+    level=logging.DEBUG,
     format="{message}",
     colorize=False,
     filter=inv_analytics_filter,
