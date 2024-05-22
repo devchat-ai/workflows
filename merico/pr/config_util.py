@@ -1,10 +1,11 @@
 import json
 import os
 
-from lib.chatmark import TextEditor, Radio
-
+from lib.chatmark import Radio, TextEditor
 
 cache_repo_types = {}
+
+
 # 根据PR URL获取不同的仓库管理类型
 # 支持的类型有：github gitlab bitbucket bitbucket_server azure codecommit gerrit
 def get_repo_type(url):
@@ -27,29 +28,21 @@ def get_repo_type(url):
         return cache_repo_types[url]
     else:
         radio = Radio(
-            [
-                "github",
-                "gitlab",
-                "bitbucket",
-                "bitbucket_server",
-                "azure",
-                "codecommit",
-                "gerrit"
-            ],
+            ["github", "gitlab", "bitbucket", "bitbucket_server", "azure", "codecommit", "gerrit"],
         )
         radio.render()
         if radio.selection is None:
             return ""
 
         rtype = [
-                "github",
-                "gitlab",
-                "bitbucket",
-                "bitbucket_server",
-                "azure",
-                "codecommit",
-                "gerrit"
-            ][radio.selection]
+            "github",
+            "gitlab",
+            "bitbucket",
+            "bitbucket_server",
+            "azure",
+            "codecommit",
+            "gerrit",
+        ][radio.selection]
         cache_repo_types[url] = rtype
         return rtype
 
