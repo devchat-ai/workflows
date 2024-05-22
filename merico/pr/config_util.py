@@ -10,7 +10,15 @@ cache_repo_types = {}
 # 支持的类型有：github gitlab bitbucket bitbucket_server azure codecommit gerrit
 def get_repo_type(url):
     # 根据URL的特征判断仓库管理类型
-    support_repo_list = ["github", "gitlab", "bitbucket", "bitbucket_server", "azure", "codecommit", "gerrit"]
+    support_repo_list = [
+        "github",
+        "gitlab",
+        "bitbucket",
+        "bitbucket_server",
+        "azure",
+        "codecommit",
+        "gerrit",
+    ]
     if "github.com" in url:
         return "github"
     elif "gitlab.com" in url or "gitlab" in url:
