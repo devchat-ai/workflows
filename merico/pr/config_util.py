@@ -10,6 +10,7 @@ cache_repo_types = {}
 # 支持的类型有：github gitlab bitbucket bitbucket_server azure codecommit gerrit
 def get_repo_type(url):
     # 根据URL的特征判断仓库管理类型
+    support_repo_list = ["github", "gitlab", "bitbucket", "bitbucket_server", "azure", "codecommit", "gerrit"]
     if "github.com" in url:
         return "github"
     elif "gitlab.com" in url or "gitlab" in url:
@@ -28,21 +29,14 @@ def get_repo_type(url):
         return cache_repo_types[url]
     else:
         radio = Radio(
-            ["github", "gitlab", "bitbucket", "bitbucket_server", "azure", "codecommit", "gerrit"],
+            support_repo_list,
+            title="Choose the type of repository:",
         )
         radio.render()
         if radio.selection is None:
             return ""
 
-        rtype = [
-            "github",
-            "gitlab",
-            "bitbucket",
-            "bitbucket_server",
-            "azure",
-            "codecommit",
-            "gerrit",
-        ][radio.selection]
+        rtype = support_repo_list[radio.selection]
         cache_repo_types[url] = rtype
         return rtype
 
