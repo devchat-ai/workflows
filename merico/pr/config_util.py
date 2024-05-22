@@ -38,7 +38,7 @@ def get_repo_type(url):
             ],
         )
         radio.render()
-        if radio.selection is not None:
+        if radio.selection is None:
             return ""
 
         rtype = [
@@ -159,11 +159,9 @@ def read_server_access_token_with_input(pr_url):
 
 def gitlab_host():
     host = read_gitlab_host()
-    if host:
-        return host
 
     gitlab_host_editor = TextEditor(
-        "", "Please input your gitlab host(for example: https://www.gitlab.com):"
+        host, "Please input your gitlab host(for example: https://www.gitlab.com):"
     )
     gitlab_host_editor.render()
     host = gitlab_host_editor.new_text
