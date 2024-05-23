@@ -76,6 +76,7 @@ Basic requirements
 5. If two or more test cases share the same setup, you should reuse the setup code.
 6. If two or more test cases share the same test logic, you should reuse the test logic.
 7. Use TODO comments or FIXME comments to indicate any missing parts of the code or any parts that need to be improved.
+8. Write as much production-ready code as possible, leaving less TODO comments or FIXME comments.
 
 {additional_requirements}
 

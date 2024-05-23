@@ -7,7 +7,6 @@ import openai
 
 sys.path.append(os.path.dirname(__file__))
 
-from cache import LocalCache
 from i18n import TUILanguage, get_translation
 from model import (
     FuncToTest,
@@ -16,6 +15,7 @@ from model import (
 )
 from ut_workflow import UnitTestsWorkflow
 
+from cache import LocalCache
 from lib.chatmark import Step
 from lib.ide_service import IDEService
 
