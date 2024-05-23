@@ -3,7 +3,36 @@ import os
 
 from lib.chatmark import Radio, TextEditor
 
-cache_repo_types = {}
+
+def _parse_pr_host(pr_url):
+    fields = pr_url.split("/")
+    for field in fields:
+        if field.find(".") > 0:
+            return field
+    return pr_url
+
+
+def _read_config_value(key):
+    config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
+    if os.path.exists(config_path):
+        with open(config_path, "r", encoding="utf-8") as f:
+            config_data = json.load(f)
+            if key in config_data:
+                return config_data[key]
+    return None
+
+
+def _save_config_value(key, value):
+    config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
+
+    config_data = {}
+    if os.path.exists(config_path):
+        with open(config_path, "r", encoding="utf-8") as f:
+            config_data = json.load(f)
+
+    config_data[key] = value
+    with open(config_path, "w+", encoding="utf-8") as f:
+        json.dump(config_data, f, indent=4)
 
 
 # 根据PR URL获取不同的仓库管理类型
@@ -24,15 +53,21 @@ def get_repo_type(url):
         return "codecommit"
     elif "gerrit" in url:
         return "gerrit"
-    elif url in cache_repo_types:
-        return cache_repo_types[url]
     else:
+        pr_host = _parse_pr_host(url)
+        repo_type_map = _read_config_value("repo_type_map")
+        if repo_type_map and pr_host in repo_type_map:
+            return repo_type_map[pr_host]
+        if not repo_type_map:
+            repo_type_map = {}
+
         radio = Radio(
             ["github", "gitlab", "bitbucket", "bitbucket_server", "azure", "codecommit", "gerrit"],
+            title="Choose the type of your repo:",
         )
         radio.render()
         if radio.selection is None:
-            return ""
+            return None
 
         rtype = [
             "github",
@@ -43,7 +78,8 @@ def get_repo_type(url):
             "codecommit",
             "gerrit",
         ][radio.selection]
-        cache_repo_types[url] = rtype
+        repo_type_map[pr_host] = rtype
+        _save_config_value("repo_type_map", repo_type_map)
         return rtype
 
 
@@ -135,6 +171,26 @@ def read_server_access_token_with_input(pr_url):
     if not repo_type:
         return ""
 
+    pr_host = _parse_pr_host(pr_url)
+    if repo_type == "gitlab":
+        # get gitlab host
+        gitlab_host_map = _read_config_value("gitlab_host_map")
+        if gitlab_host_map and pr_host in gitlab_host_map:
+            repo_type = gitlab_host_map[pr_host]
+        else:
+            if not gitlab_host_map:
+                gitlab_host_map = {}
+            gitlab_host_editor = TextEditor(
+                "", "Please input your gitlab host(for example: https://www.gitlab.com):"
+            )
+            gitlab_host_editor.render()
+            gitlab_host = gitlab_host_editor.new_text
+            if not gitlab_host:
+                return ""
+            gitlab_host_map[pr_host] = gitlab_host
+            _save_config_value("gitlab_host_map", gitlab_host_map)
+            repo_type = gitlab_host
+
     server_access_token = read_server_access_token(repo_type)
     if not server_access_token:
         # Input your server access TOKEN to access server api:
@@ -150,14 +206,21 @@ def read_server_access_token_with_input(pr_url):
     return server_access_token
 
 
-def gitlab_host():
-    host = read_gitlab_host()
+def get_gitlab_host(pr_url):
+    pr_host = _parse_pr_host(pr_url)
+    gitlab_host_map = _read_config_value("gitlab_host_map")
+    if gitlab_host_map and pr_host in gitlab_host_map:
+        return gitlab_host_map[pr_host]
+    if not gitlab_host_map:
+        gitlab_host_map = {}
 
     gitlab_host_editor = TextEditor(
-        host, "Please input your gitlab host(for example: https://www.gitlab.com):"
+        "https://www.gitlab.com",
+        "Please input your gitlab host(for example: https://www.gitlab.com):",
     )
     gitlab_host_editor.render()
     host = gitlab_host_editor.new_text
     if host:
-        save_gitlab_host(host)
+        gitlab_host_map[pr_host] = host
+        _save_config_value("gitlab_host_map", gitlab_host_map)
     return host

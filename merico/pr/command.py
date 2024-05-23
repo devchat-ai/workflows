@@ -103,7 +103,7 @@ logger.add(
 )
 
 
-from config_util import get_repo_type, gitlab_host, read_server_access_token_with_input
+from config_util import get_gitlab_host, get_repo_type, read_server_access_token_with_input
 from custom_suggestions_config import get_custom_suggestions_system_prompt
 
 # set openai key and api base
@@ -124,7 +124,7 @@ if repo_type == "github":
     get_settings().set("GITHUB.USER_TOKEN", access_token)
 elif repo_type == "gitlab":
     get_settings().set("GITLAB.PERSONAL_ACCESS_TOKEN", access_token)
-    host = gitlab_host()
+    host = get_gitlab_host(sys.argv[1])
     if host:
         IDEService().ide_logging("debug", f"gitlab host: {host}")
         get_settings().set("GITLAB.URL", host)
