@@ -1,6 +1,8 @@
 import json
 import os
 
+import yaml
+
 from lib.chatmark import Radio, TextEditor
 
 
@@ -224,3 +226,17 @@ def get_gitlab_host(pr_url):
         gitlab_host_map[pr_host] = host
         _save_config_value("gitlab_host_map", gitlab_host_map)
     return host
+
+
+def get_model_max_input(model):
+    config_file = os.path.expanduser("~/.chat/config.yml")
+    try:
+        with open(config_file, "r", encoding="utf-8") as file:
+            yaml_contents = file.read()
+            parsed_yaml = yaml.safe_load(yaml_contents)
+            for model_t in parsed_yaml.get("models", {}):
+                if model_t == model:
+                    return parsed_yaml["models"][model_t].get("max_input_tokens", 6000)
+        return 6000
+    except Exception:
+        return 6000
