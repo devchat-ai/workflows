@@ -1,6 +1,7 @@
 import os
+import re
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 
 def retrieve_file_content(file_path: str, root_path: str) -> str:
@@ -154,3 +155,47 @@ def is_source_code(file_name: str, only_code=False) -> bool:
     _, extension = os.path.splitext(file_name)
 
     return extension in source_code_extensions
+
+
+DEFAULT_TEST_REGS = [r"^(.+/)*[Tt]ests?/"]  # C, C++, OBJC
+TEST_PATH_PATTERNS: Dict[str, List[str]] = {
+    "C": DEFAULT_TEST_REGS,
+    "C++": DEFAULT_TEST_REGS,
+    "Objective-C": DEFAULT_TEST_REGS,
+    # Gradle https://docs.gradle.org/current/userguide/java_testing.html#sec:test_detection
+    "Java": [r"^(.+/)*src/test/.*Tests?.java$"],
+    # jest
+    "JavaScript": [r"(.+/)*(__[Tt]ests__/.*|((.*\.)?(test|spec)))\.[jt]sx?$"],
+    # pytest https://docs.pytest.org/en/stable/goodpractices.html#conventions-for-python-test-discovery
+    "Python": [r"(.*_test|.*/?test_[^/]*)\.py$"],
+    "Ruby": [r"^(.+/)*(spec/.*_spec.rb|test/.*_test.rb)$"],
+    # golang, from `go help test`
+    "Go": [r"^(.+/)*[^_\.][^/]*_test.go$"],
+    "PHP": [r"^(.+/)*[Tt]ests?/(.+/)*([^/]*[Tt]ests?\.php|[Ff]ixtures?/(.+/)*.+\.php)"],
+    "Kotlin": [r"^(.+/)*src/test/.*Tests?.kt$"],
+    "C#": [r"^(.+/)[^/]+[Tt]ests?.cs$"],
+    "Swift": [r"^(.+/)*[^/]*Tests?.swift"],
+    "Scala": [r"^(.+/)*src/test/.*(scala|sc)"],
+    "Dart": [r"^(.+/)*[Tt]ests?/(.+/)*[^/]*[Tt]ests?.dart"],
+    "Lua": [r"^(.+/)*(specs?/.*_spec|tests?/(.*_test|test_[^/]*))\.lua$"],
+}
+LANG_TEST_REGS: Dict[str, List] = {
+    k: [re.compile(r) for r in v] for k, v in TEST_PATH_PATTERNS.items()
+}
+
+
+def is_test_file(file_path: str) -> bool:
+    """
+    Check if a given file is a test file based on its path.
+
+    Args:
+        file_path (str): The path to the file to check.
+
+    Returns:
+        bool: True if the file is a test file, False otherwise.
+    """
+    for _, regs in LANG_TEST_REGS.items():
+        for reg in regs:
+            if reg.match(file_path):
+                return True
+    return False
