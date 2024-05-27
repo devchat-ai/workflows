@@ -202,14 +202,22 @@ class TextEditor(Widget):
         super().__init__(submit_button_name, cancel_button_name)
 
         self._title = title
-        self._text = text
+        self._text = self._handle_block_flag(text)
 
         self._editor_key = self.gen_id(self._id_prefix, 0)
         self._new_text: Optional[str] = None
 
+    def _handle_block_flag(self, text):
+        """convert \\ to \\, and ` to \\`"""
+        return text.replace("\\", "\\\\").replace("`", "\\`")
+
+    def _remove_block_flag(self, text):
+        """convert \\ to \\, and \\` to `"""
+        return text.replace("\\`", "`").replace("\\\\", "\\")
+
     @property
     def new_text(self):
-        return self._new_text
+        return self._remove_block_flag(self._new_text)
 
     def _in_chatmark(self) -> str:
         """
