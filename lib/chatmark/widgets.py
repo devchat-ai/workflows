@@ -207,16 +207,18 @@ class TextEditor(Widget):
         self._editor_key = self.gen_id(self._id_prefix, 0)
         self._new_text: Optional[str] = None
 
-    def _handle_block_flag(self, text):
+    def _handle_block_flag(self, text: str):
         """convert \\ to \\, and ` to \\`"""
         return text.replace("\\", "\\\\").replace("`", "\\`")
 
-    def _remove_block_flag(self, text):
+    def _remove_block_flag(self, text: str):
         """convert \\ to \\, and \\` to `"""
         return text.replace("\\`", "`").replace("\\\\", "\\")
 
     @property
-    def new_text(self):
+    def new_text(self) -> Optional[str]:
+        if self._new_text is None:
+            return None
         return self._remove_block_flag(self._new_text)
 
     def _in_chatmark(self) -> str:
