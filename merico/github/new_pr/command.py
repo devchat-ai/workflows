@@ -39,7 +39,7 @@ PROMPT = (
 )
 
 
-@chat_json(prompt=PROMPT, model="gpt-4-1106-preview")
+@chat_json(prompt=PROMPT)
 def generate_pr_content_llm(issue, commit_message, user_input):
     pass
 

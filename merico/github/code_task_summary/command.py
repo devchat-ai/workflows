@@ -31,7 +31,7 @@ PROMPT = (
 )
 
 
-@chat_json(prompt=PROMPT, model="gpt-4-1106-preview")
+@chat_json(prompt=PROMPT)
 def generate_code_task_summary(issue_body):
     pass
 
