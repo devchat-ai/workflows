@@ -26,7 +26,7 @@ PROMPT = (
 )
 
 
-@chat_json(prompt=PROMPT, model="gpt-4-1106-preview")
+@chat_json(prompt=PROMPT)
 def generate_branch_name(task):
     pass
 
