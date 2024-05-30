@@ -1,0 +1,5 @@
+description: 创建一个issue
+hint: question
+input: required
+steps:
+  - run: $devchat_python $command_path/command.py "$input"
