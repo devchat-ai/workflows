@@ -401,6 +401,8 @@ def main():
         if branch_name:
             user_input += "\ncurrent repo branch name is:" + branch_name
         commit_message = generate_commit_message_base_diff(user_input, diff)
+        if not commit_message:
+            sys.exit(1)
 
         # TODO
         # remove Closes #IssueNumber in commit message

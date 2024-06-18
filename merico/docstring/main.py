@@ -291,6 +291,8 @@ def main():
     response = add_docstring(
         selected_text=selected_text.get("text", ""), file_path=selected_text.get("abspath", "")
     )
+    if not response:
+        sys.exit(1)
 
     # Get indent level
     indent = get_indent_level(selected_text.get("text", ""))

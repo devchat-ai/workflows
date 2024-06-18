@@ -138,10 +138,12 @@ def write_and_print_tests(
 
     if USE_USER_MODEL:
         # Use the wrapped api
-        _ = chat_completion_stream_out(
+        response = chat_completion_stream_out(
             messages=[{"role": "user", "content": user_msg}],
             llm_config={"model": MODEL, "temperature": 0.1},
         )
+        if not response.get("content", None):
+            raise response["error"]
 
     else:
         # Use the openai api parameters
