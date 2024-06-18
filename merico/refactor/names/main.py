@@ -229,6 +229,8 @@ def main():
 
     # rewrite
     response = reanme_variable(selected_text=selected_code, file_path=selected_file)
+    if not response:
+        sys.exit(1)
 
     # apply new code to editor
     new_code = extract_markdown_block(response)

@@ -83,8 +83,8 @@ def explain(selected_text, visible_text):
 
 
 def main():
-    explain(selected_text=get_selected_code(), visible_text=get_visible_code())
-    sys.exit(0)
+    result = explain(selected_text=get_selected_code(), visible_text=get_visible_code())
+    sys.exit(0 if result else 1)
 
 
 if __name__ == "__main__":

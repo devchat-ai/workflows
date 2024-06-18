@@ -120,6 +120,8 @@ def main():
 
     # rewrite
     response = ai_rewrite(question=question, selected_text=selected_text)
+    if not response:
+        sys.exit(1)
 
     # apply new code to editor
     new_code = extract_markdown_block(response)

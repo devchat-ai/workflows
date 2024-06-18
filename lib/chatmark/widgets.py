@@ -209,11 +209,11 @@ class TextEditor(Widget):
 
     def _handle_block_flag(self, text: str):
         """convert \\ to \\, and ` to \\`"""
-        return text.replace("\\", "\\\\").replace("`", "\\`")
+        return text.replace("```", "\\`\\`\\`") if text else text
 
     def _remove_block_flag(self, text: str):
         """convert \\ to \\, and \\` to `"""
-        return text.replace("\\`", "`").replace("\\\\", "\\")
+        return text.replace("\\`\\`\\`", "```") if text else text
 
     @property
     def new_text(self) -> Optional[str]:

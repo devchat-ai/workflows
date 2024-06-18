@@ -122,6 +122,8 @@ def propose_test(
             )
             or {}
         )
+        if not json_res:
+            raise ValueError("No valid json response")
 
     else:
         # Use the openai api parameters

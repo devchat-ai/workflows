@@ -141,6 +141,8 @@ def main():
 
     # rewrite
     response = fix_bugs(selected_text=selected_text, visible_text=visible_text)
+    if not response:
+        sys.exit(1)
 
     # apply new code to editor
     new_code = extract_markdown_block(response)

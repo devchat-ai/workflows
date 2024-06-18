@@ -259,6 +259,8 @@ def main():
     code_text = selected_text.get("text", "")
 
     response = add_comments(selected_text=code_text, file_path=file_path)
+    if not response:
+        sys.exit(1)
     new_code = extract_markdown_block(response)
 
     if not new_code:
