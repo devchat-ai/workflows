@@ -101,8 +101,8 @@ logger.add(
 from merico.pr.config_util import (
     get_gitlab_host,
     get_repo_type,
-    read_server_access_token_with_input,
     read_review_inline_config,
+    read_server_access_token_with_input,
 )
 from merico.pr.custom_suggestions_config import get_custom_suggestions_system_prompt
 

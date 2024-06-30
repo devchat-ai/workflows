@@ -114,6 +114,7 @@ def read_gitlab_host():
                 return config_data["gitlab_host"]
     return ""
 
+
 def read_review_inline_config():
     config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
     if os.path.exists(config_path):
@@ -122,6 +123,7 @@ def read_review_inline_config():
             if "pr_review_inline" in config_data:
                 return config_data["pr_review_inline"]
     return False
+
 
 def save_github_token(github_token):
     config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")

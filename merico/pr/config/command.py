@@ -4,7 +4,6 @@ import sys
 
 from lib.chatmark import Checkbox
 
-
 # Configuration items
 CONFIG_ITEMS = {
     "pr_review_inline": "PR Review Inline Enabled",
@@ -13,12 +12,14 @@ CONFIG_ITEMS = {
 # Configuration file paths
 GLOBAL_CONFIG_PATH = os.path.join(os.path.expanduser("~"), ".chat", ".workflow_config.json")
 
+
 def read_config(config_path, item):
     if os.path.exists(config_path):
         with open(config_path, "r", encoding="utf-8") as f:
             config = json.load(f)
             return config.get(item)
     return None
+
 
 def save_config(config_path, item, value):
     if os.path.exists(config_path):
@@ -49,10 +50,13 @@ def is_pre_review_inline_enabled(current_value=False):
         return None
     return False
 
+
 def main():
     print("Starting configuration of workflow settings...", end="\n\n", flush=True)
-    print("If you want to change access token or host url, "
-          "please edit the configuration file directly.")
+    print(
+        "If you want to change access token or host url, "
+        "please edit the configuration file directly."
+    )
     print("Configuration file is located at:", GLOBAL_CONFIG_PATH, end="\n\n", flush=True)
 
     pr_review_inline_enable = read_config(GLOBAL_CONFIG_PATH, "pr_review_inline")
@@ -62,6 +66,7 @@ def main():
         save_config(GLOBAL_CONFIG_PATH, "pr_review_inline", pr_review_inline_enable)
     print("Workflow settings configuration successful.")
     sys.exit(0)
+
 
 if __name__ == "__main__":
     main()
