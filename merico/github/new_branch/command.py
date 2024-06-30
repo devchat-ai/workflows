@@ -18,9 +18,7 @@ from git_api import (  # noqa: E402
 PROMPT = (
     "Give me 5 different git branch names, "
     "mainly hoping to express: {task}, "
-    "Good branch name should looks like: <type>/<main content>-#<issue id>,"
-    "<issue id> is optional, add it only when you know the issue id clearly, "
-    "don't miss '#' before issue id. "
+    "Good branch name should looks like: <type>/<main content>,"
     "the final result is output in JSON format, "
     'as follows: {{"names":["name1", "name2", .. "name5"]}}\n'
 )
@@ -47,9 +45,9 @@ def get_issue_or_task(task):
         issue = read_issue_by_url(task.strip())
         assert_exit(not issue, "Failed to read issue.", exit_code=-1)
 
-        return json.dumps({"id": issue["number"], "title": issue["title"], "body": issue["body"]})
+        return json.dumps({"id": issue["number"], "title": issue["title"], "body": issue["body"]}), issue["number"]
     else:
-        return task
+        return task, None
 
 
 # Main function
@@ -67,13 +65,16 @@ def main():
     )
 
     # read issue by url
-    task = get_issue_or_task(task)
+    task, issue_id = get_issue_or_task(task)
 
     # Generate 5 branch names
     print("Generating branch names ...", end="\n\n", flush=True)
     branch_names = generate_branch_name(task=task)
     assert_exit(not branch_names, "Failed to generate branch names.", exit_code=-1)
     branch_names = branch_names["names"]
+    for index, branch_name in enumerate(branch_names):
+        if issue_id:
+            branch_names[index] = f"{branch_name}-#{issue_id}"
 
     # Select branch name
     selected_branch = select_branch_name(branch_names)
