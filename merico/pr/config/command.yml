@@ -1,0 +1,3 @@
+description: 'Config required settings for GIT workflows.'
+steps:
+  - run: $devchat_python $command_path/command.py

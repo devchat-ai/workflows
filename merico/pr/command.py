@@ -102,6 +102,7 @@ from merico.pr.config_util import (
     get_gitlab_host,
     get_repo_type,
     read_server_access_token_with_input,
+    read_review_inline_config,
 )
 from merico.pr.custom_suggestions_config import get_custom_suggestions_system_prompt
 
@@ -169,7 +170,8 @@ language_prompt = "\n\n输出内容使用中文输出。\n" if language == "zh" 
 get_settings().pr_code_suggestions_prompt.system += language_prompt
 get_settings().pr_review_prompt.system += language_prompt
 get_settings().pr_description_prompt.system += language_prompt
-# get_settings().pr_reviewer.inline_code_comments = True
+if read_review_inline_config():
+    get_settings().pr_reviewer.inline_code_comments = True
 
 # config for find similar issues
 get_settings().set("PR_SIMILAR_ISSUE.VECTORDB", "lancedb")
