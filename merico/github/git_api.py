@@ -411,3 +411,36 @@ def update_pr(pr_number, title, body, repo_name):
     else:
         print("Failed to update PR.")
         return None
+
+def get_last_base_branch(default_branch):
+    """ read last base branch from config file """
+    def read_config(config_path, item):
+        if os.path.exists(config_path):
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = json.load(f)
+                return config.get(item)
+        return None
+
+    project_config_path = os.path.join(os.getcwd(), ".chat", ".workflow_config.json")
+    last_base_branch = read_config(project_config_path, "last_base_branch")
+    if last_base_branch:
+        return last_base_branch
+    return default_branch
+
+def save_last_base_branch(save_branch=None):
+    """ save last base branch to config file """
+    def save_config(config_path, item, value):
+        if os.path.exists(config_path):
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = json.load(f)
+        else:
+            config = {}
+
+        config[item] = value
+        with open(config_path, "w", encoding="utf-8") as f:
+            json.dump(config, f, indent=4)
+
+    if not save_branch:
+        base_branch = get_current_branch()
+    project_config_path = os.path.join(os.getcwd(), ".chat", ".workflow_config.json")
+    save_config(project_config_path, "last_base_branch", base_branch)

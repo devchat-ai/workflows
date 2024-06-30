@@ -12,6 +12,7 @@ from git_api import (  # noqa: E402
     create_and_checkout_branch,
     is_issue_url,
     read_issue_by_url,
+    save_last_base_branch,
 )
 
 # Function to generate a random branch name
@@ -78,6 +79,9 @@ def main():
 
     # Select branch name
     selected_branch = select_branch_name(branch_names)
+
+    # save base branch name
+    save_last_base_branch()
 
     # create and checkout branch
     print(f"Creating and checking out branch: {selected_branch}")

@@ -14,9 +14,9 @@ from git_api import (  # noqa: E402
     get_current_branch,
     get_github_repo,
     get_issue_info,
+    get_last_base_branch,
+    save_last_base_branch,
 )
-
-BASH_BRANCH = "main"
 
 
 # 从分支名称中提取issue id
@@ -57,6 +57,9 @@ def generate_pr_content(issue, commit_messages, user_input):
 def edit_pr(title, body):
     pass
 
+@ui_edit(ui_type="editor", description="Edit base branch:")
+def edit_base_branch(base_branch):
+    pass
 
 def get_issue_json(issue_id):
     issue = {"id": "no issue id", "title": "", "body": ""}
@@ -76,6 +79,12 @@ def get_issue_json(issue_id):
 def main():
     print("start new_pr ...", end="\n\n", flush=True)
 
+    base_branch = get_last_base_branch("main")
+    base_branch = edit_base_branch(base_branch)
+    if isinstance(base_branch, list) and len(base_branch) > 0:
+        base_branch = base_branch[0]
+        save_last_base_branch(base_branch)
+
     repo_name = get_github_repo()
     branch_name = get_current_branch()
     issue_id = extract_issue_id(branch_name)
@@ -86,7 +95,7 @@ def main():
     print("issue id:", issue_id, end="\n\n")
 
     issue = get_issue_json(issue_id)
-    commit_messages = get_commit_messages(BASH_BRANCH)
+    commit_messages = get_commit_messages(base_branch)
 
     print("generating pr title and body ...", end="\n\n", flush=True)
     user_input = sys.argv[1]
@@ -99,7 +108,7 @@ def main():
     is_push_success = auto_push()
     assert_exit(not is_push_success, "Failed to push changes.", exit_code=-1)
 
-    pr = create_pull_request(pr_title, pr_body, branch_name, BASH_BRANCH, repo_name)
+    pr = create_pull_request(pr_title, pr_body, branch_name, base_branch, repo_name)
     assert_exit(not pr, "Failed to create PR.", exit_code=-1)
 
     print(f"PR created successfully: {pr['html_url']}")
