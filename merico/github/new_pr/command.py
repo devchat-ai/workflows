@@ -57,9 +57,11 @@ def generate_pr_content(issue, commit_messages, user_input):
 def edit_pr(title, body):
     pass
 
+
 @ui_edit(ui_type="editor", description="Edit base branch:")
 def edit_base_branch(base_branch):
     pass
+
 
 def get_issue_json(issue_id):
     issue = {"id": "no issue id", "title": "", "body": ""}

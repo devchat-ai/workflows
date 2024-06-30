@@ -412,8 +412,10 @@ def update_pr(pr_number, title, body, repo_name):
         print("Failed to update PR.")
         return None
 
+
 def get_last_base_branch(default_branch):
-    """ read last base branch from config file """
+    """read last base branch from config file"""
+
     def read_config_item(config_path, item):
         if os.path.exists(config_path):
             with open(config_path, "r", encoding="utf-8") as f:
@@ -427,8 +429,10 @@ def get_last_base_branch(default_branch):
         return last_base_branch
     return default_branch
 
+
 def save_last_base_branch(base_branch=None):
-    """ save last base branch to config file """
+    """save last base branch to config file"""
+
     def save_config_item(config_path, item, value):
         if os.path.exists(config_path):
             with open(config_path, "r", encoding="utf-8") as f:

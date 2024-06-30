@@ -46,7 +46,9 @@ def get_issue_or_task(task):
         issue = read_issue_by_url(task.strip())
         assert_exit(not issue, "Failed to read issue.", exit_code=-1)
 
-        return json.dumps({"id": issue["number"], "title": issue["title"], "body": issue["body"]}), issue["number"]
+        return json.dumps(
+            {"id": issue["number"], "title": issue["title"], "body": issue["body"]}
+        ), issue["number"]
     else:
         return task, None
 
