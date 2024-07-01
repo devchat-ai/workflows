@@ -1,2 +1,3 @@
 git+https://gitee.com/imlaji/pr-agent.git@main
 git+https://gitee.com/devchat-ai/devchat.git@main
+
