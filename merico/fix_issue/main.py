@@ -372,7 +372,7 @@ def get_rule_description(issue_description):
     issue_language = issue_code.split(':')[0]
 
     tools_path = IDEService().get_extension_tools_path()
-    rules_path = "sonar_respec"
+    rules_path = "sonar-rspec"
 
     rule_path = os.path.join(tools_path, rules_path, "rules", issue_id, issue_language, "rule.adoc")
     if os.path.exists(rule_path):
