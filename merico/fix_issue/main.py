@@ -26,6 +26,7 @@ def extract_markdown_block(text):
             return None
         return text
 
+
 # step 1 : get selected code
 def get_selected_code():
     selected_data = IDEService().get_selected_range().dict()
@@ -37,7 +38,7 @@ def get_selected_code():
         print("Please select the line code of issue reported.\n\n", file=sys.stderr)
         sys.exit(1)
 
-    return selected_data['abspath'], selected_data['text'], selected_data["range"]["start"]["line"]
+    return selected_data["abspath"], selected_data["text"], selected_data["range"]["start"]["line"]
 
 
 # step 2 : input issue descriptions
@@ -68,12 +69,12 @@ Here is the rule description:
 
 Please provide me refactor code to fix this issue.
 """
+
+
 @chat(prompt=PROMPT, stream_out=True)
 def call_llm_to_generate_fix_solutions(
-        file_content,
-        issue_line_code,
-        issue_description,
-        rule_description):
+    file_content, issue_line_code, issue_description, rule_description
+):
     pass
 
 
@@ -85,10 +86,11 @@ def get_current_file_content(file_path, issue_line_num):
         print("Error reading file:", file=sys.stderr)
         return None
 
+
 # get issue description
 def get_rule_description(issue_description):
     def parse_source_code(text):
-        pattern = r'<(\w+):(.+?)>'
+        pattern = r"<(\w+):(.+?)>"
         match = re.search(pattern, text)
 
         if match:
@@ -102,8 +104,8 @@ def get_rule_description(issue_description):
     if issue_source.find("sonar") == -1:
         return issue_description
 
-    issue_id = issue_code.split(':')[-1]
-    issue_language = issue_code.split(':')[0]
+    issue_id = issue_code.split(":")[-1]
+    issue_language = issue_code.split(":")[0]
 
     tools_path = IDEService().get_extension_tools_path()
     rules_path = "sonar-rspec"
@@ -129,12 +131,14 @@ def main():
     print("start fix issue ...\n\n")
     file_path, issue_line, issue_line_num = get_selected_code()
     if not file_path or not issue_line:
-        print('No code selected. Please select the code line you want to fix.', file=sys.stderr)
+        print("No code selected. Please select the code line you want to fix.", file=sys.stderr)
         sys.exit(1)
     issue_description = input_issue_descriptions(file_path, issue_line_num)
     if not issue_description:
-        print('There are no issues to resolve on the current line. '
-              'Please select the line where an issue needs to be resolved.')
+        print(
+            "There are no issues to resolve on the current line. "
+            "Please select the line where an issue needs to be resolved."
+        )
         sys.exit(0)
 
     print("make llm prompt ...\n\n")
@@ -147,7 +151,8 @@ def main():
         file_content=current_file_content,
         issue_line_code=issue_line,
         issue_description=issue_description,
-        rule_description=rule_description)
+        rule_description=rule_description,
+    )
     if not fix_solutions:
         sys.exit(1)
 
