@@ -69,7 +69,11 @@ Here is the rule description:
 Please provide me refactor code to fix this issue.
 """
 @chat(prompt=PROMPT, stream_out=True)
-def call_llm_to_generate_fix_solutions(file_content, issue_line_code, issue_description, rule_description):
+def call_llm_to_generate_fix_solutions(
+        file_content,
+        issue_line_code,
+        issue_description,
+        rule_description):
     pass
 
 
