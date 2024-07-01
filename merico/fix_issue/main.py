@@ -399,8 +399,8 @@ def main():
         sys.exit(1)
     issue_description = input_issue_descriptions(file_path, issue_line_num)
     if not issue_description:
-        print('There are no issues to resolve on the current line. Please select the line where an issue needs to be resolved.', file=sys.stderr)
-        sys.exit(1)
+        print('There are no issues to resolve on the current line. Please select the line where an issue needs to be resolved.')
+        sys.exit(0)
     
     print("make llm prompt ...\n\n")
     current_file_content = get_current_file_content(file_path, issue_line_num)
