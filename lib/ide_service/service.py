@@ -117,7 +117,7 @@ class IDEService:
         return self._result
 
     @rpc_method
-    def diff_apply(self, filepath, content) -> bool:
+    def diff_apply(self, filepath, content, autoedit: bool = False) -> bool:
         """
         Applies a given diff to a file.
 

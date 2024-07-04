@@ -10,7 +10,7 @@ def run_code(code: str):
 
 
 @rpc_call
-def diff_apply(filepath, content):
+def diff_apply(filepath, content, autoedit=False):
     pass
 
 
