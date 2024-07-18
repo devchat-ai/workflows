@@ -1,0 +1,4 @@
+description: Automatically fix lint errors.
+help: README.md
+steps:
+  - run: $devchat_python $command_path/main.py
