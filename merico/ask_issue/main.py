@@ -26,6 +26,7 @@ def extract_edits_block(text):
         else:
             return text[start:end]
 
+
 def extract_markdown_block(text):
     """
     Extracts the first Markdown code block from the given text without the language specifier.
@@ -78,8 +79,11 @@ def input_issue_descriptions(file_path, issue_line_num):
 
 
 # step 3 : call llm to generate fix solutions
-SYSTEM_ROLE_DIFF= """
-You are a code refactoring assistant. Your task is to refactor the user's code to fix lint diagnostics. You will be provided with a code snippet and a list of diagnostics. Your response should include two parts:
+SYSTEM_ROLE_DIFF = """
+You are a code refactoring assistant.
+Your task is to refactor the user's code to fix lint diagnostics.
+You will be provided with a code snippet and a list of diagnostics. \
+Your response should include two parts:
 
 1. An explanation of the reason for the diagnostics and how to fix them.
 2. The edited code snippet with the diagnostics fixed, using markdown format for clarity.
@@ -105,9 +109,14 @@ Or like this, if a variable is not defined:
 ```
 Please note the following important points:
 
-1. The new code should maintain the correct indentation. The "+ " sign is followed by two spaces for indentation, which should be included in the edited code.
-2. In addition to outputting key editing information, sufficient context (i.e., key information before and after editing) should also be provided to help locate the specific position of the edited line.
-3. Don't output all file lines, if some lines are unchanged, please use "..." to indicate the ignored lines.
+1. The new code should maintain the correct indentation. \
+The "+ " sign is followed by two spaces for indentation, \
+which should be included in the edited code.
+2. In addition to outputting key editing information, \
+sufficient context (i.e., key information before and after editing) \
+should also be provided to help locate the specific position of the edited line.
+3. Don't output all file lines, if some lines are unchanged, \
+please use "..." to indicate the ignored lines.
 4. Use "+ " and "- " at start of the line to indicate the addition and deletion of lines.
 
 Here are some examples of incorrect responses:
@@ -119,14 +128,16 @@ def hello():
     print("Call hello():")
 +   print("hello")
 ```
-In this case, if the "+ " sign and the extra space are removed, the print("hello") statement will lack the necessary two spaces for correct indentation.
+In this case, if the "+ " sign and the extra space are removed, \
+the print("hello") statement will lack the necessary two spaces for correct indentation.
 
 Incorrect example 2, where no other code lines are provided:
 
 ```edits
 + print("hello")
 ```
-This is an incorrect example because without additional context, it's unclear where the new print("hello") statement should be inserted.
+This is an incorrect example because without additional context, \
+it's unclear where the new print("hello") statement should be inserted.
 """
 
 SYSTEM_ROLE_CODEBLOCK = """
@@ -150,7 +161,14 @@ if __name__ == "__main__":
 
 
 LLM_MODEL = os.environ.get("LLM_MODEL", "gpt-3.5-turbo-1106")
-if LLM_MODEL in ["qwen2-72b-instruct", "qwen-long", "qwen-turbo", "Yi-34B-Chat", "deepseek-coder", "xinghuo-3.5"]:
+if LLM_MODEL in [
+    "qwen2-72b-instruct",
+    "qwen-long",
+    "qwen-turbo",
+    "Yi-34B-Chat",
+    "deepseek-coder",
+    "xinghuo-3.5",
+]:
     SYSTEM_ROLE = SYSTEM_ROLE_CODEBLOCK
 else:
     SYSTEM_ROLE = SYSTEM_ROLE_DIFF
@@ -178,11 +196,14 @@ Here is the rule description:
 
 {rule_description}
 
-Please focus only on the error described in the prompt. Other errors in the code should be disregarded.
+Please focus only on the error described in the prompt. \
+Other errors in the code should be disregarded.
 
 """
 
 memory = FixSizeChatMemory(max_size=20, messages=MESSAGES_A)
+
+
 @chat(prompt=PROMPT, stream_out=True, memory=memory)
 def call_llm_to_generate_fix_solutions(
     file_content, issue_line_code, issue_description, rule_description
@@ -246,7 +267,7 @@ def main():
     print("make llm prompt ...\n\n")
     current_file_content = get_current_file_content(file_path, issue_line_num)
     rule_description = get_rule_description(issue_description)
-    #print("Rule description:\n\n", rule_description, end="\n\n")
+    # print("Rule description:\n\n", rule_description, end="\n\n")
 
     print("call llm to fix issue ...\n\n")
     fix_solutions = call_llm_to_generate_fix_solutions(

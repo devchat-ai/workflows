@@ -1,10 +1,10 @@
+import json
 import os
 import re
-import json
 import subprocess
 import sys
 
-from devchat.llm import chat, chat_completion_stream
+from devchat.llm import chat
 from devchat.memory import FixSizeChatMemory
 
 from lib.ide_service import IDEService
@@ -27,6 +27,7 @@ def extract_edits_block(text):
             return None
         else:
             return text[start:end]
+
 
 def extract_markdown_block(text):
     """
@@ -80,8 +81,11 @@ def input_issue_descriptions(file_path, issue_line_num):
 
 
 # step 3 : call llm to generate fix solutions
-SYSTEM_ROLE_DIFF= """
-You are a code refactoring assistant. Your task is to refactor the user's code to fix lint diagnostics. You will be provided with a code snippet and a list of diagnostics. Your response should include two parts:
+SYSTEM_ROLE_DIFF = """
+You are a code refactoring assistant. \
+Your task is to refactor the user's code to fix lint diagnostics. \
+You will be provided with a code snippet and a list of diagnostics. \
+Your response should include two parts:
 
 1. An explanation of the reason for the diagnostics and how to fix them.
 2. The edited code snippet with the diagnostics fixed, using markdown format for clarity.
@@ -107,9 +111,14 @@ Or like this, if a variable is not defined:
 ```
 Please note the following important points:
 
-1. The new code should maintain the correct indentation. The "+ " sign is followed by two spaces for indentation, which should be included in the edited code.
-2. In addition to outputting key editing information, sufficient context (i.e., key information before and after editing) should also be provided to help locate the specific position of the edited line.
-3. Don't output all file lines, if some lines are unchanged, please use "..." to indicate the ignored lines.
+1. The new code should maintain the correct indentation. \
+The "+ " sign is followed by two spaces for indentation, \
+which should be included in the edited code.
+2. In addition to outputting key editing information, \
+sufficient context (i.e., key information before and after editing) \
+should also be provided to help locate the specific position of the edited line.
+3. Don't output all file lines, if some lines are unchanged, \
+please use "..." to indicate the ignored lines.
 4. Use "+ " and "- " at start of the line to indicate the addition and deletion of lines.
 
 Here are some examples of incorrect responses:
@@ -121,14 +130,16 @@ def hello():
     print("Call hello():")
 +   print("hello")
 ```
-In this case, if the "+ " sign and the extra space are removed, the print("hello") statement will lack the necessary two spaces for correct indentation.
+In this case, if the "+ " sign and the extra space are removed, \
+the print("hello") statement will lack the necessary two spaces for correct indentation.
 
 Incorrect example 2, where no other code lines are provided:
 
 ```edits
 + print("hello")
 ```
-This is an incorrect example because without additional context, it's unclear where the new print("hello") statement should be inserted.
+This is an incorrect example because without additional context, \
+it's unclear where the new print("hello") statement should be inserted.
 """
 
 SYSTEM_ROLE_CODEBLOCK = """
@@ -152,7 +163,14 @@ if __name__ == "__main__":
 
 
 LLM_MODEL = os.environ.get("LLM_MODEL", "gpt-3.5-turbo-1106")
-if LLM_MODEL in ["qwen2-72b-instruct", "qwen-long", "qwen-turbo", "Yi-34B-Chat", "deepseek-coder", "xinghuo-3.5"]:
+if LLM_MODEL in [
+    "qwen2-72b-instruct",
+    "qwen-long",
+    "qwen-turbo",
+    "Yi-34B-Chat",
+    "deepseek-coder",
+    "xinghuo-3.5",
+]:
     SYSTEM_ROLE = SYSTEM_ROLE_CODEBLOCK
 else:
     SYSTEM_ROLE = SYSTEM_ROLE_DIFF
@@ -180,11 +198,14 @@ Here is the rule description:
 
 {rule_description}
 
-Please focus only on the error described in the prompt. Other errors in the code should be disregarded.
+Please focus only on the error described in the prompt. \
+Other errors in the code should be disregarded.
 
 """
 
 memory = FixSizeChatMemory(max_size=20, messages=MESSAGES_A)
+
+
 @chat(prompt=PROMPT, stream_out=True, memory=memory)
 def call_llm_to_generate_fix_solutions(
     file_content, issue_line_code, issue_description, rule_description
@@ -193,7 +214,8 @@ def call_llm_to_generate_fix_solutions(
 
 
 APPLY_SYSTEM_PROMPT = """
-Your task is apply the fix solution to the code, output the whole new code in markdown code block format.
+Your task is apply the fix solution to the code, \
+output the whole new code in markdown code block format.
 
 Here is the code file:
 {file_content}
@@ -204,10 +226,14 @@ Here is the fix solution:
 Some rules for output code:
 1. Focus on the fix solution, don't focus on other errors in the code.
 2. Don't change the indentation of the code.
-3. Don't change lines which are not metioned in fix solution, for example, don't remove empty lines in code.
+3. Don't change lines which are not metioned in fix solution, for example, \
+don't remove empty lines in code.
 
-Please output only the whole new code which is the result of applying the fix solution, and output the whole code.
+Please output only the whole new code which is the result of \
+applying the fix solution, and output the whole code.
 """
+
+
 @chat(prompt=APPLY_SYSTEM_PROMPT, stream_out=True, model="deepseek-coder")
 def apply_fix_solution(file_content, fix_solution):
     pass
@@ -254,13 +280,15 @@ def get_rule_description(issue_description):
 
 def get_file_content(file_path):
     try:
-        with open(file_path, 'r', encoding='utf-8') as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             return file.read()
     except Exception:
         print("Error reading file:", file=sys.stderr)
         return None
 
+
 GLOBAL_CONFIG_PATH = os.path.join(os.path.expanduser("~"), ".chat", ".workflow_config.json")
+
 
 def get_aider_python_path():
     """
@@ -273,8 +301,9 @@ def get_aider_python_path():
     if os.path.exists(GLOBAL_CONFIG_PATH):
         with open(GLOBAL_CONFIG_PATH, "r", encoding="utf-8") as f:
             config = json.load(f)
-        return config.get('aider_python')
+        return config.get("aider_python")
     return None
+
 
 def run_aider(message, file_path):
     """
@@ -294,8 +323,8 @@ def run_aider(message, file_path):
         SystemExit: If the Aider process returns a non-zero exit code, indicating an error.
     """
     python = get_aider_python_path()
-    model = os.environ.get('LLM_MODEL', 'gpt-3.5-turbo-1106')
-    
+    model = os.environ.get("LLM_MODEL", "gpt-3.5-turbo-1106")
+
     cmd = [
         python,
         "-m",
@@ -303,20 +332,15 @@ def run_aider(message, file_path):
         "--model",
         f"openai/{model}",
         "--yes",
-        "--no-auto-commits", 
+        "--no-auto-commits",
         "--dry-run",
         "--no-pretty",
         "--message",
         message,
-        file_path
+        file_path,
     ]
 
-    process = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
-    )
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     has_started = False
     aider_output = ""
@@ -350,13 +374,13 @@ def apply_changes(changes, file_path):
     these changes to the specified file. It handles the execution of aider and manages
     the output and potential errors.
     """
-    changes_file = '.chat/changes.txt'
+    changes_file = ".chat/changes.txt"
     os.makedirs(os.path.dirname(changes_file), exist_ok=True)
-    with open(changes_file, 'w', encoding='utf-8') as f:
+    with open(changes_file, "w", encoding="utf-8") as f:
         f.write(changes)
 
     python = get_aider_python_path()
-    model = os.environ.get('LLM_MODEL', 'gpt-3.5-turbo-1106')
+    model = os.environ.get("LLM_MODEL", "gpt-3.5-turbo-1106")
 
     cmd = [
         python,
@@ -368,15 +392,10 @@ def apply_changes(changes, file_path):
         "--no-auto-commits",
         "--apply",
         changes_file,
-        file_path
+        file_path,
     ]
 
-    process = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
-    )
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     has_started = False
     for line in process.stdout:
@@ -418,7 +437,7 @@ def main():
     print("make llm prompt ...\n\n", flush=True)
     current_file_content = get_current_file_content(file_path, issue_line_num)
     rule_description = get_rule_description(issue_description)
-    #print("Rule description:\n\n", rule_description, end="\n\n")
+    # print("Rule description:\n\n", rule_description, end="\n\n")
 
     print("call llm to fix issue ...\n\n", flush=True)
 
@@ -444,15 +463,15 @@ Rule description: {rule_description}
 
         print("\nApplying changes...\n", flush=True)
 
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             original_content = f.read()
 
         apply_changes(changes, file_path)
 
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             updated_content = f.read()
 
-        with open(file_path, 'w', encoding='utf-8') as f:
+        with open(file_path, "w", encoding="utf-8") as f:
             f.write(original_content)
 
         os.environ["PYTHONPATH"] = python_path
@@ -474,11 +493,6 @@ Rule description: {rule_description}
         print("\n\n", flush=True)
 
         print("apply fix solution ...\n\n")
-        # updated_content = apply_fix_solution(file_content=get_file_content(file_path), fix_solution=fix_solutions)
-        # if not updated_content:
-        #     print("No edits code generated.")
-        #     sys.exit(0)
-        # updated_content = fix_solutions['content']
         updated_content = extract_markdown_block(fix_solutions)
         if updated_content:
             # Display changes in IDE

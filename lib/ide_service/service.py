@@ -184,7 +184,9 @@ class IDEService:
         return self._result
 
     @rpc_method
-    def select_range(self, fileName: str, startLine: int, startColumn: int, endLine: int, endColumn: int) -> bool:
+    def select_range(
+        self, fileName: str, startLine: int, startColumn: int, endLine: int, endColumn: int
+    ) -> bool:
         """
         Selects a range of text in the specified file.
 

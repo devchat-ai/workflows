@@ -1,6 +1,7 @@
 import os
 import sys
 
+
 def is_valid_path(path):
     """
     检查路径是否为有效的文件路径形式
@@ -9,9 +10,13 @@ def is_valid_path(path):
         # 尝试规范化路径
         normalized_path = os.path.normpath(path)
         # 检查路径是否是绝对路径或相对路径
-        return os.path.isabs(normalized_path) or not os.path.dirname(normalized_path) == normalized_path
+        return (
+            os.path.isabs(normalized_path)
+            or not os.path.dirname(normalized_path) == normalized_path
+        )
     except Exception:
         return False
+
 
 def remove_file(file_path):
     # 1. 检查是否为有效的文件路径形式
@@ -23,8 +28,8 @@ def remove_file(file_path):
     abs_file_path = file_path.strip()
 
     # 2. 从.chat/.aider_files文件中移除指定文件路径
-    aider_files_path = os.path.join('.chat', '.aider_files')
-    
+    aider_files_path = os.path.join(".chat", ".aider_files")
+
     # 确保.chat目录存在
     if not os.path.exists(aider_files_path):
         print(f"Error: '{aider_files_path}' does not exist.", file=sys.stderr)
@@ -32,7 +37,7 @@ def remove_file(file_path):
 
     # 读取现有文件列表
     existing_files = set()
-    with open(aider_files_path, 'r') as f:
+    with open(aider_files_path, "r") as f:
         existing_files = set(line.strip() for line in f)
 
     # 检查文件是否在列表中
@@ -44,7 +49,7 @@ def remove_file(file_path):
     existing_files.remove(abs_file_path)
 
     # 写入更新后的文件列表
-    with open(aider_files_path, 'w') as f:
+    with open(aider_files_path, "w") as f:
         for file in sorted(existing_files):
             f.write(f"{file}\n")
 
@@ -53,6 +58,7 @@ def remove_file(file_path):
     for file in sorted(existing_files):
         print(f"- {file}")
 
+
 def main():
     if len(sys.argv) != 2 or sys.argv[1].strip() == "":
         print("Usage: /aider.files.remove <file_path>", file=sys.stderr)
@@ -60,6 +66,7 @@ def main():
 
     file_path = sys.argv[1]
     remove_file(file_path)
+
 
 if __name__ == "__main__":
     main()
