@@ -1,0 +1,4 @@
+description: "add files to aider"
+input: required
+steps:
+  - run: $devchat_python $command_path/command.py "$input"
