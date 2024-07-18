@@ -14,11 +14,6 @@ def diff_apply(filepath, content, autoedit=False):
     pass
 
 
-@rpc_call
-def get_symbol_defines_in_selected_code():
-    pass
-
-
 def find_symbol(command, abspath, line, col):
     code = (
         f"const position = new vscode.Position({line}, {col});"
