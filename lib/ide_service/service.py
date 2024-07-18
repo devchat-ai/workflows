@@ -182,3 +182,23 @@ class IDEService:
             The extension tools path.
         """
         return self._result
+
+    @rpc_method
+    def select_range(self, fileName: str, startLine: int, startColumn: int, endLine: int, endColumn: int) -> bool:
+        """
+        Selects a range of text in the specified file.
+
+        Args:
+            fileName: The name of the file.
+            startLine: The starting line of the selection (0-based).
+            startColumn: The starting column of the selection (0-based).
+            endLine: The ending line of the selection (0-based).
+            endColumn: The ending column of the selection (0-based).
+
+        Returns:
+            A boolean indicating whether the selection was successful.
+
+        Note:
+            If startLine is -1, it cancels the current selection.
+        """
+        return self._result
