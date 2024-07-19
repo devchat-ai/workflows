@@ -3,3 +3,4 @@ workflow_python:
   env_name: devchat-pr-env4
   version: 3.11.0
   dependencies: requirements.txt
+help: README.md
