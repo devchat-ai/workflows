@@ -201,7 +201,6 @@ def main():
             button.render()
 
             idx = button.clicked
-            print("click button:", idx)
             if idx == 0:
                 continue
             else:

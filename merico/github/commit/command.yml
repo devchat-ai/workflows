@@ -1,5 +1,6 @@
 description: 'Writes a well-formatted commit message for selected code changes and commits them via Git. Include an issue number if desired (e.g., input "/commit to close #12").'
 hint: to close Issue #issue_number
 input: optional
+help: README.md
 steps:
   - run: $devchat_python $command_path/commit.py "$input" "english"
