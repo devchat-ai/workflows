@@ -1,7 +1,5 @@
-import json
 import os
 import re
-import subprocess
 import sys
 
 from devchat.llm import chat
@@ -82,8 +80,8 @@ def input_issue_descriptions(file_path, issue_line_num):
 
 # step 3 : call llm to generate fix solutions
 SYSTEM_ROLE_DIFF = """
-You are a code refactoring assistant. \
-Your task is to refactor the user's code to fix lint diagnostics. \
+You are a code refactoring assistant.
+Your task is to refactor the user's code to fix lint diagnostics.
 You will be provided with a code snippet and a list of diagnostics. \
 Your response should include two parts:
 
@@ -213,32 +211,6 @@ def call_llm_to_generate_fix_solutions(
     pass
 
 
-APPLY_SYSTEM_PROMPT = """
-Your task is apply the fix solution to the code, \
-output the whole new code in markdown code block format.
-
-Here is the code file:
-{file_content}
-
-Here is the fix solution:
-{fix_solution}
-
-Some rules for output code:
-1. Focus on the fix solution, don't focus on other errors in the code.
-2. Don't change the indentation of the code.
-3. Don't change lines which are not metioned in fix solution, for example, \
-don't remove empty lines in code.
-
-Please output only the whole new code which is the result of \
-applying the fix solution, and output the whole code.
-"""
-
-
-@chat(prompt=APPLY_SYSTEM_PROMPT, stream_out=True, model="deepseek-coder")
-def apply_fix_solution(file_content, fix_solution):
-    pass
-
-
 # current file content
 def get_current_file_content(file_path, issue_line_num):
     try:
@@ -278,150 +250,8 @@ def get_rule_description(issue_description):
     return issue_description
 
 
-def get_file_content(file_path):
-    try:
-        with open(file_path, "r", encoding="utf-8") as file:
-            return file.read()
-    except Exception:
-        print("Error reading file:", file=sys.stderr)
-        return None
-
-
-GLOBAL_CONFIG_PATH = os.path.join(os.path.expanduser("~"), ".chat", ".workflow_config.json")
-
-
-def get_aider_python_path():
-    """
-    Retrieves the path to the Aider Python executable from the global configuration file.
-
-    Returns:
-        str or None: The path to the Aider Python executable if found in the configuration,
-                     or None if the configuration file doesn't exist or the path is not set.
-    """
-    if os.path.exists(GLOBAL_CONFIG_PATH):
-        with open(GLOBAL_CONFIG_PATH, "r", encoding="utf-8") as f:
-            config = json.load(f)
-        return config.get("aider_python2")
-    return None
-
-
-def run_aider(message, file_path):
-    """
-    Run the Aider tool to apply changes to a file based on a given message.
-
-    This function executes the Aider tool with specific parameters to apply changes
-    to the specified file. It captures and returns the output from Aider.
-
-    Args:
-        message (str): The message describing the changes to be made.
-        file_path (str): The path to the file that needs to be modified.
-
-    Returns:
-        str: The output from the Aider tool, containing information about the changes made.
-
-    Raises:
-        SystemExit: If the Aider process returns a non-zero exit code, indicating an error.
-    """
-    python = get_aider_python_path()
-    model = os.environ.get("LLM_MODEL", "gpt-3.5-turbo-1106")
-
-    cmd = [
-        python,
-        "-m",
-        "aider",
-        "--model",
-        f"openai/{model}",
-        "--yes",
-        "--no-auto-commits",
-        "--dry-run",
-        "--no-pretty",
-        "--message",
-        message,
-        file_path,
-    ]
-
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
-    has_started = False
-    aider_output = ""
-    for line in process.stdout:
-        if "run with --help" in line or 'run "aider --help"' in line:
-            has_started = True
-            continue
-        if has_started:
-            aider_output += line
-            print(line, end="", flush=True)
-
-    return_code = process.wait()
-
-    if return_code != 0:
-        for line in process.stderr:
-            print(f"Error: {line.strip()}", file=sys.stderr)
-        sys.exit(return_code)
-
-    return aider_output
-
-
-def apply_changes(changes, file_path):
-    """
-    Apply the changes to the specified file using aider.
-
-    Args:
-        changes (str): The changes to be applied to the file.
-        file_path (str): The path to the file where changes will be applied.
-
-    This function creates a temporary file with the changes, then uses aider to apply
-    these changes to the specified file. It handles the execution of aider and manages
-    the output and potential errors.
-    """
-    changes_file = ".chat/changes.txt"
-    os.makedirs(os.path.dirname(changes_file), exist_ok=True)
-    with open(changes_file, "w", encoding="utf-8") as f:
-        f.write(changes)
-
-    python = get_aider_python_path()
-    model = os.environ.get("LLM_MODEL", "gpt-3.5-turbo-1106")
-
-    cmd = [
-        python,
-        "-m",
-        "aider",
-        "--model",
-        f"openai/{model}",
-        "--yes",
-        "--no-auto-commits",
-        "--apply",
-        changes_file,
-        file_path,
-    ]
-
-    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
-    has_started = False
-    for line in process.stdout:
-        if "Model:" in line:
-            has_started = True
-            continue
-        if has_started:
-            print(line, end="", flush=True)
-
-    return_code = process.wait()
-
-    if return_code != 0:
-        for line in process.stderr:
-            print(f"Error: {line.strip()}", file=sys.stderr)
-        sys.exit(return_code)
-
-    os.remove(changes_file)
-
-
 def main():
-    """
-    Main function to fix issues in the selected code.
-    It retrieves the selected code, gets issue descriptions,
-    generates fix solutions using LLM, and applies the changes.
-    """
-    print("start fix issue ...\n\n", flush=True)
+    print("start fix issue ...\n\n")
     file_path, issue_line, issue_line_num = get_selected_code()
     if not file_path or not issue_line:
         print("No code selected. Please select the code line you want to fix.", file=sys.stderr)
@@ -434,71 +264,22 @@ def main():
         )
         sys.exit(0)
 
-    print("make llm prompt ...\n\n", flush=True)
+    print("make llm prompt ...\n\n")
     current_file_content = get_current_file_content(file_path, issue_line_num)
     rule_description = get_rule_description(issue_description)
     # print("Rule description:\n\n", rule_description, end="\n\n")
 
-    print("call llm to fix issue ...\n\n", flush=True)
+    print("call llm to fix issue ...\n\n")
+    fix_solutions = call_llm_to_generate_fix_solutions(
+        file_content=current_file_content,
+        issue_line_code=issue_line,
+        issue_description=issue_description,
+        rule_description=rule_description,
+    )
+    if not fix_solutions:
+        sys.exit(1)
 
-    # ===> 如果aider python已经安装，则直接调用aider来执行AI访问
-    aider_python = get_aider_python_path()
-
-    if aider_python and os.path.exists(aider_python):
-        python_path = os.environ.get("PYTHONPATH", "")
-        if python_path:
-            # remove PYTHONPATH
-            os.environ.pop("PYTHONPATH")
-        # Use aider-based implementation
-        message = f"""
-Fix issue: {issue_description}
-Which is reported at line: {issue_line}
-
-Rule description: {rule_description}
-"""
-        changes = run_aider(message, file_path)
-        if not changes:
-            print("No changes suggested by aider.")
-            sys.exit(0)
-
-        print("\nApplying changes...\n", flush=True)
-
-        with open(file_path, "r", encoding="utf-8") as f:
-            original_content = f.read()
-
-        apply_changes(changes, file_path)
-
-        with open(file_path, "r", encoding="utf-8") as f:
-            updated_content = f.read()
-
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(original_content)
-
-        os.environ["PYTHONPATH"] = python_path
-
-        # Display changes in IDE
-        IDEService().select_range(file_path, -1, -1, -1, -1)
-        IDEService().diff_apply("", updated_content, False)
-    else:
-        print("No aider python found, using default implementation.", end="\n\n")
-        fix_solutions = call_llm_to_generate_fix_solutions(
-            file_content=current_file_content,
-            issue_line_code=issue_line,
-            issue_description=issue_description,
-            rule_description=rule_description,
-        )
-        if not fix_solutions:
-            sys.exit(1)
-
-        print("\n\n", flush=True)
-
-        print("apply fix solution ...\n\n")
-        updated_content = extract_markdown_block(fix_solutions)
-        if updated_content:
-            # Display changes in IDE
-            IDEService().diff_apply("", updated_content, True)
-
-    print("Changes have been displayed in the IDE.")
+    print("\n\n", flush=True)
 
 
 if __name__ == "__main__":

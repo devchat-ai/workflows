@@ -10,12 +10,7 @@ def run_code(code: str):
 
 
 @rpc_call
-def diff_apply(filepath, content):
-    pass
-
-
-@rpc_call
-def get_symbol_defines_in_selected_code():
+def diff_apply(filepath, content, autoedit=False):
     pass
 
 

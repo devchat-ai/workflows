@@ -9,3 +9,4 @@ custom/*
 !custom/config.yml.example
 
 user_settings.yml
+.aider*

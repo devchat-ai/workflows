@@ -1,0 +1,5 @@
+description: "remove files from aider"
+input: required
+help: README.md
+steps:
+  - run: $devchat_python $command_path/command.py "$input"
