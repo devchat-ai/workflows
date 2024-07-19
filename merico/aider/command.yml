@@ -4,5 +4,6 @@ workflow_python:
   version: 3.11.0
   dependencies: requirements.txt
 input: required
+help: README.md
 steps:
   - run: $workflow_python $command_path/command.py "$input"

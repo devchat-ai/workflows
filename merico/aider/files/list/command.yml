@@ -1,3 +1,4 @@
 description: "list files in aider"
+help: README.md
 steps:
   - run: $devchat_python $command_path/command.py

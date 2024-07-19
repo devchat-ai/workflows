@@ -301,7 +301,7 @@ def get_aider_python_path():
     if os.path.exists(GLOBAL_CONFIG_PATH):
         with open(GLOBAL_CONFIG_PATH, "r", encoding="utf-8") as f:
             config = json.load(f)
-        return config.get("aider_python")
+        return config.get("aider_python2")
     return None
 
 
