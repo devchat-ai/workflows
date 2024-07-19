@@ -1,3 +1,4 @@
 description: 'Config required settings for GIT workflows.'
+help: README.md
 steps:
   - run: $devchat_python $command_path/command.py

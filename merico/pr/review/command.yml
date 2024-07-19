@@ -1,4 +1,5 @@
 description: "review pr"
 input: required
+help: README.md
 steps:
   - run: $workflow_python $command_path/../command.py "$input" review
