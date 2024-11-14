@@ -163,6 +163,57 @@ class Checkbox(Widget):
         self._selections = selections
 
 
+class MultiSelect(Checkbox):
+    """
+    ChatMark syntax:
+    ```chatmark
+    Which files would you like to commit? I've suggested a few.
+    > {x}(file1) devchat/engine/prompter.py
+    > {x}(file2) devchat/prompt.py
+    > {}(file3) tests/test_cli_prompt.py
+    ```
+
+    Response:
+    ```yaml
+    file1: checked
+    file3: checked
+    ```
+    """
+
+    def __init__(
+        self,
+        options: List[str],
+        check_states: Optional[List[bool]] = None,
+        title: Optional[str] = None,
+        submit_button_name: str = "Submit",
+        cancel_button_name: str = "Cancel",
+    ):
+        """
+        options: options to be selected
+        check_states: initial check states of options, default to all False
+        title: title of the widget
+        """
+        super().__init__(options, check_states, title, submit_button_name, cancel_button_name)
+
+    def _in_chatmark(self) -> str:
+        """
+        Generate ChatMark syntax for checkbox options
+        Use the index of option to generate id/key
+        """
+        lines = []
+
+        if self._title:
+            lines.append(self._title)
+
+        for idx, (option, state) in enumerate(zip(self._options, self._states)):
+            mark = "{x}" if state else "{}"
+            key = self.gen_id(self._id_prefix, idx)
+            lines.append(f"> {mark}({key}) {option}")
+
+        text = "\n".join(lines)
+        return text
+
+
 class TextEditor(Widget):
     """
     ChatMark syntax:

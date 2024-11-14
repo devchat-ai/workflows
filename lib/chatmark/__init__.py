@@ -1,6 +1,6 @@
 from .form import Form
 from .step import Step
-from .widgets import Button, Checkbox, Radio, TextEditor
+from .widgets import Button, Checkbox, MultiSelect, Radio, TextEditor
 
 __all__ = [
     "Checkbox",
@@ -9,4 +9,5 @@ __all__ = [
     "Button",
     "Form",
     "Step",
+    "MultiSelect",
 ]
