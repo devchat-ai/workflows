@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -10,21 +11,21 @@ from lib.chatmark import TextEditor
 from lib.ide_service import IDEService
 
 
-def read_github_token():
+def read_gitlab_token():
     config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
     if os.path.exists(config_path):
         with open(config_path, "r", encoding="utf-8") as f:
             config_data = json.load(f)
-            if "github_token" in config_data:
-                return config_data["github_token"]
+            if "gitlab_token" in config_data:
+                return config_data["gitlab_token"]
 
-    # ask user to input github token
-    server_access_token_editor = TextEditor("", "Please input your GITHUB access TOKEN to access:")
+    # ask user to input gitlab token
+    server_access_token_editor = TextEditor("", "Please input your GitLab access TOKEN to access:")
     server_access_token_editor.render()
 
     server_access_token = server_access_token_editor.new_text
     if not server_access_token:
-        print("Please input your GITHUB access TOKEN to continue.")
+        print("Please input your GitLab access TOKEN to continue.")
         sys.exit(-1)
     return server_access_token
 
@@ -107,21 +108,22 @@ def subprocess_check_call(*popenargs, timeout=None, **kwargs):
     return subprocess.check_call(*popenargs, timeout=timeout, **kwargs)
 
 
-GITHUB_ACCESS_TOKEN = read_github_token()
-GITHUB_API_URL = "https://api.github.com"
+GITLAB_ACCESS_TOKEN = read_gitlab_token()
+GITLAB_API_URL = "https://gitlab.com/api/v4"
 
 
-def create_issue(title, body):
+def create_issue(title, description):
     headers = {
-        "Authorization": f"token {GITHUB_ACCESS_TOKEN}",
-        "Accept": "application/vnd.github.v3+json",
+        "Private-Token": GITLAB_ACCESS_TOKEN,
+        "Content-Type": "application/json",
     }
     data = {
         "title": title,
-        "body": body,
+        "description": description,
     }
-    issue_api_url = f"https://api.github.com/repos/{get_github_repo(True)}/issues"
-    response = requests.post(issue_api_url, headers=headers, data=json.dumps(data))
+    project_id = get_gitlab_project_id()
+    issue_api_url = f"{GITLAB_API_URL}/projects/{project_id}/issues"
+    response = requests.post(issue_api_url, headers=headers, json=data)
 
     if response.status_code == 201:
         print("Issue created successfully!")
@@ -131,24 +133,18 @@ def create_issue(title, body):
         return None
 
 
-def update_issue_body(issue_url, issue_body):
-    """
-    Update the body text of a GitHub issue.
-
-    :param issue_url: The API URL of the issue to update.
-    :param issue_body: The new body text for the issue.
-    """
+def update_issue_body(issue_iid, issue_body):
     headers = {
-        "Authorization": f"token {GITHUB_ACCESS_TOKEN}",
-        "Accept": "application/vnd.github.v3+json",
+        "Private-Token": GITLAB_ACCESS_TOKEN,
+        "Content-Type": "application/json",
     }
     data = {
-        "body": issue_body,
+        "description": issue_body,
     }
 
-    issue_api_url = f"https://api.github.com/repos/{get_github_repo(True)}/issues"
-    api_url = f"{issue_api_url}/{issue_url.split('/')[-1]}"
-    response = requests.patch(api_url, headers=headers, data=json.dumps(data))
+    project_id = get_gitlab_project_id()
+    api_url = f"{GITLAB_API_URL}/projects/{project_id}/issues/{issue_iid}"
+    response = requests.put(api_url, headers=headers, json=data)
 
     if response.status_code == 200:
         print("Issue updated successfully!")
@@ -158,19 +154,50 @@ def update_issue_body(issue_url, issue_body):
         return None
 
 
-# parse sub tasks in issue body
-def parse_sub_tasks(body):
+def get_gitlab_project_id():
+    try:
+        result = subprocess_check_output(
+            ["git", "remote", "get-url", "origin"], stderr=subprocess.STDOUT
+        ).strip()
+        repo_url = result.decode("utf-8")
+        print(f"Original repo URL: {repo_url}", file=sys.stderr)
+
+        if repo_url.startswith("git@"):
+            # Handle SSH URL format
+            parts = repo_url.split(":")
+            project_path = parts[1].replace(".git", "")
+        elif repo_url.startswith("https://"):
+            # Handle HTTPS URL format
+            parts = repo_url.split("/")
+            project_path = "/".join(parts[3:]).replace(".git", "")
+        else:
+            raise ValueError(f"Unsupported Git URL format: {repo_url}")
+
+        print(f"Extracted project path: {project_path}", file=sys.stderr)
+        encoded_project_path = requests.utils.quote(project_path, safe="")
+        print(f"Encoded project path: {encoded_project_path}", file=sys.stderr)
+        return encoded_project_path
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing git command: {e}", file=sys.stderr)
+        return None
+    except Exception as e:
+        print(f"Error in get_gitlab_project_id: {e}", file=sys.stderr)
+        return None
+
+
+# parse sub tasks in issue description
+def parse_sub_tasks(description):
     sub_tasks = []
-    lines = body.split("\n")
+    lines = description.split("\n")
     for line in lines:
         if line.startswith("- ["):
             sub_tasks.append(line[2:])
     return sub_tasks
 
 
-def update_sub_tasks(body, tasks):
+def update_sub_tasks(description, tasks):
     # remove all existing tasks
-    lines = body.split("\n")
+    lines = description.split("\n")
     updated_body = "\n".join(line for line in lines if not line.startswith("- ["))
 
     # add new tasks
@@ -179,7 +206,7 @@ def update_sub_tasks(body, tasks):
     return updated_body
 
 
-def update_task_issue_url(body, task, issue_url):
+def update_task_issue_url(description, task, issue_url):
     # task is like:
     # [ ] task name
     # [x] task name
@@ -189,7 +216,7 @@ def update_task_issue_url(body, task, issue_url):
     if task.find("] ") == -1:
         return None
     task = task[task.find("] ") + 2 :]
-    return body.replace(task, f"[{task}]({issue_url})")
+    return description.replace(task, f"[{task}]({issue_url})")
 
 
 def check_git_installed():
@@ -216,59 +243,68 @@ def create_and_checkout_branch(branch_name):
 
 
 def is_issue_url(task):
-    issue_url = f"https://github.com/{get_github_repo(True)}/issues"
-    return task.strip().startswith(issue_url)
+    task = task.strip()
+
+    # 使用正则表达式匹配 http 或 https 开头，issues/数字 结尾的 URL
+    pattern = r"^(http|https)://.*?/issues/\d+$"
+
+    is_issue = bool(re.match(pattern, task))
+
+    # print(f"Task to check: {task}", file=sys.stderr)
+    # print(f"Is issue URL: {is_issue}", file=sys.stderr)
+
+    return is_issue
 
 
 def read_issue_by_url(issue_url):
-    issue_number = issue_url.split("/")[-1]
+    # Extract the issue number and project path from the URL
+    issue_url = issue_url.replace("/-/", "/")
+    parts = issue_url.split("/")
+    issue_number = parts[-1]
+    project_path = "/".join(
+        parts[3:-2]
+    )  # Assumes URL format: https://gitlab.com/project/path/-/issues/number
+
+    # URL encode the project path
+    encoded_project_path = requests.utils.quote(project_path, safe="")
 
     # Construct the API endpoint URL
-    issue_api_url = f"https://api.github.com/repos/{get_github_repo(True)}/issues"
-    api_url = f"{issue_api_url}/{issue_number}"
+    api_url = f"{GITLAB_API_URL}/projects/{encoded_project_path}/issues/{issue_number}"
 
     # Send a GET request to the API endpoint
     headers = {
-        "Accept": "application/vnd.github.v3+json",
-        "Authorization": f"token {GITHUB_ACCESS_TOKEN}",
+        "Private-Token": GITLAB_ACCESS_TOKEN,
+        "Content-Type": "application/json",
     }
     response = requests.get(api_url, headers=headers)
 
     if response.status_code == 200:
         return response.json()
     else:
+        print(f"Error fetching issue: {response.status_code}", file=sys.stderr)
+        print(f"Response content: {response.text}", file=sys.stderr)
         return None
 
 
-def get_github_repo(issue_repo=False):
+def get_gitlab_issue_repo(issue_repo=False):
     try:
         config_path = os.path.join(os.getcwd(), ".chat", ".workflow_config.json")
         if os.path.exists(config_path) and issue_repo:
             with open(config_path, "r", encoding="utf-8") as f:
                 config_data = json.load(f)
-                if "issue_repo" in config_data:
+
+                if "git_issue_repo" in config_data:
+                    issue_repo = requests.utils.quote(config_data["git_issue_repo"], safe="")
                     print(
                         "current issue repo:",
-                        config_data["issue_repo"],
+                        config_data["git_issue_repo"],
                         end="\n\n",
                         file=sys.stderr,
                         flush=True,
                     )
-                    return config_data["issue_repo"]
+                    return config_data["git_issue_repo"]
 
-        # 使用git命令获取当前仓库的URL
-        result = subprocess_check_output(
-            ["git", "remote", "get-url", "origin"], stderr=subprocess.STDOUT
-        ).strip()
-        # 将结果从bytes转换为str并提取出仓库信息
-        repo_url = result.decode("utf-8")
-        # 假设repo_url的格式为：https://github.com/username/repo.git
-        parts = repo_url.split("/")
-        repo = parts[-1].replace(".git", "")
-        username = parts[-2].split(":")[-1]
-        github_repo = f"{username}/{repo}"
-        IDEService().ide_logging("debug", f"current github repo: {github_repo}")
-        return github_repo
+        return get_gitlab_project_id()
     except subprocess.CalledProcessError as e:
         print(e)
         # 如果发生错误，打印错误信息
@@ -308,7 +344,6 @@ def get_parent_branch():
         ).strip()
         # 将结果从bytes转换为str
         parent_branch_ref = result.decode("utf-8")
-        print("==>", parent_branch_ref)
         if parent_branch_ref == current_branch:
             # 如果父分支引用和当前分支相同，说明当前分支可能是基于一个没有父分支的提交创建的
             return None
@@ -330,20 +365,23 @@ def get_parent_branch():
 
 
 def get_issue_info(issue_id):
-    # Construct the API endpoint URL
-    issue_api_url = f"https://api.github.com/repos/{get_github_repo(True)}/issues"
-    api_url = f"{issue_api_url}/{issue_id}"
+    # 获取 GitLab 项目 ID
+    project_id = get_gitlab_issue_repo()
+    # 构造 GitLab API 端点 URL
+    api_url = f"{GITLAB_API_URL}/projects/{project_id}/issues/{issue_id}"
 
-    # Send a GET request to the API endpoint
+    # 发送 GET 请求到 API 端点
     headers = {
-        "Accept": "application/vnd.github.v3+json",
-        "Authorization": f"token {GITHUB_ACCESS_TOKEN}",
+        "Private-Token": GITLAB_ACCESS_TOKEN,
+        "Content-Type": "application/json",
     }
     response = requests.get(api_url, headers=headers)
 
     if response.status_code == 200:
         return response.json()
     else:
+        print(f"Failed to get issue info. Status code: {response.status_code}", file=sys.stderr)
+        print(f"Response content: {response.text}", file=sys.stderr)
         return None
 
 
@@ -391,16 +429,47 @@ def get_commit_messages(base_branch):
 
 
 # 创建PR
-def create_pull_request(title, body, head, base, repo_name):
-    url = f"{GITHUB_API_URL}/repos/{repo_name}/pulls"
-    print("url:", url, end="\n\n")
-    headers = {"Authorization": f"token {GITHUB_ACCESS_TOKEN}", "Content-Type": "application/json"}
-    payload = {"title": title, "body": body, "head": head, "base": base}
-    response = requests.post(url, headers=headers, data=json.dumps(payload))
+def create_pull_request(title, description, source_branch, target_branch, project_id):
+    url = f"{GITLAB_API_URL}/projects/{project_id}/merge_requests"
+    headers = {"Private-Token": GITLAB_ACCESS_TOKEN, "Content-Type": "application/json"}
+    payload = {
+        "title": title,
+        "description": description,
+        "source_branch": source_branch,
+        "target_branch": target_branch,
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
     if response.status_code == 201:
-        return response.json()
+        response_json = response.json()
+        return response_json
+
     print(response.text, end="\n\n", file=sys.stderr)
     return None
+
+
+def get_recently_mr(project_id):
+    project_id = requests.utils.quote(project_id, safe="")
+    url = (
+        f"{GITLAB_API_URL}/projects/{project_id}/"
+        "merge_requests?state=opened&order_by=updated_at&sort=desc"
+    )
+    headers = {
+        "Private-Token": GITLAB_ACCESS_TOKEN,
+        "Content-Type": "application/json",
+    }
+    response = requests.get(url, headers=headers)
+
+    branch_name = get_current_branch()
+
+    if response.status_code == 200:
+        mrs = response.json()
+        for mr in mrs:
+            if mr["source_branch"] == branch_name:
+                return mr
+        return None
+    else:
+        return None
 
 
 def run_command_with_retries(command, retries=3, delay=5):
@@ -416,6 +485,21 @@ def run_command_with_retries(command, retries=3, delay=5):
             else:
                 print("All retries failed.")
     return False
+
+
+def update_mr(project_id, mr_iid, title, description):
+    project_id = requests.utils.quote(project_id, safe="")
+    url = f"{GITLAB_API_URL}/projects/{project_id}/merge_requests/{mr_iid}"
+    headers = {"Private-Token": GITLAB_ACCESS_TOKEN, "Content-Type": "application/json"}
+    payload = {"title": title, "description": description}
+    response = requests.put(url, headers=headers, json=payload)
+
+    if response.status_code == 200:
+        print(f"MR updated successfully: {response.json()['web_url']}")
+        return response.json()
+    else:
+        print("Failed to update MR.")
+        return None
 
 
 def check_unpushed_commits():
@@ -457,13 +541,12 @@ def auto_push():
 
 
 def get_recently_pr(repo):
-    url = f"{GITHUB_API_URL}/repos/{repo}/pulls?state=open&sort=updated"
+    url = f"{GITLAB_API_URL}/repos/{repo}/pulls?state=open&sort=updated"
     headers = {
-        "Authorization": f"token {GITHUB_ACCESS_TOKEN}",
+        "Authorization": f"token {GITLAB_ACCESS_TOKEN}",
         "Accept": "application/vnd.github.v3+json",
     }
     response = requests.get(url, headers=headers)
-    print("=>:", url)
 
     branch_name = get_current_branch()
 
@@ -477,14 +560,14 @@ def get_recently_pr(repo):
         return None
 
 
-def update_pr(pr_number, title, body, repo_name):
-    url = f"{GITHUB_API_URL}/repos/{repo_name}/pulls/{pr_number}"
-    headers = {"Authorization": f"token {GITHUB_ACCESS_TOKEN}", "Content-Type": "application/json"}
-    payload = {"title": title, "body": body}
+def update_pr(pr_number, title, description, repo_name):
+    url = f"{GITLAB_API_URL}/repos/{repo_name}/pulls/{pr_number}"
+    headers = {"Authorization": f"token {GITLAB_ACCESS_TOKEN}", "Content-Type": "application/json"}
+    payload = {"title": title, "description": description}
     response = requests.patch(url, headers=headers, data=json.dumps(payload))
 
     if response.status_code == 200:
-        print(f"PR updated successfully: {response.json()['html_url']}")
+        print(f"PR updated successfully: {response.json()['web_url']}")
         return response.json()
     else:
         print("Failed to update PR.")

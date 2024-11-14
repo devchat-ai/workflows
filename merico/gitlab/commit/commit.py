@@ -323,15 +323,15 @@ def extract_issue_id(branch_name):
 
 
 def get_issue_json(issue_id):
-    issue = {"id": "no issue id", "title": "", "body": ""}
+    issue = {"id": "no issue id", "title": "", "description": ""}
     if issue_id:
         issue = get_issue_info(issue_id)
-        assert_exit(not issue, "Failed to retrieve issue with ID: {issue_id}", exit_code=-1)
+        assert_exit(not issue, f"Failed to retrieve issue with ID: {issue_id}", exit_code=-1)
         issue = {
             "id": issue_id,
-            "html_url": issue["html_url"],
+            "web_url": issue["web_url"],
             "title": issue["title"],
-            "body": issue["body"],
+            "description": issue["description"],
         }
     return issue
 
