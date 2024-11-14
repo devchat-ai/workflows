@@ -12,7 +12,7 @@ from lib.ide_service import IDEService
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 from common_util import assert_exit  # noqa: E402
-from git_api import get_issue_info, subprocess_check_output
+from git_api import get_issue_info, subprocess_check_output, subprocess_run
 
 diff_too_large_message_en = (
     "Commit failed. The modified content is too long "
@@ -219,7 +219,7 @@ def rebuild_stage_list(user_files):
     subprocess_check_output(["git", "reset"])
     # Stage all user_files
     for file in user_files:
-        os.system(f'git add "{file}"')
+        subprocess_run(["git", "add", file])
 
 
 def get_diff():
