@@ -28,13 +28,16 @@ def read_github_token():
         sys.exit(-1)
     return server_access_token
 
+
 current_repo_dir = None
+
+
 def get_current_repo():
     """
     获取当前文件所在的仓库信息
     """
     global current_repo_dir
-    
+
     if not current_repo_dir:
         selected_data = IDEService().get_selected_range().dict()
         current_file = selected_data.get("abspath", None)
@@ -43,48 +46,63 @@ def get_current_repo():
         current_dir = os.path.dirname(current_file)
         try:
             # 获取仓库根目录
-            current_repo_dir = subprocess.check_output(['git', 'rev-parse', '--show-toplevel'],  stderr=subprocess.DEVNULL, cwd=current_dir).decode('utf-8').strip()
+            current_repo_dir = (
+                subprocess.check_output(
+                    ["git", "rev-parse", "--show-toplevel"],
+                    stderr=subprocess.DEVNULL,
+                    cwd=current_dir,
+                )
+                .decode("utf-8")
+                .strip()
+            )
         except subprocess.CalledProcessError:
             # 如果发生错误，可能不在git仓库中
             return None
     return current_repo_dir
 
+
 def subprocess_check_output(*popenargs, timeout=None, **kwargs):
     # 将 current_dir 添加到 kwargs 中的 cwd 参数
     current_repo = get_current_repo()
     if current_repo:
-        kwargs['cwd'] = kwargs.get('cwd', current_repo)
-    
+        kwargs["cwd"] = kwargs.get("cwd", current_repo)
+
     # 调用 subprocess.check_output
     return subprocess.check_output(*popenargs, timeout=timeout, **kwargs)
 
-def subprocess_run(*popenargs,
-                   input=None, capture_output=False, timeout=None, check=False, **kwargs):
+
+def subprocess_run(
+    *popenargs, input=None, capture_output=False, timeout=None, check=False, **kwargs
+):
     current_repo = get_current_repo()
     if current_repo:
-        kwargs['cwd'] = kwargs.get('cwd', current_repo)
-    
+        kwargs["cwd"] = kwargs.get("cwd", current_repo)
+
     # 调用 subprocess.run
-    return subprocess.run(*popenargs,
-                          input=input,
-                          capture_output=capture_output,
-                          timeout=timeout,
-                          check=check,
-                          **kwargs)
+    return subprocess.run(
+        *popenargs,
+        input=input,
+        capture_output=capture_output,
+        timeout=timeout,
+        check=check,
+        **kwargs,
+    )
+
 
 def subprocess_call(*popenargs, timeout=None, **kwargs):
     current_repo = get_current_repo()
     if current_repo:
-        kwargs['cwd'] = kwargs.get('cwd', current_repo)
-    
+        kwargs["cwd"] = kwargs.get("cwd", current_repo)
+
     # 调用 subprocess.call
     return subprocess.call(*popenargs, timeout=timeout, **kwargs)
+
 
 def subprocess_check_call(*popenargs, timeout=None, **kwargs):
     current_repo = get_current_repo()
     if current_repo:
-        kwargs['cwd'] = kwargs.get('cwd', current_repo)
-    
+        kwargs["cwd"] = kwargs.get("cwd", current_repo)
+
     # 调用 subprocess.check_call
     return subprocess.check_call(*popenargs, timeout=timeout, **kwargs)
 
