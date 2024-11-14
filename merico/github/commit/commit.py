@@ -12,7 +12,7 @@ from lib.ide_service import IDEService
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 from common_util import assert_exit  # noqa: E402
-from git_api import get_issue_info
+from git_api import get_issue_info, subprocess_check_output
 
 diff_too_large_message_en = (
     "Commit failed. The modified content is too long "
@@ -137,7 +137,7 @@ def get_modified_files():
         tuple: 包含两个list的元组，第一个list包含当前修改过的文件，第二个list包含已经staged的文件
     """
     """ 获取当前修改文件列表以及已经staged的文件列表"""
-    output = subprocess.check_output(["git", "status", "-s", "-u"], text=True, encoding="utf-8")
+    output = subprocess_check_output(["git", "status", "-s", "-u"], text=True, encoding="utf-8")
     lines = output.split("\n")
     modified_files = []
     staged_files = []
@@ -216,7 +216,7 @@ def rebuild_stage_list(user_files):
 
     """
     # Unstage all files
-    subprocess.check_output(["git", "reset"])
+    subprocess_check_output(["git", "reset"])
     # Stage all user_files
     for file in user_files:
         os.system(f'git add "{file}"')
@@ -233,13 +233,13 @@ def get_diff():
         bytes: 返回bytes类型，是git diff --cached命令的输出结果
 
     """
-    return subprocess.check_output(["git", "diff", "--cached"])
+    return subprocess_check_output(["git", "diff", "--cached"])
 
 
 def get_current_branch():
     try:
         # 使用git命令获取当前分支名称
-        result = subprocess.check_output(
+        result = subprocess_check_output(
             ["git", "branch", "--show-current"], stderr=subprocess.STDOUT
         ).strip()
         # 将结果从bytes转换为str
@@ -313,7 +313,7 @@ def display_commit_message_and_commit(commit_message):
     new_commit_message = text_editor.new_text
     if not new_commit_message:
         return None
-    return subprocess.check_output(["git", "commit", "-m", new_commit_message])
+    return subprocess_check_output(["git", "commit", "-m", new_commit_message])
 
 
 def extract_issue_id(branch_name):
