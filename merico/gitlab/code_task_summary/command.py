@@ -46,7 +46,9 @@ def get_issue_or_task(task):
         issue = read_issue_by_url(task.strip())
         assert_exit(not issue, "Failed to read issue.", exit_code=-1)
 
-        return json.dumps({"id": issue["iid"], "title": issue["title"], "description": issue["description"]})
+        return json.dumps(
+            {"id": issue["iid"], "title": issue["title"], "description": issue["description"]}
+        )
     else:
         return task
 
@@ -84,7 +86,9 @@ def main():
     print("issue id:", issue_id, end="\n\n")
 
     issue = get_issue_json(issue_id, task)
-    assert_exit(not issue["description"], f"Failed to retrieve issue with ID: {issue_id}", exit_code=-1)
+    assert_exit(
+        not issue["description"], f"Failed to retrieve issue with ID: {issue_id}", exit_code=-1
+    )
 
     # Generate 5 branch names
     print("Generating code task summary ...", end="\n\n", flush=True)

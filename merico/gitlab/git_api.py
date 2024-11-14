@@ -164,17 +164,17 @@ def get_gitlab_project_id():
 
         if repo_url.startswith("git@"):
             # Handle SSH URL format
-            parts = repo_url.split(':')
+            parts = repo_url.split(":")
             project_path = parts[1].replace(".git", "")
         elif repo_url.startswith("https://"):
             # Handle HTTPS URL format
-            parts = repo_url.split('/')
-            project_path = '/'.join(parts[3:]).replace(".git", "")
+            parts = repo_url.split("/")
+            project_path = "/".join(parts[3:]).replace(".git", "")
         else:
             raise ValueError(f"Unsupported Git URL format: {repo_url}")
 
         print(f"Extracted project path: {project_path}", file=sys.stderr)
-        encoded_project_path = requests.utils.quote(project_path, safe='')
+        encoded_project_path = requests.utils.quote(project_path, safe="")
         print(f"Encoded project path: {encoded_project_path}", file=sys.stderr)
         return encoded_project_path
     except subprocess.CalledProcessError as e:
@@ -183,6 +183,7 @@ def get_gitlab_project_id():
     except Exception as e:
         print(f"Error in get_gitlab_project_id: {e}", file=sys.stderr)
         return None
+
 
 # parse sub tasks in issue description
 def parse_sub_tasks(description):
@@ -243,27 +244,29 @@ def create_and_checkout_branch(branch_name):
 
 def is_issue_url(task):
     task = task.strip()
-    
+
     # 使用正则表达式匹配 http 或 https 开头，issues/数字 结尾的 URL
-    pattern = r'^(http|https)://.*?/issues/\d+$'
-    
+    pattern = r"^(http|https)://.*?/issues/\d+$"
+
     is_issue = bool(re.match(pattern, task))
-    
+
     # print(f"Task to check: {task}", file=sys.stderr)
     # print(f"Is issue URL: {is_issue}", file=sys.stderr)
-    
+
     return is_issue
 
 
 def read_issue_by_url(issue_url):
     # Extract the issue number and project path from the URL
     issue_url = issue_url.replace("/-/", "/")
-    parts = issue_url.split('/')
+    parts = issue_url.split("/")
     issue_number = parts[-1]
-    project_path = '/'.join(parts[3:-2])  # Assumes URL format: https://gitlab.com/project/path/-/issues/number
+    project_path = "/".join(
+        parts[3:-2]
+    )  # Assumes URL format: https://gitlab.com/project/path/-/issues/number
 
     # URL encode the project path
-    encoded_project_path = requests.utils.quote(project_path, safe='')
+    encoded_project_path = requests.utils.quote(project_path, safe="")
 
     # Construct the API endpoint URL
     api_url = f"{GITLAB_API_URL}/projects/{encoded_project_path}/issues/{issue_number}"
@@ -289,9 +292,9 @@ def get_gitlab_issue_repo(issue_repo=False):
         if os.path.exists(config_path) and issue_repo:
             with open(config_path, "r", encoding="utf-8") as f:
                 config_data = json.load(f)
-        
+
                 if "git_issue_repo" in config_data:
-                    issue_repo = requests.utils.quote(config_data["git_issue_repo"], safe='')
+                    issue_repo = requests.utils.quote(config_data["git_issue_repo"], safe="")
                     print(
                         "current issue repo:",
                         config_data["git_issue_repo"],
@@ -433,9 +436,9 @@ def create_pull_request(title, description, source_branch, target_branch, projec
         "title": title,
         "description": description,
         "source_branch": source_branch,
-        "target_branch": target_branch
+        "target_branch": target_branch,
     }
-    
+
     response = requests.post(url, headers=headers, json=payload)
     if response.status_code == 201:
         response_json = response.json()
@@ -446,8 +449,11 @@ def create_pull_request(title, description, source_branch, target_branch, projec
 
 
 def get_recently_mr(project_id):
-    project_id = requests.utils.quote(project_id, safe='')
-    url = f"{GITLAB_API_URL}/projects/{project_id}/merge_requests?state=opened&order_by=updated_at&sort=desc"
+    project_id = requests.utils.quote(project_id, safe="")
+    url = (
+        f"{GITLAB_API_URL}/projects/{project_id}/"
+        "merge_requests?state=opened&order_by=updated_at&sort=desc"
+    )
     headers = {
         "Private-Token": GITLAB_ACCESS_TOKEN,
         "Content-Type": "application/json",
@@ -482,7 +488,7 @@ def run_command_with_retries(command, retries=3, delay=5):
 
 
 def update_mr(project_id, mr_iid, title, description):
-    project_id = requests.utils.quote(project_id, safe='')
+    project_id = requests.utils.quote(project_id, safe="")
     url = f"{GITLAB_API_URL}/projects/{project_id}/merge_requests/{mr_iid}"
     headers = {"Private-Token": GITLAB_ACCESS_TOKEN, "Content-Type": "application/json"}
     payload = {"title": title, "description": description}
@@ -494,6 +500,7 @@ def update_mr(project_id, mr_iid, title, description):
     else:
         print("Failed to update MR.")
         return None
+
 
 def check_unpushed_commits():
     try:

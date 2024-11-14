@@ -54,7 +54,7 @@ def update_tasks_input(user_input):
 
 def get_issue_json(issue_url):
     issue = get_issue_info_by_url(issue_url)
-    assert_exit(not issue, f"Failed to retrieve issue with ID: {issue_id}", exit_code=-1)
+    assert_exit(not issue, f"Failed to retrieve issue with ID: {issue_url}", exit_code=-1)
     return {
         "id": issue["iid"],
         "web_url": issue["web_url"],
