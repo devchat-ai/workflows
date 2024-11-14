@@ -162,6 +162,7 @@ class Checkbox(Widget):
 
         self._selections = selections
 
+
 class MultiSelect(Checkbox):
     """
     ChatMark syntax:
