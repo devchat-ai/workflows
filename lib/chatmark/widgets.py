@@ -162,7 +162,7 @@ class Checkbox(Widget):
 
         self._selections = selections
 
-class multiSelect(Widget):
+class MultiSelect(Checkbox):
     """
     ChatMark syntax:
     ```chatmark
@@ -192,32 +192,7 @@ class multiSelect(Widget):
         check_states: initial check states of options, default to all False
         title: title of the widget
         """
-        super().__init__(submit_button_name, cancel_button_name)
-
-        if check_states is not None:
-            assert len(options) == len(check_states)
-        else:
-            check_states = [False for _ in options]
-
-        self._options = options
-        self._states = check_states
-        self._title = title
-
-        self._selections: Optional[List[int]] = None
-
-    @property
-    def selections(self) -> Optional[List[int]]:
-        """
-        Get the indices of selected options
-        """
-        return self._selections
-
-    @property
-    def options(self) -> List[str]:
-        """
-        Get the options
-        """
-        return self._options
+        super().__init__(options, check_states, title, submit_button_name, cancel_button_name)
 
     def _in_chatmark(self) -> str:
         """
@@ -236,19 +211,6 @@ class multiSelect(Widget):
 
         text = "\n".join(lines)
         return text
-
-    def _parse_response(self, response: Dict):
-        selections = []
-        for key, value in response.items():
-            prefix, index = self.parse_id(key)
-            # check if the prefix is the same as the widget's
-            if prefix != self._id_prefix:
-                continue
-
-            if value == "checked":
-                selections.append(index)
-
-        self._selections = selections
 
 
 class TextEditor(Widget):
