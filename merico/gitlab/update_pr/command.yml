@@ -1,0 +1,5 @@
+description: 'Create new PR.'
+input: required
+help: README.md
+steps:
+  - run: $devchat_python $command_path/command.py "$input"
