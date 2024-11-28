@@ -66,6 +66,16 @@ def active_text_editor():
     code = "return vscode.window.activeTextEditor;"
     return run_code(code=code)
 
+def get_selected_text():
+    code = """
+    const editor = vscode.window.activeTextEditor;
+    if (editor) {
+        const selection = editor.selection;
+        return editor.document.getText(selection);
+    }
+    return '';
+    """
+    return run_code(code=code)
 
 def open_folder(folder: str):
     folder = folder.replace("\\", "/")
@@ -75,6 +85,20 @@ def open_folder(folder: str):
     )
     run_code(code=code)
 
+
+def get_visible_text():
+    code = """
+    const editor = vscode.window.activeTextEditor;
+    if (editor) {
+        const visibleRanges = editor.visibleRanges;
+        if (visibleRanges.length > 0) {
+            const visibleRange = visibleRanges[0];
+            return editor.document.getText(visibleRange);
+        }
+    }
+    return '';
+    """
+    return run_code(code=code)
 
 def visible_lines():
     active_document = active_text_editor()
@@ -86,22 +110,17 @@ def visible_lines():
 
     if not active_document:
         return fail_result
-    if not os.path.exists(active_document["document"]["uri"]["fsPath"]):
-        return fail_result
 
     file_path = active_document["document"]["uri"]["fsPath"]
     start_line = active_document["visibleRanges"][0][0]["line"]
     end_line = active_document["visibleRanges"][0][1]["line"]
 
-    # read file lines from start_line to end_line
-    with open(file_path, "r", encoding="utf-8") as file:
-        _lines = file.readlines()
-        _visible_lines = _lines[start_line : end_line + 1]
+    # 获取可见文本内容
+    visible_text = get_visible_text()
 
-    # continue with the rest of the function
     return {
         "filePath": file_path,
-        "visibleText": "".join(_visible_lines),
+        "visibleText": visible_text,
         "visibleRange": [start_line, end_line],
     }
 
@@ -134,24 +153,24 @@ def selected_lines():
 
     if not active_document:
         return fail_result
-    if not os.path.exists(active_document["document"]["uri"]["fsPath"]):
-        return fail_result
 
+    # 获取活动文档的文件路径
     file_path = active_document["document"]["uri"]["fsPath"]
+    # 获取选择区域的起始行
     start_line = active_document["selection"]["start"]["line"]
     start_col = active_document["selection"]["start"]["character"]
+    # 获取选择区域的结束行
     end_line = active_document["selection"]["end"]["line"]
+    # 获取选择区域的结束列
     end_col = active_document["selection"]["end"]["character"]
 
-    # read file lines from start_line to end_line
-    with open(file_path, "r", encoding="utf-8") as file:
-        _lines = file.readlines()
-        _selected_lines = _lines[start_line : end_line + 1]
+    # 获取编辑器当前内容
+    selected_text = get_selected_text()
 
     # continue with the rest of the function
     return {
         "filePath": file_path,
-        "selectedText": "".join(_selected_lines),
+        "selectedText": selected_text,
         "selectedRange": [start_line, start_col, end_line, end_col],
     }
 
