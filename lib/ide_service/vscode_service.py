@@ -1,5 +1,3 @@
-import os
-
 from .rpc import rpc_call
 from .types import LocationWithText
 
@@ -66,6 +64,7 @@ def active_text_editor():
     code = "return vscode.window.activeTextEditor;"
     return run_code(code=code)
 
+
 def get_selected_text():
     code = """
     const editor = vscode.window.activeTextEditor;
@@ -76,6 +75,7 @@ def get_selected_text():
     return '';
     """
     return run_code(code=code)
+
 
 def open_folder(folder: str):
     folder = folder.replace("\\", "/")
@@ -99,6 +99,7 @@ def get_visible_text():
     return '';
     """
     return run_code(code=code)
+
 
 def visible_lines():
     active_document = active_text_editor()
