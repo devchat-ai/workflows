@@ -6,7 +6,7 @@ import sys
 
 from devchat.llm import chat_completion_stream
 
-from lib.chatmark import Checkbox, Form, TextEditor
+from lib.chatmark import Button, Checkbox, Form, TextEditor
 from lib.ide_service import IDEService
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
@@ -355,23 +355,84 @@ def check_git_installed():
     return False
 
 
+def ask_for_push():
+    """
+    询问用户是否要推送(push)更改到远程仓库
+
+    Returns:
+        bool: 用户是否选择推送
+    """
+
+    print(
+        "Step 3/3: Would you like to push your commit to the remote repository?",
+        end="\n\n",
+        flush=True,
+    )
+
+    button = Button(["Yes, push now", "No, I'll push later"])
+    button.render()
+
+    return button.clicked == 0  # 如果用户点击第一个按钮(Yes)，则返回True
+
+
+def push_changes():
+    """
+    推送更改到远程仓库
+
+    Returns:
+        bool: 推送是否成功
+    """
+    try:
+        current_branch = get_current_branch()
+        if not current_branch:
+            print(
+                "Could not determine current branch. Push failed.",
+                end="\n\n",
+                file=sys.stderr,
+                flush=True,
+            )
+            return False
+
+        print(f"Pushing changes to origin/{current_branch}...", end="\n\n", flush=True)
+        result = subprocess_run(
+            ["git", "push", "origin", current_branch],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+
+        if result.returncode != 0:
+            print(f"Push failed: {result.stderr}", end="\n\n", flush=True)
+            return False
+        print("Push completed successfully.", end="\n\n", flush=True)
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"Push failed: {str(e)}", end="\n\n", file=sys.stderr, flush=True)
+        return False
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}", end="\n\n", file=sys.stderr, flush=True)
+        return False
+
+
 def main():
     global language
     try:
         print("Let's follow the steps below.\n\n")
         # Ensure enough command line arguments are provided
-        if len(sys.argv) < 3:
+        if len(sys.argv) < 2:
             print("Usage: python script.py <user_input> <language>", file=sys.stderr, flush=True)
             sys.exit(-1)
 
         user_input = sys.argv[1]
-        language = sys.argv[2]
+        language = "english"
+        if len(sys.argv) > 2:
+            language = sys.argv[2]
 
         if not check_git_installed():
             sys.exit(-1)
 
         print(
-            "Step 1/2: Select the files you've changed that you wish to include in this commit, "
+            "Step 1/3: Select the files you've changed that you wish to include in this commit, "
             "then click 'Submit'.",
             end="\n\n",
             flush=True,
@@ -389,7 +450,7 @@ def main():
         rebuild_stage_list(selected_files)
 
         print(
-            "Step 2/2: Review the commit message I've drafted for you. "
+            "Step 2/3: Review the commit message I've drafted for you. "
             "Edit it below if needed. Then click 'Commit' to proceed with "
             "the commit using this message.",
             end="\n\n",
@@ -416,6 +477,12 @@ def main():
         if not commit_result:
             print("Commit aborted.", flush=True)
         else:
+            # 添加推送步骤
+            if ask_for_push():
+                if not push_changes():
+                    print("Push failed.", flush=True)
+                    sys.exit(-1)
+
             print("Commit completed.", flush=True)
         sys.exit(0)
     except Exception as err:

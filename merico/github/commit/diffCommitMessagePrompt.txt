@@ -6,16 +6,18 @@ Objective:** Generate a commit message that succinctly describes the codebase ch
 3. **Closing Reference (Conditional):** Include the line `Closes #IssueNumber` only if a specific, relevant issue number has been mentioned in the user input.
 
 **Response Format:**
-```
+Response should be in the following markdown codeblock format:
+```commit
 type: Title
 
 - Detail message line 1
 - Detail message line 2
 - Detail message line 3
 
-Closes #IssueNumber
+Closes <#IssueNumber>
 ```
 Only append the \"Closes #IssueNumber\" if the user input explicitly references an issue to close.
+Only output the commit message codeblock, don't include any other text.
 
 **Constraints:**
 - Exclude markdown code block indicators (```) and the placeholder \"commit_message\" from your response.
@@ -36,4 +38,12 @@ Determine if `{__USER_INPUT__}` contains a reference to closing an issue. If so,
 Related issue:
 {__ISSUE__}
 Utilize the provided format to craft a commit message that adheres to the stipulated criteria.
+
+example output:
+```commit
+feature: add update user info API
+
+- add post method api /user/update
+- implement update user info logic
+```
 
