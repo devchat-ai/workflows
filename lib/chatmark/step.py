@@ -34,4 +34,3 @@ class Step(AbstractContextManager):
         IDEService().ide_logging(
             "debug", f"Step {self.title} took {end_time - self.enter_time:.2f} seconds"
         )
-        

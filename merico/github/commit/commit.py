@@ -358,36 +358,41 @@ def check_git_installed():
 def ask_for_push():
     """
     询问用户是否要推送(push)更改到远程仓库
-    
+
     Returns:
         bool: 用户是否选择推送
     """
-    from lib.chatmark import Button
-    
+
     print(
         "Step 3/3: Would you like to push your commit to the remote repository?",
         end="\n\n",
         flush=True,
     )
-    
+
     button = Button(["Yes, push now", "No, I'll push later"])
     button.render()
-    
+
     return button.clicked == 0  # 如果用户点击第一个按钮(Yes)，则返回True
+
 
 def push_changes():
     """
     推送更改到远程仓库
-    
+
     Returns:
         bool: 推送是否成功
     """
     try:
         current_branch = get_current_branch()
         if not current_branch:
-            print("Could not determine current branch. Push failed.", end="\n\n", file=sys.stderr, flush=True)
+            print(
+                "Could not determine current branch. Push failed.",
+                end="\n\n",
+                file=sys.stderr,
+                flush=True,
+            )
             return False
-            
+
         print(f"Pushing changes to origin/{current_branch}...", end="\n\n", flush=True)
         result = subprocess_run(
             ["git", "push", "origin", current_branch],
@@ -407,6 +412,7 @@ def push_changes():
     except Exception as e:
         print(f"An unexpected error occurred: {str(e)}", end="\n\n", file=sys.stderr, flush=True)
         return False
+
 
 def main():
     global language
@@ -476,7 +482,7 @@ def main():
                 if not push_changes():
                     print("Push failed.", flush=True)
                     sys.exit(-1)
-                
+
             print("Commit completed.", flush=True)
         sys.exit(0)
     except Exception as err:
