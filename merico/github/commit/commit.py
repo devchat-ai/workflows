@@ -393,7 +393,7 @@ def push_changes():
         print("Push completed successfully.", end="\n\n", flush=True)
         return True
     except subprocess.CalledProcessError as e:
-        print(f"Push failed: {str(e)}", end="\n\n", file=sys.stderr, flush=True)
+        print(f"Push failed: {str(e)}", file=sys.stderr, flush=True)
         return False
 
 def main():
