@@ -26,6 +26,7 @@ class Step(AbstractContextManager):
 
     def __enter__(self):
         print(f"\n```Step\n# {self.title}", flush=True)
+        print("\n```", flush=True)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # close the step
@@ -33,4 +34,4 @@ class Step(AbstractContextManager):
         IDEService().ide_logging(
             "debug", f"Step {self.title} took {end_time - self.enter_time:.2f} seconds"
         )
-        print("\n```", flush=True)
+        
