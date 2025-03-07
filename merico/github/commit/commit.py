@@ -389,11 +389,23 @@ def push_changes():
             return False
             
         print(f"Pushing changes to origin/{current_branch}...", end="\n\n", flush=True)
-        result = subprocess_check_output(["git", "push", "origin", current_branch])
+        result = subprocess_run(
+            ["git", "push", "origin", current_branch],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+
+        if result.returncode != 0:
+            print(f"Push failed: {result.stderr}", end="\n\n", flush=True)
+            return False
         print("Push completed successfully.", end="\n\n", flush=True)
         return True
     except subprocess.CalledProcessError as e:
         print(f"Push failed: {str(e)}", end="\n\n", file=sys.stderr, flush=True)
+        return False
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}", end="\n\n", file=sys.stderr, flush=True)
         return False
 
 def main():
@@ -461,7 +473,9 @@ def main():
         else:
             # 添加推送步骤
             if ask_for_push():
-                push_changes()
+                if not push_changes():
+                    print("Push failed.", flush=True)
+                    sys.exit(-1)
                 
             print("Commit completed.", flush=True)
         sys.exit(0)
