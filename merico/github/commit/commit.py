@@ -385,7 +385,7 @@ def push_changes():
     try:
         current_branch = get_current_branch()
         if not current_branch:
-            print("Could not determine current branch. Push failed.", file=sys.stderr, flush=True)
+            print("Could not determine current branch. Push failed.", end="\n\n", file=sys.stderr, flush=True)
             return False
             
         print(f"Pushing changes to origin/{current_branch}...", end="\n\n", flush=True)
