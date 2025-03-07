@@ -39,3 +39,11 @@ Related issue:
 {__ISSUE__}
 Utilize the provided format to craft a commit message that adheres to the stipulated criteria.
 
+example output:
+```commit
+feature: add update user info API
+
+- add post method api /user/update
+- implement update user info logic
+```
+
