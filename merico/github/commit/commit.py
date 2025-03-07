@@ -388,12 +388,12 @@ def push_changes():
             print("Could not determine current branch. Push failed.", file=sys.stderr, flush=True)
             return False
             
-        print(f"Pushing changes to origin/{current_branch}...", flush=True)
+        print(f"Pushing changes to origin/{current_branch}...", end="\n\n", flush=True)
         result = subprocess_check_output(["git", "push", "origin", current_branch])
-        print("Push completed successfully.", flush=True)
+        print("Push completed successfully.", end="\n\n", flush=True)
         return True
     except subprocess.CalledProcessError as e:
-        print(f"Push failed: {str(e)}", file=sys.stderr, flush=True)
+        print(f"Push failed: {str(e)}", end="\n\n", file=sys.stderr, flush=True)
         return False
 
 def main():
