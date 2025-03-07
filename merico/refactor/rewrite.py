@@ -1,13 +1,12 @@
 import os
 import re
 import sys
-
-from typing import List, Dict, Any, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 from devchat.llm import chat, chat_json
 
+from lib.chatmark import Step
 from lib.ide_service import IDEService
-from lib.chatmark import Step, Form, TextEditor
 
 
 def get_selected_code():
@@ -128,9 +127,6 @@ def replace_selected(new_code):
         file.write(modified_text)
 
 
-
-
-
 # 定义用于分析代码中缺少定义的符号的提示
 SYMBOL_ANALYSIS_PROMPT = """
 角色：你是一个资深的程序工程师，擅长代码分析与代码重构。
@@ -175,13 +171,15 @@ def fun1():
         "symbol": "fun2",
         "line": "    fun2(\"hello\")",
         "value": 0.8,
-        "reason": "不能确定fun2中具体代码逻辑，是否会打印输出参数'hello'，如果是，那么重构只需要修改fun1中参数信息"
+        "reason": "不能确定fun2中具体代码逻辑，是否会打印输出参数'hello'，\
+如果是，那么重构只需要修改fun1中参数信息"
     }},
     {{
         "symbol": "fun3",
         "line": "    fun3(",
         "value": 0.8,
-        "reason": "不能确定fun3中具体代码逻辑，是否会打印输出参数'hello'，如果是，那么重构只需要修改fun1中参数信息"
+        "reason": "不能确定fun3中具体代码逻辑，是否会打印输出参数'hello'，\
+如果是，那么重构只需要修改fun1中参数信息"
     }}
 ]
 ```
@@ -218,54 +216,68 @@ SYMBOL_USAGE_PROMPT = """
 请确保返回的JSON格式正确。
 """
 
+
 @chat_json(prompt=SYMBOL_ANALYSIS_PROMPT)
 def analyze_missing_symbols(code: str, task: str) -> Dict[str, List[Dict[str, Any]]]:
     """
     使用大模型分析代码片段中缺少定义的符号
-    
+
     Args:
         code: 需要分析的代码片段
-        
+
     Returns:
         包含缺少定义的符号列表的字典
     """
     pass
 
+
 @chat_json(prompt=SYMBOL_USAGE_PROMPT)
-def generate_symbol_usage_suggestions(symbol_definitions: str, original_code: str) -> Dict[str, List[Dict[str, Any]]]:
+def generate_symbol_usage_suggestions(
+    symbol_definitions: str, original_code: str
+) -> Dict[str, List[Dict[str, Any]]]:
     """
     基于符号定义生成符号使用建议
-    
+
     Args:
         symbol_definitions: 符号定义的文本表示
         original_code: 原始代码片段
-        
+
     Returns:
         包含符号使用建议的字典
     """
     pass
 
-def get_symbol_definition(abspath: str, line: int, character: int, symbol_name: str, symbol_type: str, project_root_path: str) -> List[Tuple]:
+
+def get_symbol_definition(
+    abspath: str,
+    line: int,
+    character: int,
+    symbol_name: str,
+    symbol_type: str,
+    project_root_path: str,
+) -> List[Tuple]:
     """
     获取符号定义的代码
-    
+
     Args:
         abspath: 文件的绝对路径
         line: 符号所在行
         character: 符号所在列
         symbol_type: 符号类型
-        
+
     Returns:
         符号定义的代码，如果找不到则返回None
     """
     ide_service = IDEService()
     locations = []
     has_visited = set()
-    
+
     # 根据符号类型选择合适的查找方法
     locations1 = ide_service.find_type_def_locations(abspath, line, character)
     locations2 = ide_service.find_def_locations(abspath, line, character)
-    locations3 = ide_service.find_type_def_locations(abspath, line, character + len(symbol_name) - 1)
+    locations3 = ide_service.find_type_def_locations(
+        abspath, line, character + len(symbol_name) - 1
+    )
     locations4 = ide_service.find_def_locations(abspath, line, character + len(symbol_name) - 1)
     for location in locations1 + locations2 + locations3 + locations4:
         if not location.abspath.startswith(project_root_path):
@@ -282,96 +294,98 @@ def get_symbol_definition(abspath: str, line: int, character: int, symbol_name: 
 def format_symbol_results(symbols: List[Dict[str, Any]], definitions: Dict[str, str]) -> str:
     """
     格式化符号分析结果为Markdown格式
-    
+
     Args:
         symbols: 符号列表
         definitions: 符号定义字典
-        
+
     Returns:
         格式化后的Markdown文本
     """
     result = "## 符号分析结果\n\n"
-    
+
     if not symbols:
         return result + "没有找到缺少定义的符号。"
-    
+
     result += f"找到 {len(symbols)} 个可能缺少定义的符号：\n\n"
-    
+
     for i, symbol in enumerate(symbols):
         result += f"### {i+1}. {symbol['name']} ({symbol['type']})\n\n"
         result += f"- 位置: 第{symbol['line'] + 1}行，第{symbol['character'] + 1}列\n"
         result += f"- 原因: {symbol['reason']}\n\n"
-        
-        if symbol['name'] in definitions and definitions[symbol['name']]:
+
+        if symbol["name"] in definitions and definitions[symbol["name"]]:
             result += "#### 找到的定义:\n\n"
             result += f"{definitions[symbol['name']]}\n\n"
         else:
             result += "#### 未找到定义\n\n"
             result += "无法在当前项目中找到此符号的定义。可能是外部库、内置函数或拼写错误。\n\n"
-    
+
     return result
+
 
 def format_usage_suggestions(suggestions: List[Dict[str, Any]]) -> str:
     """
     格式化符号使用建议为Markdown格式
-    
+
     Args:
         suggestions: 符号使用建议列表
-        
+
     Returns:
         格式化后的Markdown文本
     """
     if not suggestions:
         return ""
-    
+
     result = "## 符号使用建议\n\n"
-    
+
     for i, suggestion in enumerate(suggestions):
         result += f"### {i+1}. {suggestion['symbol']}\n\n"
         result += f"**正确使用方法**:\n{suggestion['explanation']}\n\n"
-        
-        if suggestion.get('errors'):
+
+        if suggestion.get("errors"):
             result += f"**可能存在的错误**:\n{suggestion['errors']}\n\n"
-        
-        if suggestion.get('fix'):
+
+        if suggestion.get("fix"):
             result += f"**修复建议**:\n{suggestion['fix']}\n\n"
-        
-        if suggestion.get('example'):
-            result += "**示例代码**:\n```python\n" + suggestion['example'] + "\n```\n\n"
-    
+
+        if suggestion.get("example"):
+            result += "**示例代码**:\n```python\n" + suggestion["example"] + "\n```\n\n"
+
     return result
 
 
 def find_project_root(file_path: str) -> str:
     """
     根据文件路径查找项目根目录
-    
+
     通过向上遍历目录，查找 .git 或 .svn 目录来确定项目根目录
-    
+
     Args:
         file_path: 文件的绝对路径
-        
+
     Returns:
         项目根目录的绝对路径，如果找不到则返回原始文件所在目录
     """
     if not os.path.isabs(file_path):
         file_path = os.path.abspath(file_path)
-        
+
     current_dir = os.path.dirname(file_path)
-    
+
     # 向上遍历目录，直到找到包含 .git 或 .svn 的目录，或者到达根目录
-    while current_dir and current_dir != '/':
+    while current_dir and current_dir != "/":
         # 检查当前目录是否包含 .git 或 .svn
-        if os.path.exists(os.path.join(current_dir, '.git')) or \
-           os.path.exists(os.path.join(current_dir, '.svn')):
+        if os.path.exists(os.path.join(current_dir, ".git")) or os.path.exists(
+            os.path.join(current_dir, ".svn")
+        ):
             return current_dir
-        
+
         # 向上移动一级目录
         parent_dir = os.path.dirname(current_dir)
         if parent_dir == current_dir:  # 防止在Windows根目录下无限循环
             break
         current_dir = parent_dir
-    
+
     # 如果没有找到版本控制目录，返回文件所在目录
     return os.path.dirname(file_path)
 
@@ -382,11 +396,10 @@ def main():
     rafact_task = sys.argv[1]
     # prepare code
 
-
     # 步骤1: 获取用户选中的代码片段
     with Step("获取选中的代码片段..."):
         selected_code = ide_service.get_selected_range()
-        
+
         if not selected_code or not selected_code.text.strip():
             print("请先选择一段代码片段再执行此命令。")
             return
@@ -395,85 +408,82 @@ def main():
     project_root_path = find_project_root(selected_code.abspath)
     print(f"项目根目录: {project_root_path}\n\n")
 
-
     # 步骤2: 分析代码片段中缺少定义的符号
     with Step("分析代码中缺少定义的符号..."):
         try:
             analysis_result = analyze_missing_symbols(code=selected_code.text, task=rafact_task)
             missing_symbols = analysis_result  # 直接获取返回的列表
-            
+
             if not missing_symbols:
                 print("没有找到缺少定义的符号。")
                 return
-                
+
             ide_service.ide_logging("info", f"找到 {len(missing_symbols)} 个可能缺少定义的符号")
         except Exception as e:
             ide_service.ide_logging("error", f"分析符号时出错: {str(e)}")
             print(f"分析代码时出错: {str(e)}")
             return
 
-    current_filepath = selected_code.abspath
     base_line = selected_code.range.start.line
-    # range = "abspath='/Users/boboyang/.chat/scripts/merico/symbol_resolver/command.py' range=line=248 character=0 - line=248 character=24 text=' print(selected_code)'"
 
     # 步骤3: 将分析结果转换为可处理的结构
     with Step("处理符号信息..."):
         symbols = []
         code_lines = selected_code.text.splitlines()
-        
+
         for symbol_info in missing_symbols:
             symbol_name = symbol_info["symbol"]
             symbol_line_text = symbol_info["line"]
-            
+
             # 在代码中查找匹配的行
             line_index = -1
             for i, line in enumerate(code_lines):
                 if line == symbol_line_text:
                     line_index = i
                     break
-            
+
             if line_index == -1:
                 ide_service.ide_logging("warning", f"找不到符号 {symbol_name} 所在行")
                 continue
-            
+
             # 在行中查找符号位置
             char_index = symbol_line_text.find(symbol_name)
             if char_index == -1:
                 ide_service.ide_logging("warning", f"在行中找不到符号 {symbol_name}")
                 continue
-            
+
             # 构建符号信息
             symbol = {
                 "name": symbol_name,
                 "line": base_line + line_index,
                 "character": char_index,
                 "type": "unknown",  # 默认类型
-                "reason": symbol_info.get("reason", "未知原因")
+                "reason": symbol_info.get("reason", "未知原因"),
             }
-            
+
             symbols.append(symbol)
-    
+
     # 步骤3: 查找符号的实际定义
     with Step("查找符号的实际定义..."):
         symbol_definitions = {}
-        
+
         for symbol in symbols:
             symbol_name = symbol["name"]
             symbol_line = symbol.get("line", 0)
             symbol_char = symbol.get("character", 0)
             symbol_type = symbol.get("type", "unknown")
-            
+
             definitions = get_symbol_definition(
-                selected_code.abspath, 
-                symbol_line, 
-                symbol_char, 
+                selected_code.abspath,
+                symbol_line,
+                symbol_char,
                 symbol_name,
                 symbol_type,
-                project_root_path
+                project_root_path,
             )
-            
+
             symbol_definitions[symbol_name] = definitions
-    
+
     # 计算每个文件被引用次数
     files_ref_counts = {}
     # 当前选中代码文件，默认计算100
