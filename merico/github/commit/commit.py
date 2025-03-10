@@ -429,12 +429,15 @@ def push_changes():
 def get_selected_issue_ids():
     """
     获取用户选中的issue id
+
+    Returns:
+        list: 用户选中的issue id列表
     """
     name = get_git_username()
     if not name:
-        return []
-    owner_repo = get_github_repo()
-    issues = get_github_repo_issues(owner_repo, assignee=name, state="open")
+        return
+    issue_repo = get_github_repo(True)
+    issues = get_github_repo_issues(issue_repo, assignee=name, state="open")
     if issues:
         checkbox = Checkbox(
             [f"#{issue['number']}: {issue['title']}" for issue in issues],
@@ -442,7 +445,6 @@ def get_selected_issue_ids():
         )
         checkbox.render()
         return [issues[idx]["number"] for idx in checkbox.selections]
-    return []
 
 
 def main():
@@ -510,8 +512,14 @@ def main():
         # add closes #IssueNumber in commit message from issues from user selected
         issue_ids = get_selected_issue_ids()
         if issue_ids:
+            issue_repo = get_github_repo(True)
+            owner_repo = get_github_repo()
+            closes_issue_contents = []
             for issue_id in issue_ids:
-                commit_message["content"] += f"\n\nCloses #{issue_id}"
+                closes_issue_contents.append(
+                    f"#{issue_id}" if owner_repo == issue_repo else f"{issue_repo}#{issue_id}"
+                )
+            commit_message["content"] += f"\n\nCloses {', '.join(closes_issue_contents)}"
         commit_result = display_commit_message_and_commit(commit_message["content"])
         if not commit_result:
             print("Commit aborted.", flush=True)
