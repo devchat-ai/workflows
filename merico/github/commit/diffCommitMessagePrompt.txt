@@ -13,10 +13,7 @@ type: Title
 - Detail message line 1
 - Detail message line 2
 - Detail message line 3
-
-Closes <#IssueNumber>
 ```
-Only append the \"Closes #IssueNumber\" if the user input explicitly references an issue to close.
 Only output the commit message codeblock, don't include any other text.
 
 **Constraints:**
@@ -24,7 +21,6 @@ Only output the commit message codeblock, don't include any other text.
 - Follow commit message best practices:
   - Limit the title length to 50 characters.
   - Limit each summary line to 72 characters.
-- If the precise issue number is not known or not stated by the user, do not include the closing reference.
 
 **User Input:** `{__USER_INPUT__}`
 
