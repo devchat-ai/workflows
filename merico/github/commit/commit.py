@@ -13,9 +13,9 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 from common_util import assert_exit  # noqa: E402
 from git_api import (
-    get_git_username,
     get_github_repo,
     get_github_repo_issues,
+    get_github_username,
     get_issue_info,
     subprocess_check_output,
     subprocess_run,
@@ -433,9 +433,7 @@ def get_selected_issue_ids():
     Returns:
         list: 用户选中的issue id列表
     """
-    name = get_git_username()
-    if not name:
-        return
+    name = get_github_username()
     issue_repo = get_github_repo(True)
     issues = get_github_repo_issues(issue_repo, assignee=name, state="open")
     if issues:
