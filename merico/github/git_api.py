@@ -203,7 +203,10 @@ def check_git_installed():
     """
     try:
         subprocess_run(
-            ["git", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            ["git", "--version"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
         )
         return True
     except subprocess.CalledProcessError:
@@ -304,7 +307,8 @@ def get_parent_branch():
     try:
         # 使用git命令获取当前分支的父分支引用
         result = subprocess_check_output(
-            ["git", "rev-parse", "--abbrev-ref", f"{current_branch}@{1}"], stderr=subprocess.STDOUT
+            ["git", "rev-parse", "--abbrev-ref", f"{current_branch}@{1}"],
+            stderr=subprocess.STDOUT,
         ).strip()
         # 将结果从bytes转换为str
         parent_branch_ref = result.decode("utf-8")
@@ -394,7 +398,10 @@ def get_commit_messages(base_branch):
 def create_pull_request(title, body, head, base, repo_name):
     url = f"{GITHUB_API_URL}/repos/{repo_name}/pulls"
     print("url:", url, end="\n\n")
-    headers = {"Authorization": f"token {GITHUB_ACCESS_TOKEN}", "Content-Type": "application/json"}
+    headers = {
+        "Authorization": f"token {GITHUB_ACCESS_TOKEN}",
+        "Content-Type": "application/json",
+    }
     payload = {"title": title, "body": body, "head": head, "base": base}
     response = requests.post(url, headers=headers, data=json.dumps(payload))
     if response.status_code == 201:
@@ -479,7 +486,10 @@ def get_recently_pr(repo):
 
 def update_pr(pr_number, title, body, repo_name):
     url = f"{GITHUB_API_URL}/repos/{repo_name}/pulls/{pr_number}"
-    headers = {"Authorization": f"token {GITHUB_ACCESS_TOKEN}", "Content-Type": "application/json"}
+    headers = {
+        "Authorization": f"token {GITHUB_ACCESS_TOKEN}",
+        "Content-Type": "application/json",
+    }
     payload = {"title": title, "body": body}
     response = requests.patch(url, headers=headers, data=json.dumps(payload))
 
@@ -526,3 +536,46 @@ def save_last_base_branch(base_branch=None):
         base_branch = get_current_branch()
     project_config_path = os.path.join(os.getcwd(), ".chat", ".workflow_config.json")
     save_config_item(project_config_path, "last_base_branch", base_branch)
+
+
+def get_git_username():
+    return subprocess_check_output(["git", "config", "--get", "user.name"]).decode("utf-8").strip()
+
+
+def get_github_repo_issues(
+    owner_repo,
+    milestone=None,
+    state=None,
+    assignee=None,
+    creator=None,
+    mentioned=None,
+    labels=None,
+    sort=None,
+    direction=None,
+    since=None,
+    per_page=None,
+    page=None,
+):
+    url = f"{GITHUB_API_URL}/repos/{owner_repo}/issues"
+    headers = {
+        "Authorization": f"token {GITHUB_ACCESS_TOKEN}",
+        "Accept": "application/vnd.github.v3+json",
+    }
+    params = {
+        "milestone": milestone,
+        "state": state,
+        "assignee": assignee,
+        "creator": creator,
+        "mentioned": mentioned,
+        "labels": labels,
+        "sort": sort,
+        "direction": direction,
+        "since": since,
+        "per_page": per_page,
+        "page": page,
+    }
+    response = requests.get(url, headers=headers, params=params)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None

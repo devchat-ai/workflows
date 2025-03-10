@@ -12,7 +12,14 @@ from lib.ide_service import IDEService
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 from common_util import assert_exit  # noqa: E402
-from git_api import get_issue_info, subprocess_check_output, subprocess_run
+from git_api import (
+    get_git_username,
+    get_github_repo,
+    get_github_repo_issues,
+    get_issue_info,
+    subprocess_check_output,
+    subprocess_run,
+)
 
 diff_too_large_message_en = (
     "Commit failed. The modified content is too long "
@@ -410,8 +417,32 @@ def push_changes():
         print(f"Push failed: {str(e)}", end="\n\n", file=sys.stderr, flush=True)
         return False
     except Exception as e:
-        print(f"An unexpected error occurred: {str(e)}", end="\n\n", file=sys.stderr, flush=True)
+        print(
+            f"An unexpected error occurred: {str(e)}",
+            end="\n\n",
+            file=sys.stderr,
+            flush=True,
+        )
         return False
+
+
+def get_selected_issue_ids():
+    """
+    获取用户选中的issue id
+    """
+    name = get_git_username()
+    if not name:
+        return []
+    owner_repo = get_github_repo()
+    issues = get_github_repo_issues(owner_repo, assignee=name, state="open")
+    if issues:
+        checkbox = Checkbox(
+            [f"#{issue['number']}: {issue['title']}" for issue in issues],
+            title="Select the issues you want to close",
+        )
+        checkbox.render()
+        return [issues[idx]["number"] for idx in checkbox.selections]
+    return []
 
 
 def main():
@@ -420,7 +451,11 @@ def main():
         print("Let's follow the steps below.\n\n")
         # Ensure enough command line arguments are provided
         if len(sys.argv) < 2:
-            print("Usage: python script.py <user_input> <language>", file=sys.stderr, flush=True)
+            print(
+                "Usage: python script.py <user_input> <language>",
+                file=sys.stderr,
+                flush=True,
+            )
             sys.exit(-1)
 
         user_input = sys.argv[1]
@@ -472,7 +507,11 @@ def main():
             .replace("No specific issue to close", "")
             .replace("No specific issue mentioned.", "")
         )
-
+        # add closes #IssueNumber in commit message from issues from user selected
+        issue_ids = get_selected_issue_ids()
+        if issue_ids:
+            for issue_id in issue_ids:
+                commit_message["content"] += f"\n\nCloses #{issue_id}"
         commit_result = display_commit_message_and_commit(commit_message["content"])
         if not commit_result:
             print("Commit aborted.", flush=True)
