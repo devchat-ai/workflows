@@ -538,8 +538,14 @@ def save_last_base_branch(base_branch=None):
     save_config_item(project_config_path, "last_base_branch", base_branch)
 
 
-def get_git_username():
-    return subprocess_check_output(["git", "config", "--get", "user.name"]).decode("utf-8").strip()
+def get_github_username():
+    url = f"{GITHUB_API_URL}/user"
+    headers = {
+        "Authorization": f"token {GITHUB_ACCESS_TOKEN}",
+        "Accept": "application/vnd.github.v3+json",
+    }
+    response = requests.get(url, headers=headers)
+    return response.json()["login"]
 
 
 def get_github_repo_issues(
