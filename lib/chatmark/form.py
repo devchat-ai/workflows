@@ -22,9 +22,9 @@ class Form:
         components: components in the form, can be widgets (except Button) or strings
         title: title of the form
         """
-        assert any(isinstance(c, Button) for c in components) is False, (
-            "Button is not allowed in Form"
-        )
+        assert (
+            any(isinstance(c, Button) for c in components) is False
+        ), "Button is not allowed in Form"
 
         self._components = components
         self._title = title

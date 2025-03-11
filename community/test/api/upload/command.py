@@ -8,6 +8,7 @@ import requests
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(ROOT_DIR)
 
+# noqa: I001
 from api.utils import (  # noqa: E402
     OPENAPI_URL,
     PROJECT_ID,
@@ -15,8 +16,9 @@ from api.utils import (  # noqa: E402
     VERSION_URL,
     get_path_op_id,
     session,
-)  # noqa: E402
+)
 
+# noqa: E402
 from lib.chatmark.step import Step  # noqa: E402
 
 
