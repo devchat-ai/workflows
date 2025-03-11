@@ -3,6 +3,8 @@ import os
 import sys
 
 import click
+from cache import LocalCache
+
 import openai
 
 sys.path.append(os.path.dirname(__file__))
@@ -15,7 +17,7 @@ from model import (
 )
 from ut_workflow import UnitTestsWorkflow
 
-from cache import LocalCache
+
 from lib.chatmark import Step
 from lib.ide_service import IDEService
 
