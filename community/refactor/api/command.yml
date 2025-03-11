@@ -1,0 +1,5 @@
+description: 对选中代码进行API重构
+input: required
+help: README.md
+steps:
+  - run: $devchat_python $command_path/command.py "$input"
