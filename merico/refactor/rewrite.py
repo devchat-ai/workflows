@@ -63,7 +63,7 @@ REWRITE_PROMPT = prompt = """
 """
 
 
-@chat(prompt=REWRITE_PROMPT, stream_out=True)
+@chat(prompt=REWRITE_PROMPT, stream_out=False)
 # pylint: disable=unused-argument
 def ai_rewrite(question, selected_text, context_code):
     """
