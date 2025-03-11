@@ -1,4 +1,4 @@
-# ruff: noqa: E402
+# ruff: noqa: E402 I001
 import os
 import sys
 
