@@ -8,7 +8,7 @@ import requests
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(ROOT_DIR)
 
-from api.utils import (
+from api.utils import (  # noqa: E402
     OPENAPI_URL,
     PROJECT_ID,
     SERVER_URL,

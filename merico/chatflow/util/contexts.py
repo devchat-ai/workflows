@@ -57,7 +57,7 @@ def load_existing_workflow_defines() -> str:
                 with open(os.path.join(root, "command.yml"), "r") as f:
                     wrkflow_defines.append(
                         (
-                            f"工作流命令/{root[len(root_path)+1:].replace(os.sep, '.')}的定义："
+                            f"工作流命令/{root[len(root_path) + 1 :].replace(os.sep, '.')}的定义："
                             f"\n{f.read()}\n\n"
                         )
                     )

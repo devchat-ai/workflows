@@ -293,7 +293,10 @@ class UnitTestsWorkflow:
             width = len(str(len(contexts)))
             lines.extend(
                 [
-                    f"{(i + 1):>{width}}. {c.file_path}:{c.range.start.line + 1}-{c.range.end.line + 1}"
+                    (
+                        f"{(i + 1):>{width}}. {c.file_path}:"
+                        f"{c.range.start.line + 1}-{c.range.end.line + 1}"
+                    )
                     for i, c in enumerate(contexts)
                 ]
             )
