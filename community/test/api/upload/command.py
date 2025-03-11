@@ -8,9 +8,17 @@ import requests
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(ROOT_DIR)
 
-from api.utils import PROJECT_ID, SERVER_URL, OPENAPI_URL, VERSION_URL, get_path_op_id, session
+from api.utils import (  # noqa: E402
+    OPENAPI_URL,
+    PROJECT_ID,
+    SERVER_URL,
+    VERSION_URL,
+    get_path_op_id,
+    session,
+)  # noqa: E402
 
-from lib.chatmark.step import Step
+from lib.chatmark.step import Step  # noqa: E402
+
 
 def get_apidocs():
     res = session.get(
@@ -23,9 +31,7 @@ def get_apidocs():
 def delete_old_apidocs():
     apidocs = get_apidocs()
     for apidoc in apidocs:
-        session.delete(
-            f"{SERVER_URL}/autotest/projects/{PROJECT_ID}/apidocs/{apidoc['id']}"
-        )
+        session.delete(f"{SERVER_URL}/autotest/projects/{PROJECT_ID}/apidocs/{apidoc['id']}")
 
 
 def get_local_version():
@@ -39,7 +45,7 @@ def check_api_version():
     if not VERSION_URL:
         print("未配置VERSION_URL，跳过API版本检查...")
         return
-        
+
     local_version = get_local_version()
     print("检查被测服务器文档是否已经更新到最新版本...")
     while True:
@@ -51,7 +57,7 @@ def check_api_version():
                 break
             else:
                 print(
-                    f".",
+                    ".",
                     end="",
                     flush=True,
                 )
@@ -74,7 +80,7 @@ def wait_for_testcase_done(testcase_id):
                 break
             else:
                 print(
-                    f".",
+                    ".",
                     end="",
                     flush=True,
                 )
@@ -95,7 +101,7 @@ def wait_for_testcode_done(task_id):
                 break
             else:
                 print(
-                    f".",
+                    ".",
                     end="",
                     flush=True,
                 )
@@ -124,7 +130,7 @@ def wait_for_task_done(task_id):
                 break
             else:
                 print(
-                    f".",
+                    ".",
                     end="",
                     flush=True,
                 )
@@ -143,9 +149,7 @@ def get_testcase(api_path_id):
 
 
 def main():
-    error_msg = (
-        "请输入要测试的API名称和测试目标！如：/test.api.upload api_path method test_target"
-    )
+    error_msg = "请输入要测试的API名称和测试目标！如：/test.api.upload api_path method test_target"
     if len(sys.argv) < 2:
         print(error_msg)
         return
@@ -160,15 +164,13 @@ def main():
     with Step("检查 API 版本是否更新..."):
         check_api_version()
         delete_old_apidocs()
-    
-    with Step(
-        f"上传 OpenAPI 文档，并且触发 API {api_path} 的测试用例和自动测试脚本生成任务..."
-    ):
+
+    with Step(f"上传 OpenAPI 文档，并且触发 API {api_path} 的测试用例和自动测试脚本生成任务..."):
         # 使用配置的OPENAPI_URL
         if not OPENAPI_URL:
             print("错误：未配置OPENAPI_URL，无法获取OpenAPI文档")
             return
-            
+
         res = requests.get(
             OPENAPI_URL,
         )
@@ -219,7 +221,7 @@ def main():
         else:
             print(f"提交执行自动测试脚本失败！{res.text}")
             return
-    
+
     api_path_id = get_path_op_id(api_path, method)
     with Step("开始查询测试脚本执行结果..."):
         while True:
