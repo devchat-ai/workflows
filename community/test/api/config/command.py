@@ -2,8 +2,6 @@ import json
 import os
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-
 from lib.chatmark import Form, TextEditor  # 导入 ChatMark 组件
 
 

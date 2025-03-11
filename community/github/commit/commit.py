@@ -293,7 +293,7 @@ def generate_commit_message_base_diff(user_input, diff, issue):
     if (
         not response["content"]
         and response.get("error", None)
-        and f'{response["error"]}'.find("This model's maximum context length is") > 0
+        and f"{response['error']}".find("This model's maximum context length is") > 0
     ):
         print(model_token_limit_error)
         sys.exit(0)
