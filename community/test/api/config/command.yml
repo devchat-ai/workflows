@@ -1,0 +1,4 @@
+description: '配置 API 测试所需的全局和仓库相关设置'
+help: README.md
+steps:
+  - run: $devchat_python $command_path/command.py

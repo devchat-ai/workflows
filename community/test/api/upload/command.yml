@@ -1,0 +1,4 @@
+description: 上传 API 文档，生成目标 API 的测试用例和测试脚本并执行测试代码。输入形式为：APIPATH METHOD API重构描述
+input: required
+steps:
+  - run: $devchat_python $command_path/command.py "$input"

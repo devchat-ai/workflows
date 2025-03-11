@@ -1,13 +1,14 @@
-# ruff: noqa: E402
+# ruff: noqa: E402 I001
 import os
 import sys
 
 import click
+from cache import LocalCache
 import openai
+
 
 sys.path.append(os.path.dirname(__file__))
 
-from cache import LocalCache
 from i18n import TUILanguage, get_translation
 from model import (
     FuncToTest,

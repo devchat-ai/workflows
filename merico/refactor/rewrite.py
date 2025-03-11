@@ -63,7 +63,7 @@ REWRITE_PROMPT = prompt = """
 """
 
 
-@chat(prompt=REWRITE_PROMPT, stream_out=True)
+@chat(prompt=REWRITE_PROMPT, stream_out=False)
 # pylint: disable=unused-argument
 def ai_rewrite(question, selected_text, context_code):
     """
@@ -310,7 +310,7 @@ def format_symbol_results(symbols: List[Dict[str, Any]], definitions: Dict[str, 
     result += f"找到 {len(symbols)} 个可能缺少定义的符号：\n\n"
 
     for i, symbol in enumerate(symbols):
-        result += f"### {i+1}. {symbol['name']} ({symbol['type']})\n\n"
+        result += f"### {i + 1}. {symbol['name']} ({symbol['type']})\n\n"
         result += f"- 位置: 第{symbol['line'] + 1}行，第{symbol['character'] + 1}列\n"
         result += f"- 原因: {symbol['reason']}\n\n"
 
@@ -340,7 +340,7 @@ def format_usage_suggestions(suggestions: List[Dict[str, Any]]) -> str:
     result = "## 符号使用建议\n\n"
 
     for i, suggestion in enumerate(suggestions):
-        result += f"### {i+1}. {suggestion['symbol']}\n\n"
+        result += f"### {i + 1}. {suggestion['symbol']}\n\n"
         result += f"**正确使用方法**:\n{suggestion['explanation']}\n\n"
 
         if suggestion.get("errors"):

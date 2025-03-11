@@ -1,6 +1,6 @@
+# ruff: noqa: I001
 from typing import Dict, List, Tuple
 
-from cache import LocalCache
 from find_context import (
     Context,
     Position,
@@ -18,6 +18,7 @@ from propose_test import propose_test
 from tools.file_util import retrieve_file_content
 from write_tests import write_and_print_tests
 
+from cache import LocalCache
 from lib.chatmark import Checkbox, Form, Step, TextEditor
 
 
@@ -189,8 +190,7 @@ class UnitTestsWorkflow:
         case_editor = TextEditor(
             text="",
             title=_i(
-                "You can add more test cases here\n"
-                "(Multiple cases can be separated by line breaks)"
+                "You can add more test cases here\n(Multiple cases can be separated by line breaks)"
             ),
         )
         ref_editor = TextEditor(
@@ -263,7 +263,7 @@ class UnitTestsWorkflow:
 
         lines.append(_i("\nTest cases:"))
         width = len(str(len(cases)))
-        lines.extend([f"{(i+1):>{width}}. {c}" for i, c in enumerate(cases)])
+        lines.extend([f"{(i + 1):>{width}}. {c}" for i, c in enumerate(cases)])
 
         if not valid_files:
             lines.append(
@@ -276,7 +276,7 @@ class UnitTestsWorkflow:
             lines.append(_i("\nWill use the following reference files to generate tests."))
             # lines.append(_i("\nValid reference files:"))
             width = len(str(len(valid_files)))
-            lines.extend([f"{(i+1):>{width}}. {f}" for i, f in enumerate(valid_files)])
+            lines.extend([f"{(i + 1):>{width}}. {f}" for i, f in enumerate(valid_files)])
 
         # if invalid_files:
         #     lines.append(_i("\nInvalid files:"))
@@ -294,7 +294,10 @@ class UnitTestsWorkflow:
             width = len(str(len(contexts)))
             lines.extend(
                 [
-                    f"{(i+1):>{width}}. {c.file_path}:{c.range.start.line+1}-{c.range.end.line+1}"
+                    (
+                        f"{(i + 1):>{width}}. {c.file_path}:"
+                        f"{c.range.start.line + 1}-{c.range.end.line + 1}"
+                    )
                     for i, c in enumerate(contexts)
                 ]
             )

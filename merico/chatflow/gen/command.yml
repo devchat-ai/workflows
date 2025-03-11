@@ -1,0 +1,4 @@
+description: 生成工作流命令，输入命令信息
+input: required
+steps:
+  - run: $devchat_python $command_path/command.py "$input"
