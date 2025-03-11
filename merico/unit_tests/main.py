@@ -3,9 +3,9 @@ import os
 import sys
 
 import click
-from cache import LocalCache
-
 import openai
+
+from cache import LocalCache
 
 sys.path.append(os.path.dirname(__file__))
 
@@ -16,7 +16,6 @@ from model import (
     UserCancelledException,
 )
 from ut_workflow import UnitTestsWorkflow
-
 
 from lib.chatmark import Step
 from lib.ide_service import IDEService

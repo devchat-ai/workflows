@@ -1,4 +1,3 @@
-from cache import LocalCache
 from typing import Dict, List, Tuple
 
 from find_context import (
@@ -18,6 +17,7 @@ from propose_test import propose_test
 from tools.file_util import retrieve_file_content
 from write_tests import write_and_print_tests
 
+from cache import LocalCache
 from lib.chatmark import Checkbox, Form, Step, TextEditor
 
 
