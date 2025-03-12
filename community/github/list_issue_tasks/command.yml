@@ -1,4 +1,4 @@
-description: 'Create new issue.'
+description: 'List issue tasks.'
 input: required
 help: README.md
 steps:

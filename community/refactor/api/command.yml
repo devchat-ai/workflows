@@ -1,4 +1,4 @@
-description: 对选中代码进行API重构
+description: Refactor for selected api.
 input: required
 help: README.md
 steps:
