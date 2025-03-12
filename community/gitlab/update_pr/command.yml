@@ -1,4 +1,4 @@
-description: 'Create new PR.'
+description: 'Update PR.'
 input: required
 help: README.md
 steps:

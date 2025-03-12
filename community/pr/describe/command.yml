@@ -1,4 +1,4 @@
-description: "review pr"
+description: "Describe PR."
 input: required
 help: README.md
 steps:

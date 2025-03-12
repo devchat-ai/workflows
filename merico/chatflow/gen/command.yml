@@ -1,4 +1,4 @@
-description: 生成工作流命令，输入命令信息
+description: 'Generate workflow command, input command information.'
 input: required
 steps:
   - run: $devchat_python $command_path/command.py "$input"

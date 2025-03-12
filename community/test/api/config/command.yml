@@ -1,4 +1,4 @@
-description: '配置 API 测试所需的全局和仓库相关设置'
+description: 'Configure global and repository-specific settings for API testing.'
 help: README.md
 steps:
   - run: $devchat_python $command_path/command.py
