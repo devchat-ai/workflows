@@ -23,10 +23,15 @@ from lib.chatmark.step import Step  # noqa: E402
 
 
 def get_apidocs():
+    print("----")
+    print(f"{SERVER_URL}/autotest/projects/{PROJECT_ID}/apidocs")
+    
     res = session.get(
         f"{SERVER_URL}/autotest/projects/{PROJECT_ID}/apidocs",
         params={"page": 1, "size": 100},
     )
+    print(res.text)
+    # exit(0)
     return res.json()["docs"]
 
 
@@ -179,7 +184,7 @@ def main():
         res = session.post(
             f"{SERVER_URL}/autotest/projects/{PROJECT_ID}/apidocs",
             files={"file": ("openapi.json", res.content, "application/json")},
-            data={"apiauth_id": 46},
+            data={"apiauth_id": 1},
         )
         if res.status_code == 200:
             print("上传 OpenAPI 文档成功！\n")
