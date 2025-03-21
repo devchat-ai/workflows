@@ -30,8 +30,7 @@ def get_apidocs():
     return res.json()["docs"]
 
 
-def delete_old_apidocs():
-    apidocs = get_apidocs()
+def delete_old_apidocs(apidocs):
     for apidoc in apidocs:
         session.delete(f"{SERVER_URL}/autotest/projects/{PROJECT_ID}/apidocs/{apidoc['id']}")
 
@@ -162,10 +161,10 @@ def main():
     api_path = args[0]
     method = args[1]
     test_target = " ".join(args[2:])
-
+    docs = get_apidocs()
     with Step("检查 API 版本是否更新..."):
         check_api_version()
-        delete_old_apidocs()
+        delete_old_apidocs(docs)
 
     with Step(f"上传 OpenAPI 文档，并且触发 API {api_path} 的测试用例和自动测试脚本生成任务..."):
         # 使用配置的OPENAPI_URL
@@ -179,7 +178,7 @@ def main():
         res = session.post(
             f"{SERVER_URL}/autotest/projects/{PROJECT_ID}/apidocs",
             files={"file": ("openapi.json", res.content, "application/json")},
-            data={"apiauth_id": 46},
+            data={"apiauth_id": docs[0]["apiauth_id"]},
         )
         if res.status_code == 200:
             print("上传 OpenAPI 文档成功！\n")
