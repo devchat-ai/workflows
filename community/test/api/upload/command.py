@@ -23,15 +23,10 @@ from lib.chatmark.step import Step  # noqa: E402
 
 
 def get_apidocs():
-    print("----")
-    print(f"{SERVER_URL}/autotest/projects/{PROJECT_ID}/apidocs")
-    
     res = session.get(
         f"{SERVER_URL}/autotest/projects/{PROJECT_ID}/apidocs",
         params={"page": 1, "size": 100},
     )
-    print(res.text)
-    # exit(0)
     return res.json()["docs"]
 
 
