@@ -230,14 +230,6 @@ def main():
     api_path_id = get_path_op_id(api_path, method)
     with Step("开始查询测试脚本执行结果..."):
         while True:
-            res = session.get(
-                f"{SERVER_URL}/autotest/projects/{PROJECT_ID}/tasks",
-                params={"page": 1, "size": 1},
-            )
-            ret = res.json()
-            task = ret["tasks"][0]
-            task_id = task["id"]
-            wait_for_task_done(task_id)
             testcase = get_testcase(api_path_id)
             last_testcode_passed = testcase["last_testcode_passed"]
             if last_testcode_passed:
