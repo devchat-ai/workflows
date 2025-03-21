@@ -179,7 +179,7 @@ def main():
         res = session.post(
             f"{SERVER_URL}/autotest/projects/{PROJECT_ID}/apidocs",
             files={"file": ("openapi.json", res.content, "application/json")},
-            data={"apiauth_id": 46},
+            data={"apiauth_id": 1},
         )
         if res.status_code == 200:
             print("上传 OpenAPI 文档成功！\n")
