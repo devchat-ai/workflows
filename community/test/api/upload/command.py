@@ -48,13 +48,13 @@ def check_api_version():
         return
 
     local_version = get_local_version()
-    print("检查被测服务器文档是否已经更新到最新版本...")
+    print("检查被测服务器文档是否已经更新到最新版本...", flush=True)
     while True:
         try:
             res = session.get(VERSION_URL)
             version = res.json()["version"]
             if version == local_version:
-                print(f"API 文档已更新，当前版本为 {version}，开始上传 OpenAPI 文档...")
+                print(f"API 文档已更新，当前版本为 {version}，开始上传 OpenAPI 文档...", flush=True)
                 break
             else:
                 print(
@@ -126,7 +126,11 @@ def wait_for_task_done(task_id):
             res = session.get(f"{SERVER_URL}/tasks/{task_id}")
             data = res.json()
             status = data["status"]
-            if status == "succeeded":
+
+            CREATED = "created"
+            RUNNING = "running"
+            WAITING = "waiting"
+            if status not in [CREATED, RUNNING, WAITING]:
                 print("自动测试脚本执行完成！", flush=True)
                 break
             else:
