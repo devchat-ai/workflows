@@ -10,7 +10,7 @@ from common_util import assert_exit, ui_edit  # noqa: E402
 from git_api import (  # noqa: E402
     check_git_installed,
     get_current_branch,
-    get_gitlab_issue_repo,
+    get_gitlab_repo,
     get_issue_info,
     is_issue_url,
     read_issue_by_url,
@@ -76,7 +76,7 @@ def main():
 
     task = sys.argv[1]
 
-    repo_name = get_gitlab_issue_repo()
+    repo_name = get_gitlab_repo()
     branch_name = get_current_branch()
     issue_id = extract_issue_id(branch_name)
 

@@ -7,8 +7,8 @@ import time
 
 import requests
 
-from lib.chatmark import TextEditor
 from lib.ide_service import IDEService
+from lib.workflow.call import workflow_call
 
 
 def read_gitlab_token():
@@ -16,18 +16,11 @@ def read_gitlab_token():
     if os.path.exists(config_path):
         with open(config_path, "r", encoding="utf-8") as f:
             config_data = json.load(f)
-            if "gitlab_token" in config_data:
-                return config_data["gitlab_token"]
-
-    # ask user to input gitlab token
-    server_access_token_editor = TextEditor("", "Please input your GitLab access TOKEN to access:")
-    server_access_token_editor.render()
-
-    server_access_token = server_access_token_editor.new_text
-    if not server_access_token:
-        print("Please input your GitLab access TOKEN to continue.")
-        sys.exit(-1)
-    return server_access_token
+            if "gitlab_token" in config_data and "gitlab_api_url" in config_data:
+                return config_data["gitlab_token"], config_data["gitlab_api_url"]
+    else:
+        workflow_call("/gitlab.config")
+    return read_gitlab_token()
 
 
 current_repo_dir = None
@@ -108,8 +101,7 @@ def subprocess_check_call(*popenargs, timeout=None, **kwargs):
     return subprocess.check_call(*popenargs, timeout=timeout, **kwargs)
 
 
-GITLAB_ACCESS_TOKEN = read_gitlab_token()
-GITLAB_API_URL = "https://gitlab.com/api/v4"
+GITLAB_ACCESS_TOKEN, GITLAB_API_URL = read_gitlab_token()
 
 
 def create_issue(title, description):
@@ -286,7 +278,7 @@ def read_issue_by_url(issue_url):
         return None
 
 
-def get_gitlab_issue_repo(issue_repo=False):
+def get_gitlab_repo(issue_repo=False):
     try:
         config_path = os.path.join(os.getcwd(), ".chat", ".workflow_config.json")
         if os.path.exists(config_path) and issue_repo:
@@ -366,7 +358,7 @@ def get_parent_branch():
 
 def get_issue_info(issue_id):
     # 获取 GitLab 项目 ID
-    project_id = get_gitlab_issue_repo()
+    project_id = get_gitlab_repo()
     # 构造 GitLab API 端点 URL
     api_url = f"{GITLAB_API_URL}/projects/{project_id}/issues/{issue_id}"
 
@@ -609,3 +601,27 @@ def save_last_base_branch(base_branch=None):
         base_branch = get_current_branch()
     project_config_path = os.path.join(os.getcwd(), ".chat", ".workflow_config.json")
     save_config_item(project_config_path, "last_base_branch", base_branch)
+
+
+def get_gitlab_repo_issues(repo: str, assignee_username: str, state: str = "opened"):
+    url = f"{GITLAB_API_URL}/projects/{repo}/issues"
+    params = {
+        "state": state,
+        "assignee_username": assignee_username,
+    }
+    headers = {
+        "Private-Token": GITLAB_ACCESS_TOKEN,
+        "Content-Type": "application/json",
+    }
+    response = requests.get(url, headers=headers, params=params)
+    return response.json()
+
+
+def get_gitlab_username():
+    url = f"{GITLAB_API_URL}/user"
+    headers = {
+        "Private-Token": GITLAB_ACCESS_TOKEN,
+        "Content-Type": "application/json",
+    }
+    response = requests.get(url, headers=headers)
+    return response.json()["username"]
