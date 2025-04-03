@@ -12,7 +12,7 @@ from git_api import (  # noqa: E402
     create_pull_request,
     get_commit_messages,
     get_current_branch,
-    get_gitlab_issue_repo,
+    get_gitlab_repo,
     get_issue_info,
     get_last_base_branch,
     save_last_base_branch,
@@ -87,7 +87,7 @@ def main():
         base_branch = base_branch[0]
         save_last_base_branch(base_branch)
 
-    repo_name = get_gitlab_issue_repo()
+    repo_name = get_gitlab_repo()
     branch_name = get_current_branch()
     issue_id = extract_issue_id(branch_name)
 

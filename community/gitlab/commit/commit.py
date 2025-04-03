@@ -12,7 +12,14 @@ from lib.ide_service import IDEService
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 from common_util import assert_exit  # noqa: E402
-from git_api import get_issue_info, subprocess_check_output, subprocess_run
+from git_api import (
+    get_gitlab_repo,
+    get_gitlab_repo_issues,
+    get_gitlab_username,
+    get_issue_info,
+    subprocess_check_output,
+    subprocess_run,
+)
 
 diff_too_large_message_en = (
     "Commit failed. The modified content is too long "
@@ -414,6 +421,25 @@ def push_changes():
         return False
 
 
+def get_selected_issue_ids():
+    """
+    获取用户选中的issue id
+
+    Returns:
+        list: 用户选中的issue id列表
+    """
+    name = get_gitlab_username()
+    issue_repo = get_gitlab_repo(True)
+    issues = get_gitlab_repo_issues(issue_repo, name)
+    if issues:
+        checkbox = Checkbox(
+            [f"#{issue['iid']}: {issue['title']}" for issue in issues],
+            title="Select the issues you want to close",
+        )
+        checkbox.render()
+        return [issues[idx]["iid"] for idx in checkbox.selections]
+
+
 def main():
     global language
     try:
@@ -472,7 +498,17 @@ def main():
             .replace("No specific issue to close", "")
             .replace("No specific issue mentioned.", "")
         )
-
+        # add closes #IssueNumber in commit message from issues from user selected
+        issue_ids = get_selected_issue_ids()
+        if issue_ids:
+            issue_repo = get_gitlab_repo(True)
+            owner_repo = get_gitlab_repo()
+            closes_issue_contents = []
+            for issue_id in issue_ids:
+                closes_issue_contents.append(
+                    f"#{issue_id}" if owner_repo == issue_repo else f"{issue_repo}#{issue_id}"
+                )
+            commit_message["content"] += f"\n\nCloses {', '.join(closes_issue_contents)}"
         commit_result = display_commit_message_and_commit(commit_message["content"])
         if not commit_result:
             print("Commit aborted.", flush=True)
