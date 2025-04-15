@@ -434,7 +434,7 @@ def get_selected_issue_ids():
     if issues:
         checkbox = Checkbox(
             [f"#{issue['iid']}: {issue['title']}" for issue in issues],
-            title="Select the issues you want to close",
+            title="Select the issues to close",
         )
         checkbox.render()
         return [issues[idx]["iid"] for idx in checkbox.selections]
@@ -458,8 +458,8 @@ def main():
             sys.exit(-1)
 
         print(
-            "Step 1/3: Select the files you've changed that you wish to include in this commit, "
-            "then click 'Submit'.",
+            "Step 1/3: Select the changed files to include in this commit, "
+            "then click 'Continue'.",
             end="\n\n",
             flush=True,
         )
@@ -476,9 +476,7 @@ def main():
         rebuild_stage_list(selected_files)
 
         print(
-            "Step 2/3: Review the commit message I've drafted for you. "
-            "Edit it below if needed. Then click 'Commit' to proceed with "
-            "the commit using this message.",
+            "Step 2/3: Review the commit message. ",
             end="\n\n",
             flush=True,
         )
