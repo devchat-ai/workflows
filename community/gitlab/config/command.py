@@ -78,19 +78,19 @@ def save_gitlab_api_url(gitlab_api_url):
 
 
 @editor(
-    "Please specify the issue's repository, "
+    "Input the issues repository, "
     "If the issue is within this repository, no need to specify. "
     "Otherwise, format as: username/repository-name"
 )
-@editor("Input your gitlab API URL to access gitlab api:")
-@editor("Input your gitlab TOKEN to access gitlab api:")
+@editor(
+    "Input your gitlab API URL to access gitlab api, if not specified, default is https://gitlab.com/api/v4"
+)
+@editor("Input your gitlab TOKEN to access gitlab api")
 def edit_issue(issue_url, gitlab_api_url, gitlab_token):
     pass
 
 
 def main():
-    print("start config git settings ...", end="\n\n", flush=True)
-
     issue_url = read_issue_url()
     gitlab_token = read_gitlab_token()
     gitlab_api_url = read_gitlab_api_url()
@@ -99,11 +99,9 @@ def main():
         save_issue_url(issue_url)
     if gitlab_token:
         save_gitlab_token(gitlab_token)
-    if gitlab_api_url:
-        save_gitlab_api_url(gitlab_api_url)
     if not gitlab_api_url:
-        print("Please specify the gitlab api url to access gitlab api.")
-        sys.exit(0)
+        gitlab_api_url = "https://gitlab.com/api/v4"
+    save_gitlab_api_url(gitlab_api_url)
     if not gitlab_token:
         print("Please specify the gitlab token to access gitlab api.")
         sys.exit(0)
