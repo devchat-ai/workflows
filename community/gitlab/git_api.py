@@ -18,6 +18,8 @@ def read_gitlab_token():
             config_data = json.load(f)
             if "gitlab_token" in config_data and "gitlab_api_url" in config_data:
                 return config_data["gitlab_token"], config_data["gitlab_api_url"]
+            else:
+                workflow_call("/gitlab.config")
     else:
         workflow_call("/gitlab.config")
     return read_gitlab_token()
