@@ -1,32 +1,34 @@
-
 ### explain
 
-这个命令用于自动为选中的代码块生成解释。
+This Command is used to automatically generate explanations for selected code blocks.
 
-#### 用途
-- 快速获取选中代码块的详细解释
-- 帮助开发者理解复杂或不熟悉的代码逻辑
-- 提高代码审查和学习效率
+#### Purpose
 
-#### 使用方法
-1. 在IDE中选中需要解释的代码块
-2. 执行以下命令之一：
-   - 输入 `/explain` 并回车
-   - 右键点击选中的代码，选择 **DevChat: Generate Explain**
+- Quickly obtain detailed explanations for selected code blocks
+- Help developers understand complex or unfamiliar code logic
+- Improve code review and learning efficiency
 
-#### 操作流程
-1. 选中需要解释的代码块
-2. 执行explain命令
-3. 等待代码解释生成完成
-4. 解释将直接显示在输出窗口中
+#### Usage Method
 
-#### 注意事项
-1. 确保在执行命令前已选中需要解释的代码块
-2. 解释会考虑选中代码的上下文（可见的代码），但只会解释选中的部分
-3. 解释的详细程度可能因代码复杂度而异
-4. 对于非常长或复杂的代码块，生成解释可能需要较长时间
+1. Select the code block that needs explanation in the IDE
+2. Execute one of the following Commands:
+   - Type `/explain` and press Enter
+   - Right-click on the selected code, choose **DevChat: Generate Explain**
 
+#### Operation Process
 
-如图所示：
+1. Select the code block that needs explanation
+2. Execute the explain Command
+3. Wait for code explanation generation to complete
+4. The explanation will be displayed directly in the output window
 
-![图片](https://deploy-script.merico.cn/devchat/workflow/readme_explain.gif)
+#### Notes
+
+1. Ensure that you have selected the code block that needs explanation before executing the Command
+2. The explanation will consider the context of the selected code (visible code), but will only explain the selected part
+3. The level of detail in the explanation may vary depending on code complexity
+4. For very long or complex code blocks, generating an explanation may take longer
+
+As shown in the figure:
+
+![Image](https://deploy-script.merico.cn/devchat/workflow/readme_explain.gif)

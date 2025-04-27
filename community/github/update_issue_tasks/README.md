@@ -1,22 +1,26 @@
 ### update_issue_tasks
 
-更新指定Issue中的任务列表。
+Update task lists in specified Issues.
 
-#### 用途
-- 添加、修改或删除Issue中的子任务
-- 更新任务进度
+#### Purpose
 
-#### 使用方法
-执行命令: `/github.update_issue_tasks`
+- Add, modify, or delete sub-tasks in Issues
+- Update task progress
 
-#### 操作流程
-1. 输入Issue URL
-2. 显示当前任务列表
-3. 用户输入更新建议
-4. 生成新的任务列表
-5. 允许用户编辑新任务列表
-6. 更新Issue内容
+#### Usage Method
 
-#### 注意事项
-- 需要有编辑Issue的权限
-- 小心不要删除或覆盖重要信息
+ExecuteCommand: `/github.update_issue_tasks`
+
+#### Operation Process
+
+1. Type Issue URL
+2. Display current task list
+3. User types update suggestions
+4. Generate new task list
+5. Allow user to edit new task list
+6. Update Issue content
+
+#### Notes
+
+- Requires permission to edit Issues
+- Be careful not to delete or overwrite important information

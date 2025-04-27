@@ -1,21 +1,25 @@
 ### new_issue
 
-创建新的GitHub Issue。
+Create a new GitLab Issue.
 
-#### 用途
-- 快速创建标准格式的Issue
-- 记录任务、bug或功能请求
+#### Purpose
 
-#### 使用方法
-执行命令: `/github.new_issue <description>`
+- Quickly create issues in standard format
+- Document tasks, bugs, or feature requests
 
-- description: Issue的简短描述
+#### Usage Method
 
-#### 操作流程
-1. 基于描述生成Issue标题和正文
-2. 允许用户编辑Issue内容
-3. 创建GitHub Issue
+ExecuteCommand: `/github.new_issue <description>`
 
-#### 注意事项
-- 需要有创建Issue的权限
-- 生成的内容可能需要进一步完善
+- description: Brief description of the Issue
+
+#### Operation Process
+
+1. Generate Issue title and body based on description
+2. Allow user to edit Issue content
+3. Create GitLab Issue
+
+#### Notes
+
+- Requires permission to create Issues
+- Generated content may need further refinement

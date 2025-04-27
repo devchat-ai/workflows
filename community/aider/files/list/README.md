@@ -1,19 +1,20 @@
 ### aider.files.list
 
-这个命令用于列出当前在aider处理列表中的所有文件。
+This Command is used to list all files currently in aider's processing list.
 
-用途:
-显示所有已添加到aider中的文件,提供当前aider正在处理的文件概览。
+Purpose:
+Display all files that have been added to aider, providing an overview of the files aider is currently processing.
 
-使用方法:
+Usage Method:
 /aider.files.list
 
-注意事项:
-- 如果没有文件被添加到aider,会显示相应的提示消息
-- 文件列表按字母顺序排序显示
+Notes:
 
-示例:
+- If no files have been added to aider, an appropriate message will be displayed
+- The file list is displayed sorted in alphabetical order
+
+Example:
 /aider.files.list
 
-额外信息:
-这个命令会读取.chat/.aider_files文件的内容来获取文件列表。如果该文件不存在,会提示尚未添加任何文件。
+Additional Information:
+This Command reads the contents of the .chat/.aider_files file to get the file list. If this file does not exist, it will indicate that no files have been added yet.

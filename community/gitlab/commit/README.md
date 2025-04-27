@@ -1,23 +1,27 @@
 ### commit
 
-自动生成提交信息并执行Git提交。
+Automatically generate commit messages and execute Git commit.
 
-#### 用途
-- 生成规范的提交信息
-- 简化Git提交流程
-- 保持提交历史的一致性
+#### Purpose
 
-#### 使用方法
-执行命令: `/github.commit [message]`
+- Generate standardized commit messages
+- Simplify Git commit process
+- Maintain consistency in commit history
 
-- message: 可选的用户输入,用于辅助生成提交信息
+#### Usage Method
 
-#### 操作流程
-1. 选择要提交的文件
-2. 生成提交信息
-3. 允许用户编辑提交信息
-4. 执行Git提交
+ExecuteCommand: `/github.commit [message]`
 
-#### 注意事项
-- 确保已选择需要提交的文件
-- 生成的提交信息可能需要进一步修改以符合项目规范
+- message: Optional user input to assist with generating the commit message
+
+#### Operation Process
+
+1. Select files to commit
+2. Generate commit message
+3. Allow user to edit commit message
+4. Execute Git commit
+
+#### Notes
+
+- Ensure that files to be committed have been selected
+- Generated commit messages may need further modification to comply with project standards

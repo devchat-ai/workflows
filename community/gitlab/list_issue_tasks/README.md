@@ -1,19 +1,23 @@
 ### list_issue_tasks
 
-列出指定Issue中的任务列表。
+List the tasks in a specified Issue.
 
-#### 用途
-- 查看Issue中的子任务
-- 跟踪任务进度
+#### Purpose
 
-#### 使用方法
-执行命令: `/github.list_issue_tasks <issue_url>`
+- View subtasks within an Issue
+- Track task progress
 
-#### 操作流程
-1. 获取指定Issue的信息
-2. 解析Issue内容中的任务列表
-3. 显示任务列表
+#### Usage Method
 
-#### 注意事项
-- 需要提供有效的Issue URL
-- 任务应以特定格式在Issue中列出(如: - [ ] 任务描述)
+ExecuteCommand: `/github.list_issue_tasks <issue_url>`
+
+#### Operation Process
+
+1. Get information for the specified Issue
+2. Parse task lists in the Issue content
+3. Display the task list
+
+#### Notes
+
+- A valid Issue URL must be provided
+- Tasks should be listed in a specific format in the Issue (e.g., - [ ] task description)

@@ -1,5 +1,7 @@
 description: Generate unit tests.
 input: required
-help: README.md
+help:
+  en: README.md
+  zh: README.zh.md
 steps:
   - run: $devchat_python $command_path/main.py "$input"

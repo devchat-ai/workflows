@@ -1,24 +1,28 @@
 ### code_task_summary
 
-根据当前分支或指定的Issue,生成代码任务摘要。
+Generate code task summaries based on the current branch or specified Issue.
 
-#### 用途
-- 自动生成简洁的代码任务描述
-- 帮助开发者快速理解任务要点
-- 用于更新项目配置或文档
+#### Purpose
 
-#### 使用方法
-执行命令: `/github.code_task_summary [issue_url]`
+- Automatically generate concise code task descriptions
+- Help developers quickly understand task key points
+- Used for updating project configurations or documentation
 
-- 如不提供issue_url,将基于当前分支名称提取Issue信息
-- 如提供issue_url,将直接使用该Issue的内容
+#### Usage Method
 
-#### 操作流程
-1. 获取Issue信息
-2. 生成代码任务摘要
-3. 允许用户编辑摘要
-4. 更新项目配置文件
+Execute Command: `/github.code_task_summary [issue_url]`
 
-#### 注意事项
-- 确保Git仓库配置正确
-- 需要有效的GitHub Token以访问API
+- If issue_url is not provided, Issue information will be extracted based on the current branch name
+- If issue_url is provided, the content of that Issue will be used directly
+
+#### Operation Process
+
+1. Get Issue information
+2. Generate code task summary
+3. Allow user to edit the summary
+4. Update project configuration file
+
+#### Notes
+
+- Ensure that Git repository is configured correctly
+- A valid GitHub Token is needed to access the API

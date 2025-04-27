@@ -1,60 +1,66 @@
-
 ### docstring
 
-这个命令用于自动为选中的函数或方法生成文档字符串（docstring）。
+This Command is used to automatically generate documentation strings (docstrings) for selected functions or methods.
 
-#### 用途
-- 快速为函数或方法添加标准格式的文档字符串
-- 提高代码的可读性和可维护性
-- 自动生成包含参数、返回值等信息的详细文档
+#### Purpose
 
-#### 使用方法
-1. 在IDE中选中需要添加文档字符串的函数或方法
-2. 执行以下命令之一：
-   - 输入 `/docstring` 并回车
-   - 点击函数头部的 **docstring** 按钮
+- Quickly add standard format documentation strings to functions or methods
+- Improve code readability and maintainability
+- Automatically generate detailed documentation including parameters, return values, and other information
 
-#### 操作流程
-1. 选中需要添加文档字符串的函数或方法
-2. 执行docstring命令
-3. 等待文档字符串生成完成
-4. 自动弹出Diff View，您可以选择接受或拒绝修改
+#### Usage Method
 
-#### 注意事项
-1. 确保在执行命令前已选中完整的函数或方法
-2. 生成的文档字符串会插入到函数定义之后
-3. 文档字符串的格式会根据编程语言自动调整（如Python使用三引号，Java使用JavaDoc格式）
-4. 原有的文档字符串可能会被替换，请在Diff View中仔细检查
+1. Select the function or method that needs a documentation string in the IDE
+2. Execute one of the following Commands:
+   - Type `/docstring` and press Enter
+   - Click the **docstring** button at the function header
 
-#### 示例
-选中以下Python函数：
+#### Operation Process
+
+1. Select the function or method that needs a documentation string
+2. Execute the docstring Command
+3. Wait for the documentation string generation to complete
+4. A Diff View will automatically pop up, you can choose to accept or reject the changes
+
+#### Notes
+
+1. Ensure that you have selected the complete function or method before executing the Command
+2. The generated documentation string will be inserted after the function definition
+3. The format of the documentation string will be automatically adjusted according to the programming language (e.g., Python uses triple quotes, Java uses JavaDoc format)
+4. Existing documentation strings may be replaced, please check carefully in the Diff View
+
+#### Example
+
+Select the following Python function:
+
 ```python
 def add(a, b):
     return a + b
 ```
-执行docstring命令后，可能生成如下文档字符串：
+
+After executing the docstring Command, a documentation string like the following might be generated:
+
 ```python
 def add(a, b):
     """
-    将两个数相加。
+    Add two numbers together.
 
-    参数:
-    a (int): 第一个加数
-    b (int): 第二个加数
+    Parameters:
+    a (int): The first number
+    b (int): The second number
 
-    返回:
-    int: 两个数的和
+    Returns:
+    int: The sum of the two numbers
     """
     return a + b
 ```
 
+Additional Information:
 
-额外信息:
+- The language of the documentation string will automatically adjust according to the current IDE language settings
+- For Chinese environments, Chinese documentation strings will be generated
+- This Command uses AI technology to generate documentation strings, which may require some processing time
 
-- 文档字符串的语言会根据当前IDE的语言设置自动调整
-- 对于中文环境，会生成中文文档字符串
-- 该命令利用AI技术生成文档字符串，可能需要一定的处理时间
+As shown in the figure:
 
-如图所示：
-
-![图片](https://deploy-script.merico.cn/devchat/workflow/readme_docstring.gif)
+![Image](https://deploy-script.merico.cn/devchat/workflow/readme_docstring.gif)
