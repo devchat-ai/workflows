@@ -1,38 +1,43 @@
-
 ### refactor
 
-这个命令用于根据用户的具体要求重写选中的代码块。
+This Command is used to rewrite selected code blocks according to user-specific requirements.
 
-#### 用途
-- 根据特定需求重构选中的代码
-- 优化代码结构和可读性
-- 实现快速的代码改进和调整
+#### Purpose
 
-#### 使用方法
-1. 在IDE中选中需要重构的代码块
-2. 输入 `/refactor <重构要求>` 并回车
-   例如：`/refactor 将这个函数改写成使用async/await`
+- Refactor selected code based on specific needs
+- Optimize code structure and readability
+- Implement quick code improvements and adjustments
 
-#### 操作流程
-1. 选中需要重构的代码块
-2. 执行refactor命令，并提供具体的重构要求
-3. 等待代码重构完成
-4. 自动弹出Diff View，您可以选择接受或拒绝修改
+#### Usage Method
 
-#### 注意事项
-1. 确保在执行命令前已选中需要重构的代码块
-2. 重构要求应尽可能具体和清晰
-3. 该命令只会修改选中的代码部分，不会影响其他代码
-4. 重构后的代码会保持原有的缩进格式，以确保与现有代码结构的一致性
+1. Select the code block that needs to be refactored in the IDE
+2. Type `/refactor <refactoring requirements>` and press Enter
+   Example: `/refactor Rewrite this function using async/await`
 
-#### 额外信息
-- 重构结果的语言会与原代码保持一致
-- 该命令利用AI技术生成重构建议，可能需要一定的处理时间
-- 复杂的重构可能需要多次尝试或人工调整
+#### Operation Process
 
-#### 提示
-使用refactor命令可以快速实现代码的结构性改进，但请务必仔细审查重构后的代码，确保其符合预期并保持原有功能。
+1. Select the code block that needs to be refactored
+2. Execute the refactor Command, and provide specific refactoring requirements
+3. Wait for the code refactoring to complete
+4. A Diff View will automatically pop up, you can choose to accept or reject the changes
 
-如图所示：
+#### Notes
 
-![图片](https://deploy-script.merico.cn/devchat/workflow/readme_refactor.names.gif)
+1. Ensure that you have selected the code block that needs to be refactored before executing the Command
+2. Refactoring requirements should be as specific and clear as possible
+3. This Command only modifies the selected code section, without affecting other code
+4. The refactored code will maintain the original indentation format to ensure consistency with the existing code structure
+
+#### Additional Information
+
+- The language of the refactoring result will remain consistent with the original code
+- This Command uses AI technology to generate refactoring suggestions, which may require some processing time
+- Complex refactoring may require multiple attempts or manual adjustments
+
+#### Tips
+
+Using the refactor Command can quickly implement structural improvements to code, but please carefully review the refactored code to ensure it meets expectations and maintains the original functionality.
+
+As shown in the figure:
+
+![Image](https://deploy-script.merico.cn/devchat/workflow/readme_refactor.names.gif)

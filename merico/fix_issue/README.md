@@ -1,23 +1,25 @@
 ### fix_issue
 
-自动修复代码中的lint错误。
+Automatically fix lint errors in code.
 
-用法：
+Usage:
 /fix_issue
 
-描述：
-这个命令帮助开发者自动修复代码中的lint错误。它使用AI分析选中的代码行，识别lint问题，并提供修复建议。然后，它会自动应用这些修复建议，并在IDE中显示更改。
+Description:
+This Command helps developers automatically fix lint errors in code. It uses AI to analyze selected code lines, identify lint issues, and provide fix suggestions. Then, it automatically applies these fix suggestions and displays the changes in the IDE.
 
-步骤：
-1. 在IDE中选择包含lint错误的代码行。
-2. 运行 /fix_issue 命令。
-3. 命令会自动获取选中的代码、相关的lint诊断信息，并调用AI生成修复方案。
-4. AI会提供问题解释和修复后的代码。
-5. 命令会自动应用这些修复，并在IDE中显示更改。
+Steps:
 
-注意事项：
-- 确保在运行命令前已选择包含lint错误的代码行。
-- 命令会优先处理SonarLint诊断的问题。
-- 如果安装了aider Python，命令会使用aider来执行AI访问和应用更改。
-- 如果没有安装aider Python，命令会使用默认实现来生成和应用修复。
-- 所有的更改都会在IDE中以Diff View的形式展示，你可以在查看后决定是否接受这些更改。
+1. Select code lines containing lint errors in the IDE.
+2. Run the /fix_issue Command.
+3. The Command will automatically retrieve the selected code, related lint diagnostic information, and call AI to generate fix solutions.
+4. AI will provide problem explanations and fixed code.
+5. The Command will automatically apply these fixes and display the changes in the IDE.
+
+Notes:
+
+- Ensure that you have selected code lines containing lint errors before running the Command.
+- The Command will prioritize issues diagnosed by SonarLint.
+- If aider Python is installed, the Command will use aider to execute AI access and apply changes.
+- If aider Python is not installed, the Command will use the default implementation to generate and apply fixes.
+- All changes will be displayed in the IDE in the form of a Diff View, and you can decide whether to accept these changes after reviewing them.

@@ -1,5 +1,6 @@
 description: Automatically rename poorly-named local variables for improved readability. Select the code segment and execute this command to optimize variable names.
-help: ../README.md
+help:
+  en: ../README.md
+  zh: ../README.zh.md
 steps:
   - run: $devchat_python $command_path/main.py
-

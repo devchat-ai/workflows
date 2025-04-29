@@ -1,20 +1,24 @@
 ### update_pr
 
-更新现有的Pull Request。
+Update an existing Pull Request.
 
-#### 用途
-- 更新PR的标题和描述
-- 反映最新的代码变更
+#### Purpose
 
-#### 使用方法
-执行命令: `/github.update_pr`
+- Update PR title and description
+- Reflect the latest code changes
 
-#### 操作流程
-1. 获取最近的PR信息
-2. 重新生成PR标题和描述
-3. 允许用户编辑PR内容
-4. 更新Pull Request
+#### Usage Method
 
-#### 注意事项
-- 确保有更新PR的权限
-- 更新前请确认是否有新的提交需要推送
+ExecuteCommand: `/github.update_pr`
+
+#### Operation Process
+
+1. Get recent PR information
+2. Regenerate PR title and description
+3. Allow user to edit PR content
+4. Update Pull Request
+
+#### Notes
+
+- Ensure that you have permission to update PRs
+- Confirm if there are new commits that need to be pushed before updating

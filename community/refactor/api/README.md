@@ -1,3 +1,3 @@
 # /refactor.api
 
-对选中代码进行API重构
+Refactor selected code into API

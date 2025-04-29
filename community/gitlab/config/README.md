@@ -1,19 +1,23 @@
 ### config
 
-配置GitHub工作流所需的设置。
+Configure the settings required for GitLab workflow.
 
-#### 用途
-- 设置Issue仓库URL
-- 配置GitHub Token
+#### Purpose
 
-#### 使用方法
-执行命令: `/github.config`
+- Set up Issue repository URL
+- Configure GitLab Token
 
-#### 操作流程
-1. 输入Issue仓库URL(可选)
-2. 输入GitHub Token
-3. 保存配置信息
+#### Usage Method
 
-#### 注意事项
-- GitHub Token应妥善保管,不要泄露
-- 配置信息将保存在本地文件中
+ExecuteCommand: `/github.config`
+
+#### Operation Process
+
+1. Enter Issue repository URL (optional)
+2. Enter GitLab Token
+3. Save configuration information
+
+#### Notes
+
+- GitLab Token should be kept secure, do not expose it
+- Configuration information will be saved in a local file

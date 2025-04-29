@@ -1,21 +1,25 @@
 ### new_branch
 
-基于当前分支创建新分支并切换到新分支。
+Create a new branch based on the current branch and switch to it.
 
-#### 用途
-- 快速创建新的功能或修复分支
-- 保持工作区隔离
+#### Purpose
 
-#### 使用方法
-执行命令: `/github.new_branch <description>`
+- Quickly create new feature or bugfix branches
+- Keep work areas isolated
 
-- description: 新分支的简短描述或相关Issue URL
+#### Usage Method
 
-#### 操作流程
-1. 生成多个分支名建议
-2. 用户选择或编辑分支名
-3. 创建新分支并切换
+ExecuteCommand: `/github.new_branch <description>`
 
-#### 注意事项
-- 确保当前分支的更改已提交
-- 如提供Issue URL,会自动关联Issue编号到分支名
+- description: Brief description of the new branch or related Issue URL
+
+#### Operation Process
+
+1. Generate multiple branch name suggestions
+2. User selects or edits branch name
+3. Create new branch and switch to it
+
+#### Notes
+
+- Ensure that changes in the current branch have been committed
+- If an Issue URL is provided, the Issue number will be automatically associated with the branch name

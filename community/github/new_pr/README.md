@@ -1,22 +1,26 @@
 ### new_pr
 
-创建新的Pull Request。
+Create a new Pull Request.
 
-#### 用途
-- 自动生成PR标题和描述
-- 简化代码审查流程
+#### Purpose
 
-#### 使用方法
-执行命令: `/github.new_pr [additional_info]`
+- Automatically generate PR title and description
+- Simplify code review process
 
-- additional_info: 可选的附加信息
+#### Usage Method
 
-#### 操作流程
-1. 获取当前分支信息和相关Issue
-2. 生成PR标题和描述
-3. 允许用户编辑PR内容
-4. 创建Pull Request
+ExecuteCommand: `/github.new_pr [additional_info]`
 
-#### 注意事项
-- 确保当前分支有未合并的更改
-- 需要有创建PR的权限
+- additional_info: Optional additional information
+
+#### Operation Process
+
+1. Get current branch information and related Issues
+2. Generate PR title and description
+3. Allow users to edit PR content
+4. Create Pull Request
+
+#### Notes
+
+- Ensure that the current branch has uncommitted changes
+- Requires permission to create PR

@@ -1,5 +1,7 @@
-description: "Improve PR."
+description: Improve PR.
 input: required
-help: README.md
+help:
+  en: README.md
+  zh: README.zh.md
 steps:
   - run: $workflow_python $command_path/../command.py "$input" improve

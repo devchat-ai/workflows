@@ -1,36 +1,38 @@
-
 ### comments
 
-这个命令用于自动为选中的代码块生成注释。
+This command is used to automatically generate comments for selected code blocks.
 
-#### 用途
-- 为选中的代码块快速添加解释性注释
-- 提高代码可读性和可维护性
-- 帮助开发者更好地理解代码逻辑
+#### Purpose
 
-#### 使用方法
-1. 在IDE中选中需要添加注释的代码块
-2. 执行以下命令之一：
-   - 输入 `/comments` 并回车
+- Quickly add explanatory comments to selected code blocks
+- Improve code readability and maintainability
+- Help developers better understand code logic
 
-#### 注意事项
-1. 确保在执行命令前已选中代码块
-2. 生成的注释会插入到相应的代码行之前
-3. 原有的注释会被保留
-4. 代码本身不会被修改，只会添加注释
+#### Usage Method
 
-#### 操作流程
-1. 选中需要注释的代码块
-2. 执行comments命令
-3. 等待注释生成完成
-4. 自动弹出Diff View，您可以选择接受或拒绝修改
+1. Select the code block that needs comments in the IDE
+2. Execute one of the following commands:
+   - Type `/comments` and press Enter
 
+#### Notes
 
-额外信息
-注释的语言会根据当前IDE的语言设置自动调整
-对于中文环境，会生成中文注释
-该命令利用AI技术生成注释，可能需要一定的处理时间
+1. Ensure that a code block is selected before executing the command
+2. Generated comments will be inserted before the corresponding code lines
+3. Existing comments will be preserved
+4. The code itself will not be modified, only comments will be added
 
-如图所示：
+#### Operation Process
 
-![图片](https://deploy-script.merico.cn/devchat/workflow/readme_comments.gif)
+1. Select the code block that needs comments
+2. Execute the comments command
+3. Wait for the comment generation to complete
+4. A Diff View will automatically pop up, and you can choose to accept or reject the changes
+
+Additional Information
+The language of the comments will automatically adjust according to the current IDE language settings
+For Chinese environments, Chinese comments will be generated
+This command uses AI technology to generate comments, which may require some processing time
+
+As shown in the figure:
+
+![Image](https://deploy-script.merico.cn/devchat/workflow/readme_comments.gif)

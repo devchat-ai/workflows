@@ -1,4 +1,6 @@
-description: 'Configure global and repository-specific settings for API testing.'
-help: README.md
+description: Configure global and repository-specific settings for API testing.
+help:
+  en: README.md
+  zh: README.zh.md
 steps:
   - run: $devchat_python $command_path/command.py

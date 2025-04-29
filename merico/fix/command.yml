@@ -1,4 +1,6 @@
 description: Try to find out potential bugs in the selected code and try fixing these bugs automaticly.
-help: README.md
+help:
+  en: README.md
+  zh: README.zh.md
 steps:
   - run: $devchat_python $command_path/main.py

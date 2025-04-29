@@ -1,25 +1,27 @@
-### aider 操作指南
+### aider Guide
 
-aider是一个AI辅助的代码编辑工具,可以根据自然语言指令修改代码。
+aider is an AI-assisted code editing tool that can modify code based on natural language instructions.
 
-用途:
-根据用户提供的指令,自动分析和修改已添加到aider中的代码文件。
+Purpose:
+Automatically analyze and modify code files that have been added to aider based on user-provided instructions.
 
-使用方法:
-1. 使用 `/aider.files.add` 命令添加需要处理的文件
-2. 输入 `/aider <message>` 命令,其中 `<message>` 是你想要aider执行的任务描述
-3. 等待aider生成建议的更改
-4. 在IDE中查看每个文件的Diff视图,选择是否接受修改
-5. 对于多个文件的更改,系统会在每个文件之后询问是否继续查看下一个文件的更改
+Usage Method:
 
-注意事项:
-- 使用前必须先添加文件到aider,否则会提示使用 'aider.files.add' 命令
-- 可以使用 `aider.files.remove` 命令从aider中移除文件
-- 所有更改都会在IDE中以Diff视图形式展示,你可以决定是否应用这些更改
-- aider使用OpenAI的API,请确保已正确设置API密钥
+1. Use the `/aider.files.add` command to add files that need to be processed
+2. Enter the `/aider <message>` command, where `<message>` is the description of the task you want aider to perform
+3. Wait for aider to generate suggested changes
+4. View the Diff view of each file in the IDE and choose whether to accept the modifications
+5. For changes across multiple files, the system will ask if you want to continue viewing changes in the next file after each file
 
-示例:
-/aider 重构这段代码以提高性能
+Notes:
 
-额外信息:
-aider支持多种编程语言,可以执行代码重构、bug修复、性能优化等任务。它会分析当前添加的所有文件,并提供整体的改进建议。
+- Files must be added to aider before use, otherwise you will be prompted to use the 'aider.files.add' command
+- You can use the `aider.files.remove` command to remove files from aider
+- All changes will be displayed in the IDE as a Diff view, and you can decide whether to apply these changes
+- aider uses OpenAI's API, please ensure that the API key is correctly set up
+
+Example:
+/aider Refactor this code to improve performance
+
+Additional Information:
+aider supports multiple programming languages and can perform code refactoring, bug fixing, performance optimization, and other tasks. It will analyze all files currently added and provide overall improvement suggestions.

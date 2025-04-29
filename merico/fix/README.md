@@ -1,39 +1,44 @@
-
 ### fix
 
-这个命令用于自动检测和修复选中代码块中的潜在错误。
+This Command is used to automatically detect and fix potential errors in selected code blocks.
 
-#### 用途
-- 快速识别和修复代码中的潜在bug
-- 提高代码质量和可靠性
-- 节省手动调试时间
+#### Purpose
 
-#### 使用方法
-1. 在IDE中选中需要检查和修复的代码块
-2. 执行以下命令之一：
-   - 输入 `/fix` 并回车
-   - 右键点击选中的代码，选择 **DevChat: Fix this**
+- Quickly identify and fix potential bugs in code
+- Improve code quality and reliability
+- Save manual debugging time
 
-#### 操作流程
-1. 选中需要修复的代码块
-2. 执行fix命令
-3. 等待代码分析和修复建议生成完成
-4. 自动弹出Diff View，您可以选择接受或拒绝修改
+#### Usage Method
 
-#### 注意事项
-1. 确保在执行命令前已选中需要修复的代码块
-2. 该命令只会修改选中的代码部分，不会影响其他代码
-3. 修复建议可能不总是100%准确，请仔细审查所有建议的更改
-4. 复杂的逻辑错误可能需要人工干预
+1. Select the code block that needs to be checked and fixed in the IDE
+2. Execute one of the following Commands:
+   - Type `/fix` and press Enter
+   - Right-click on the selected code, choose **DevChat: Fix this**
 
-#### 额外信息
-- 修复建议的语言会根据当前IDE的语言设置自动调整（支持中英文）
-- 该命令利用AI技术生成修复建议，可能需要一定的处理时间
-- 除了修复代码，还会提供关于发现的问题和修复方法的解释
+#### Operation Process
 
-#### 提示
-使用fix命令可以快速发现和修复简单的代码错误，但对于复杂的逻辑问题，建议结合人工审查和测试来确保代码的正确性。
+1. Select the code block that needs to be fixed
+2. Execute the fix Command
+3. Wait for code analysis and fix suggestion generation to complete
+4. A Diff View will automatically pop up, you can choose to accept or reject the changes
 
-如图所示：
+#### Notes
 
-![图片](https://deploy-script.merico.cn/devchat/workflow/readme_fix.gif)
+1. Ensure that you have selected the code block that needs to be fixed before executing the Command
+2. This Command only modifies the selected code section, without affecting other code
+3. Fix suggestions may not always be 100% accurate, please carefully review all suggested changes
+4. Complex logical errors may require manual intervention
+
+#### Additional Information
+
+- The language of the fix suggestions will automatically adjust according to the current IDE language settings (supports both Chinese and English)
+- This Command uses AI technology to generate fix suggestions, which may require some processing time
+- Besides fixing the code, it will also provide explanations about the identified issues and the fix methods
+
+#### Tips
+
+Using the fix Command can quickly discover and fix simple code errors, but for complex logical problems, it is recommended to combine manual review and testing to ensure the correctness of the code.
+
+As shown in the figure:
+
+![Image](https://deploy-script.merico.cn/devchat/workflow/readme_fix.gif)

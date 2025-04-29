@@ -1,24 +1,22 @@
 # pr.config
 
-**/pr.config命令用于配置Git工作流所需的设置。**
+**/pr.config Command is used to configure the settings required for Git workflows.**
 
+This Command allows users to configure the following options:
 
-该命令允许用户配置以下选项:
+1. PR Review Inline: Enable or disable the PR inline review feature.
 
-1. PR Review Inline: 启用或禁用PR内联评审功能。
+Usage Method:
+Simply run the /pr.config Command without additional parameters.
 
-使用方式:
-直接运行 /pr.config 命令,无需额外参数。
+The Command will guide users through configuration via an interactive interface. Users can choose whether to enable the PR inline review feature.
 
-命令会引导用户通过交互式界面进行配置。用户可以选择是否启用PR内联评审功能。
+Configuration File Location:
+The global configuration file is saved in the user's home directory at ~/.chat/.workflow_config.json
 
+Notes:
 
-配置文件位置:
-全局配置文件保存在用户主目录下的 ~/.chat/.workflow_config.json
+- To modify access tokens or host URLs, please edit the configuration file directly.
+- Configuration changes take effect immediately.
 
-
-注意:
-- 如需修改访问令牌或主机URL,请直接编辑配置文件。
-- 配置更改后会立即生效。
-
-这个命令可以帮助用户快速设置Git工作流所需的重要配置项,提高使用效率。
+This Command can help users quickly set up important configuration items required for Git workflows, improving usage efficiency.

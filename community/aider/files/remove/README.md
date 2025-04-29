@@ -1,23 +1,25 @@
 ### aider.files.remove
 
-这个命令用于从aider处理列表中移除指定的文件。
+This Command is used to remove specified files from aider's processing list.
 
-用途:
-将指定文件从aider的处理列表中删除,使其不再包含在后续的aider操作中。
+Purpose:
+Remove specified files from aider's processing list, so they are no longer included in subsequent aider operations.
 
-使用方法:
+Usage Method:
 /aider.files.remove <file_path>
 
-参数:
-- <file_path>: 要移除的文件路径(必需)
+Parameters:
 
-注意事项:
-- 文件路径必须是有效的格式
-- 如果指定的文件不在列表中,会显示相应的提示消息
-- 成功移除后会显示更新后的aider文件列表
+- <file_path>: The file path to remove (required)
 
-示例:
+Notes:
+
+- The file path must be in a valid format
+- If the specified file is not in the list, an appropriate message will be displayed
+- After successful removal, the updated aider file list will be displayed
+
+Example:
 /aider.files.remove src/main.py
 
-额外信息:
-这个命令会更新.chat/.aider_files文件,从中删除指定的文件路径。如果文件不存在于列表中,操作会安全退出。
+Additional Information:
+This Command updates the .chat/.aider_files file, removing the specified file path from it. If the file does not exist in the list, the operation will exit safely.

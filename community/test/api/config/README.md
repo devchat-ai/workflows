@@ -1,28 +1,33 @@
 ### test.api.config
 
-配置API测试工作流所需的全局和仓库相关设置。
+Configure global and repository-related settings needed for the API testing workflow.
 
-#### 用途
-- 配置服务器连接信息（SERVER_URL, USERNAME, PASSWORD）
-- 配置项目相关信息（PROJECT_ID, OPENAPI_URL, VERSION_URL）
+#### Purpose
 
-#### 使用方法
-执行命令: `/test.api.config`
+- Configure server connection information (SERVER_URL, USERNAME, PASSWORD)
+- Configure project-related information (PROJECT_ID, OPENAPI_URL, VERSION_URL)
 
-#### 操作流程
-1. 输入服务器URL（例如: http://kagent.merico.cn:8000）
-2. 输入用户名
-3. 输入密码
-4. 输入项目ID（例如: 37）
-5. 输入OpenAPI文档URL（例如: http://kagent.merico.cn:8080/openapi.json）
-6. 输入版本信息URL（例如: http://kagent.merico.cn:8080/version）
-7. 保存配置信息
+#### Usage Method
 
-#### 配置信息存储位置
-- 全局配置（SERVER_URL, USERNAME, PASSWORD）保存在 `~/.chat/.workflow_config.json`
-- 仓库配置（PROJECT_ID, OPENAPI_URL, VERSION_URL）保存在当前仓库的 `.chat/.workflow_config.json`
+Execute command: `/test.api.config`
 
-#### 注意事项
-- 密码信息应妥善保管，不要泄露
-- 配置完成后，其他API测试工作流将自动使用这些配置信息
-- 如需修改配置，重新运行此命令即可
+#### Operation Process
+
+1. Enter server URL (example: http://kagent.merico.cn:8000)
+2. Enter username
+3. Enter password
+4. Enter project ID (example: 37)
+5. Enter OpenAPI document URL (example: http://kagent.merico.cn:8080/openapi.json)
+6. Enter version information URL (example: http://kagent.merico.cn:8080/version)
+7. Save configuration information
+
+#### Configuration Storage Location
+
+- Global configuration (SERVER_URL, USERNAME, PASSWORD) is saved in `~/.chat/.workflow_config.json`
+- Repository configuration (PROJECT_ID, OPENAPI_URL, VERSION_URL) is saved in the current repository's `.chat/.workflow_config.json`
+
+#### Notes
+
+- Password information should be kept secure and not disclosed
+- After configuration is complete, other API testing workflows will automatically use these configuration settings
+- To modify the configuration, simply run this command again
