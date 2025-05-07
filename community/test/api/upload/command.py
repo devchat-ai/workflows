@@ -2,6 +2,7 @@ import os
 import subprocess
 import sys
 import time
+from urllib.parse import urlparse
 
 import requests
 
@@ -30,9 +31,40 @@ def get_apidocs():
     return res.json()["docs"]
 
 
+def get_apienvs_id():
+    res = session.get(
+        f"{SERVER_URL}/autotest/projects/{PROJECT_ID}/apienvs",
+        params={"page": 1, "size": 100},
+    )
+    return res.json()["envs"][0]["id"]
+
+
 def delete_old_apidocs(apidocs):
     for apidoc in apidocs:
         session.delete(f"{SERVER_URL}/autotest/projects/{PROJECT_ID}/apidocs/{apidoc['id']}")
+
+
+def create_api_auth(apienv_id, apidoc_id):
+    parsed = urlparse(OPENAPI_URL)
+    data = {
+        "apienv_id": apienv_id,
+        "apidoc_id": apidoc_id,
+        "base_url": parsed.scheme + "://" + parsed.netloc,
+        "ssl_verify": True,
+        "auth_test_url": "/version",
+        "auth_test_request_method": "GET",
+        "auth_test_body": None,
+        "auth_test_request_type": None,
+        "auth_method": "custom",
+        "data": {
+            "filename": "custom_auth.py",
+            "pyscript": "from requests import Request\n\n\n\ndef set_auth(request: Request):\n    # Set authentication for the request\n    # Request reference can be found at https://requests.readthedocs.io/en/latest/api/#requests.Request\n    pass\n",  # noqa: E501
+        },
+    }
+    session.post(
+        f"{SERVER_URL}/autotest/projects/{PROJECT_ID}/apiauths",
+        json=data,
+    )
 
 
 def get_local_version():
@@ -63,8 +95,7 @@ def check_api_version():
                     flush=True,
                 )
                 time.sleep(5)
-        except Exception as e:
-            print(f"检查 API 版本失败！{e}", flush=True)
+        except Exception:
             time.sleep(5)
 
 
@@ -86,8 +117,7 @@ def wait_for_testcase_done(testcase_id):
                     flush=True,
                 )
                 time.sleep(5)
-        except Exception as e:
-            print(f"检查文本用例状态失败！{e}", flush=True)
+        except Exception:
             time.sleep(5)
 
 
@@ -107,8 +137,7 @@ def wait_for_testcode_done(task_id):
                     flush=True,
                 )
                 time.sleep(5)
-        except Exception as e:
-            print(f"检查自动测试脚本生成失败！{e}", flush=True)
+        except Exception:
             time.sleep(5)
 
 
@@ -165,10 +194,11 @@ def main():
     api_path = args[0]
     method = args[1]
     test_target = " ".join(args[2:])
-    docs = get_apidocs()
+    apidocs = get_apidocs()
+    apienv_id = get_apienvs_id()
     with Step("检查 API 版本是否更新..."):
         check_api_version()
-        delete_old_apidocs(docs)
+        delete_old_apidocs(apidocs)
 
     with Step(f"上传 OpenAPI 文档，并且触发 API {api_path} 的测试用例和自动测试脚本生成任务..."):
         # 使用配置的OPENAPI_URL
@@ -182,10 +212,10 @@ def main():
         res = session.post(
             f"{SERVER_URL}/autotest/projects/{PROJECT_ID}/apidocs",
             files={"file": ("openapi.json", res.content, "application/json")},
-            data={"apiauth_id": docs[0]["apiauth_id"]},
         )
         if res.status_code == 200:
             print("上传 OpenAPI 文档成功！\n")
+            create_api_auth(apienv_id, res.json()["id"])
         else:
             print(f"上传 OpenAPI 文档失败！{res.text}", flush=True)
             return
@@ -220,6 +250,7 @@ def main():
         testcode_id = testcode["id"]
         res = session.post(
             f"{SERVER_URL}/autotest/projects/{PROJECT_ID}/testcodes/{testcode_id}/exec",
+            json={"apienv_id": apienv_id},
         )
         if res.status_code == 200:
             print("提交执行自动测试脚本成功！", flush=True)
