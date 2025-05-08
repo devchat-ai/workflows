@@ -1,3 +1,0 @@
-description: "edit custom suggestions"
-steps:
-  - run: $devchat_python $command_path/command.py

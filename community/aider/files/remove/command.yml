@@ -1,7 +1,0 @@
-description: remove files from aider
-input: required
-help:
-  en: README.md
-  zh: README.zh.md
-steps:
-  - run: $devchat_python $command_path/command.py "$input"

@@ -1,7 +1,0 @@
-description: review pr
-input: required
-help:
-  en: README.md
-  zh: README.zh.md
-steps:
-  - run: $workflow_python $command_path/../command.py "$input" review
