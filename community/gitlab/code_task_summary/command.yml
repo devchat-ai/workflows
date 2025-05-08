@@ -1,7 +1,0 @@
-description: Generate code task summary.
-input: optional
-help:
-  en: README.md
-  zh: README.zh.md
-steps:
-  - run: $devchat_python $command_path/command.py "$input"

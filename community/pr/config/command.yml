@@ -1,6 +1,0 @@
-description: "Config required settings for GIT workflows."
-help:
-  en: README.md
-  zh: README.zh.md
-steps:
-  - run: $devchat_python $command_path/command.py
