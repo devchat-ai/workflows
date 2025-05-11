@@ -1,4 +1,3 @@
-import os
 import re
 import sys
 
@@ -6,6 +5,7 @@ from devchat.llm import chat
 from devchat.memory import FixSizeChatMemory
 
 from lib.ide_service import IDEService
+from lib.workflow.decorators import check_select_code
 
 PROMPT = prompt = """
 file: {file_path}
@@ -145,35 +145,6 @@ def content_to_json(content):
 ]
 
 
-def get_selected_code():
-    """
-    Retrieves the selected lines of code from the user's selection.
-
-    This function extracts the text selected by the user in their IDE or text editor.
-    If no text has been selected, it prints an error message to stderr and exits the
-    program with a non-zero status indicating failure.
-
-    Returns:
-        dict: A dictionary containing the key 'selectedText' with the selected text
-        as its value. If no text is selected, the program exits.
-    """
-    selected_data = IDEService().get_selected_range().dict()
-
-    miss_selected_error = "Please select some text."
-    if selected_data["range"]["start"] == selected_data["range"]["end"]:
-        readme_path = os.path.join(os.path.dirname(__file__), "README.md")
-        if os.path.exists(readme_path):
-            with open(readme_path, "r", encoding="utf-8") as f:
-                readme_text = f.read()
-                print(readme_text)
-                sys.exit(0)
-
-        print(miss_selected_error, file=sys.stderr, flush=True)
-        sys.exit(-1)
-
-    return selected_data
-
-
 memory = FixSizeChatMemory(max_size=20, messages=MESSAGES_A)
 
 
@@ -283,9 +254,10 @@ def merge_code(selected_text, docstring):
     return docstring + "\n" + selected_text
 
 
-def main():
+@check_select_code("Please select code to add docstring.")
+def main(code: dict):
     # Prepare code
-    selected_text = get_selected_code()
+    selected_text = code["text"]
 
     # Rewrite
     response = add_docstring(

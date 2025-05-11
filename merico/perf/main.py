@@ -7,36 +7,7 @@ from devchat.llm import chat, chat_json
 
 from lib.chatmark import Step
 from lib.ide_service import IDEService
-
-
-def get_selected_code():
-    """
-    Retrieves the selected lines of code from the user's selection.
-
-    This function extracts the text selected by the user in their IDE or text editor.
-    If no text has been selected, it prints an error message to stderr and exits the
-    program with a non-zero status indicating failure.
-
-    Returns:
-        dict: A dictionary containing the key 'selectedText' with the selected text
-        as its value. If no text is selected, the program exits.
-    """
-    selected_data = IDEService().get_selected_range().dict()
-
-    miss_selected_error = "Please select some text."
-    if selected_data["range"]["start"] == selected_data["range"]["end"]:
-        readme_path = os.path.join(os.path.dirname(__file__), "README.md")
-        if os.path.exists(readme_path):
-            with open(readme_path, "r", encoding="utf-8") as f:
-                readme_text = f.read()
-                print(readme_text)
-                sys.exit(0)
-
-        print(miss_selected_error, file=sys.stderr, flush=True)
-        sys.exit(-1)
-
-    return selected_data
-
+from lib.workflow.decorators import check_select_code
 
 REWRITE_PROMPT = prompt = """
 你是一个代码重构专家，你的任务是根据用户的需求重写代码。你需要根据用户的需求，重写代码，并保证代码的语法正确性和逻辑正确性。
@@ -390,28 +361,20 @@ def find_project_root(file_path: str) -> str:
     return os.path.dirname(file_path)
 
 
-def main():
+@check_select_code("Please select code to refactor.")
+def main(code: dict):
     ide_service = IDEService()
     question = sys.argv[1]
     rafact_task = sys.argv[1]
     # prepare code
-
-    # 步骤1: 获取用户选中的代码片段
-    with Step("获取选中的代码片段..."):
-        selected_code = ide_service.get_selected_range()
-
-        if not selected_code or not selected_code.text.strip():
-            print("请先选择一段代码片段再执行此命令。")
-            return
-    # print(selected_code)
-    selected_text = selected_code.text
-    project_root_path = find_project_root(selected_code.abspath)
+    selected_text = code["text"]
+    project_root_path = find_project_root(code["abspath"])
     print(f"项目根目录: {project_root_path}\n\n")
 
     # 步骤2: 分析代码片段中缺少定义的符号
     with Step("分析代码中缺少定义的符号..."):
         try:
-            analysis_result = analyze_missing_symbols(code=selected_code.text, task=rafact_task)
+            analysis_result = analyze_missing_symbols(code=selected_text, task=rafact_task)
             missing_symbols = analysis_result  # 直接获取返回的列表
 
             if not missing_symbols:
@@ -424,12 +387,12 @@ def main():
             print(f"分析代码时出错: {str(e)}")
             return
 
-    base_line = selected_code.range.start.line
+    base_line = code["range"]["start"]["line"]
 
     # 步骤3: 将分析结果转换为可处理的结构
     with Step("处理符号信息..."):
         symbols = []
-        code_lines = selected_code.text.splitlines()
+        code_lines = selected_text.splitlines()
 
         for symbol_info in missing_symbols:
             symbol_name = symbol_info["symbol"]
@@ -474,7 +437,7 @@ def main():
             symbol_type = symbol.get("type", "unknown")
 
             definitions = get_symbol_definition(
-                selected_code.abspath,
+                code["abspath"],
                 symbol_line,
                 symbol_char,
                 symbol_name,
@@ -487,7 +450,7 @@ def main():
     # 计算每个文件被引用次数
     files_ref_counts = {}
     # 当前选中代码文件，默认计算100
-    files_ref_counts[selected_code.abspath] = 100
+    files_ref_counts[code["abspath"]] = 100
     for symbol in symbol_definitions:
         for definition in symbol_definitions[symbol]:
             if definition[0] not in files_ref_counts:

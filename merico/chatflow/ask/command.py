@@ -4,7 +4,7 @@ import sys
 
 from devchat.llm import chat
 
-from lib.ide_service import IDEService
+from lib.workflow.decorators import check_input, check_select_code
 
 ROOT_WORKFLOW_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(ROOT_WORKFLOW_DIR)
@@ -28,20 +28,15 @@ def ask(question, selected_code, file_path):
     pass
 
 
-def get_selected_code():
-    """Retrieves the selected lines of code from the user's selection."""
-    selected_data = IDEService().get_selected_range().dict()
-    return selected_data
-
-
-def main(question):
-    selected_text = get_selected_code()
-    file_path = selected_text.get("abspath", "")
-    code_text = selected_text.get("text", "")
+@check_input("请输入问题")
+@check_select_code("请选中代码")
+def main(code, question):
+    file_path = code.get("abspath", "")
+    code_text = code.get("text", "")
 
     ask(question=question, selected_code=code_text, file_path=file_path)
     sys.exit(0)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main()

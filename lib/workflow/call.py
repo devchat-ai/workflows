@@ -5,6 +5,8 @@ import sys
 
 import yaml
 
+import __main__
+
 
 def find_workflow_script(command_name: str) -> str:
     """
@@ -147,3 +149,22 @@ def workflow_call(command: str) -> int:
         print(f"命令执行失败，返回码: {return_code}")
 
     return return_code
+
+
+def print_sub_workflows():
+    base_dir = os.path.dirname(os.path.abspath(__main__.__file__))
+    root_dir = base_dir.split("/")[-1]
+    print(f"#### {root_dir.capitalize()} Workflows\n", flush=True)
+
+    for root, dirs, files in os.walk(base_dir):
+        if "command.yml" in files:
+            if root == base_dir:
+                continue
+            rel_path = os.path.relpath(root, base_dir)
+            workflow_name = f"/{root_dir}.{rel_path.replace(os.path.sep, '.')}"
+            if workflow_name.endswith(".zh"):
+                continue
+            with open(os.path.join(root, "command.yml"), "r", encoding="utf-8") as f:
+                config = yaml.safe_load(f)
+                description = config.get("description", "No description available")
+                print(f"- **{workflow_name}**: {description}", flush=True)

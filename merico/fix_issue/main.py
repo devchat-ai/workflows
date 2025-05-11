@@ -8,6 +8,7 @@ from devchat.llm import chat
 from devchat.memory import FixSizeChatMemory
 
 from lib.ide_service import IDEService
+from lib.workflow.decorators import check_select_code
 
 
 def extract_edits_block(text):
@@ -51,20 +52,6 @@ def extract_markdown_block(text):
         if text.find("```"):
             return None
         return text
-
-
-# step 1 : get selected code
-def get_selected_code():
-    selected_data = IDEService().get_selected_range().dict()
-
-    if selected_data["range"]["start"] == -1:
-        return None, None, None
-
-    if selected_data["range"]["start"]["line"] != selected_data["range"]["end"]["line"]:
-        print("Please select the line code of issue reported.\n\n", file=sys.stderr)
-        sys.exit(1)
-
-    return selected_data["abspath"], selected_data["text"], selected_data["range"]["start"]["line"]
 
 
 # step 2 : input issue descriptions
@@ -415,14 +402,17 @@ def apply_changes(changes, file_path):
     os.remove(changes_file)
 
 
-def main():
+@check_select_code("Please select code to fix issues.")
+def main(code: dict):
     """
     Main function to fix issues in the selected code.
     It retrieves the selected code, gets issue descriptions,
     generates fix solutions using LLM, and applies the changes.
     """
     print("start fix issue ...\n\n", flush=True)
-    file_path, issue_line, issue_line_num = get_selected_code()
+    file_path = code["abspath"]
+    issue_line = code["text"]
+    issue_line_num = code["range"]["start"]["line"]
     if not file_path or not issue_line:
         print("No code selected. Please select the code line you want to fix.", file=sys.stderr)
         sys.exit(1)
