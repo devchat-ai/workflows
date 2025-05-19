@@ -4,7 +4,6 @@ import sys
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(ROOT_DIR)
 
-from common_util import assert_exit, editor  # noqa: E402
 from devchat.llm import chat_json  # noqa: E402
 from git_api import (  # noqa: E402
     get_issue_info_by_url,
@@ -12,6 +11,8 @@ from git_api import (  # noqa: E402
     update_issue_body,
     update_sub_tasks,
 )
+
+from lib.workflow.common_util import assert_exit, editor  # noqa: E402
 
 TASKS_PROMPT = (
     "Following is my git issue content.\n"

@@ -1,80 +1,11 @@
-import json
 import os
 import sys
 
+from lib.workflow.config import read_config, save_config
+
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
-from common_util import editor  # noqa: E402
-
-
-def read_issue_url():
-    config_path = os.path.join(os.getcwd(), ".chat", ".workflow_config.json")
-    if os.path.exists(config_path):
-        with open(config_path, "r", encoding="utf-8") as f:
-            config_data = json.load(f)
-            if "git_issue_repo" in config_data:
-                return config_data["git_issue_repo"]
-    return ""
-
-
-def save_issue_url(issue_url):
-    config_path = os.path.join(os.getcwd(), ".chat", ".workflow_config.json")
-    # make dirs
-    os.makedirs(os.path.dirname(config_path), exist_ok=True)
-
-    config_data = {}
-    if os.path.exists(config_path):
-        with open(config_path, "r", encoding="utf-8") as f:
-            config_data = json.load(f)
-
-    config_data["git_issue_repo"] = issue_url
-    with open(config_path, "w+", encoding="utf-8") as f:
-        json.dump(config_data, f, indent=4)
-
-
-def read_gitlab_token():
-    config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
-    if os.path.exists(config_path):
-        with open(config_path, "r", encoding="utf-8") as f:
-            config_data = json.load(f)
-            if "gitlab_token" in config_data:
-                return config_data["gitlab_token"]
-    return ""
-
-
-def save_gitlab_token(github_token):
-    config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
-
-    config_data = {}
-    if os.path.exists(config_path):
-        with open(config_path, "r", encoding="utf-8") as f:
-            config_data = json.load(f)
-
-    config_data["gitlab_token"] = github_token
-    with open(config_path, "w+", encoding="utf-8") as f:
-        json.dump(config_data, f, indent=4)
-
-
-def read_gitlab_api_url():
-    config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
-    if os.path.exists(config_path):
-        with open(config_path, "r", encoding="utf-8") as f:
-            config_data = json.load(f)
-            if "gitlab_api_url" in config_data:
-                return config_data["gitlab_api_url"]
-    return ""
-
-
-def save_gitlab_api_url(gitlab_api_url):
-    config_path = os.path.join(os.path.expanduser("~/.chat"), ".workflow_config.json")
-    config_data = {}
-    if os.path.exists(config_path):
-        with open(config_path, "r", encoding="utf-8") as f:
-            config_data = json.load(f)
-
-    config_data["gitlab_api_url"] = gitlab_api_url
-    with open(config_path, "w+", encoding="utf-8") as f:
-        json.dump(config_data, f, indent=4)
+from lib.workflow.common_util import editor  # noqa: E402
 
 
 @editor(
@@ -86,25 +17,26 @@ def save_gitlab_api_url(gitlab_api_url):
     "Input your gitlab API URL to access gitlab api, if not specified, default is https://gitlab.com/api/v4"
 )
 @editor("Input your gitlab TOKEN to access gitlab api")
-def edit_issue(issue_url, gitlab_api_url, gitlab_token):
+@editor("Input your gitlab work report template path")
+def edit_config(issue_url, gitlab_api_url, gitlab_token, template_path):
     pass
 
 
 def main():
-    issue_url = read_issue_url()
-    gitlab_token = read_gitlab_token()
-    gitlab_api_url = read_gitlab_api_url()
-    issue_url, gitlab_api_url, gitlab_token = edit_issue(issue_url, gitlab_api_url, gitlab_token)
-    if issue_url:
-        save_issue_url(issue_url)
-    if gitlab_token:
-        save_gitlab_token(gitlab_token)
-    if not gitlab_api_url:
-        gitlab_api_url = "https://gitlab.com/api/v4"
-    save_gitlab_api_url(gitlab_api_url)
+    issue_url = read_config("git_issue_repo", is_global=True)
+    gitlab_token = read_config("gitlab_token", is_global=True)
+    gitlab_api_url = read_config("gitlab_api_url", is_global=True)
+    template_path = read_config("gitlab_work_report_template_path", is_global=True)
+    issue_url, gitlab_api_url, gitlab_token, template_path = edit_config(
+        issue_url, gitlab_api_url, gitlab_token, template_path
+    )
     if not gitlab_token:
         print("Please specify the gitlab token to access gitlab api.")
         sys.exit(0)
+    save_config("git_issue_repo", issue_url, is_global=True)
+    save_config("gitlab_token", gitlab_token, is_global=True)
+    save_config("gitlab_api_url", gitlab_api_url, is_global=True)
+    save_config("gitlab_work_report_template_path", template_path, is_global=True)
 
     print("config gitlab settings successfully.")
     sys.exit(0)

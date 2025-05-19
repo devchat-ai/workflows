@@ -7,7 +7,6 @@ from devchat.llm import chat_json
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(ROOT_DIR)
 
-from common_util import assert_exit, ui_edit  # noqa: E402
 from git_api import (  # noqa: E402
     check_git_installed,
     create_and_checkout_branch,
@@ -15,6 +14,8 @@ from git_api import (  # noqa: E402
     read_issue_by_url,
     save_last_base_branch,
 )
+
+from lib.workflow.common_util import assert_exit, ui_edit  # noqa: E402
 
 # Function to generate a random branch name
 PROMPT = (
@@ -93,4 +94,5 @@ def main():
 
 
 if __name__ == "__main__":
+    main()
     main()

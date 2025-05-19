@@ -1,0 +1,7 @@
+description: Generate work report based on the user's issue and commit information
+input: optional
+help:
+  en: README.md
+  zh: README.zh.md
+steps:
+  - run: $devchat_python $command_path/command.py "$input"

@@ -11,15 +11,16 @@ from lib.ide_service import IDEService
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
-from common_util import assert_exit  # noqa: E402
 from git_api import (
-    get_gitlab_repo,
-    get_gitlab_repo_issues,
-    get_gitlab_username,
     get_issue_info,
+    get_repo,
+    get_repo_issues,
+    get_username,
     subprocess_check_output,
     subprocess_run,
 )
+
+from lib.workflow.common_util import assert_exit  # noqa: E402
 
 diff_too_large_message_en = (
     "Commit failed. The modified content is too long "
@@ -428,9 +429,9 @@ def get_selected_issue_ids():
     Returns:
         list: 用户选中的issue id列表
     """
-    name = get_gitlab_username()
-    issue_repo = get_gitlab_repo(True)
-    issues = get_gitlab_repo_issues(issue_repo, name)
+    name = get_username()
+    issue_repo = get_repo(True)
+    issues = get_repo_issues(issue_repo, name)
     if issues:
         checkbox = Checkbox(
             [f"#{issue['iid']}: {issue['title']}" for issue in issues],
@@ -458,8 +459,7 @@ def main():
             sys.exit(-1)
 
         print(
-            "Step 1/3: Select the changed files to include in this commit, "
-            "then click 'Continue'.",
+            "Step 1/3: Select the changed files to include in this commit, then click 'Continue'.",
             end="\n\n",
             flush=True,
         )
@@ -499,8 +499,8 @@ def main():
         # add closes #IssueNumber in commit message from issues from user selected
         issue_ids = get_selected_issue_ids()
         if issue_ids:
-            issue_repo = get_gitlab_repo(True)
-            owner_repo = get_gitlab_repo()
+            issue_repo = get_repo(True)
+            owner_repo = get_repo()
             closes_issue_contents = []
             for issue_id in issue_ids:
                 closes_issue_contents.append(

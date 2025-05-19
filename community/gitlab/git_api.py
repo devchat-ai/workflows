@@ -9,6 +9,7 @@ import requests
 
 from lib.ide_service import IDEService
 from lib.workflow.call import workflow_call
+from lib.workflow.config import read_config
 
 
 def read_gitlab_token():
@@ -115,7 +116,7 @@ def create_issue(title, description):
         "title": title,
         "description": description,
     }
-    project_id = get_gitlab_project_id()
+    project_id = get_project_id()
     issue_api_url = f"{GITLAB_API_URL}/projects/{project_id}/issues"
     response = requests.post(issue_api_url, headers=headers, json=data)
 
@@ -136,7 +137,7 @@ def update_issue_body(issue_iid, issue_body):
         "description": issue_body,
     }
 
-    project_id = get_gitlab_project_id()
+    project_id = get_project_id()
     api_url = f"{GITLAB_API_URL}/projects/{project_id}/issues/{issue_iid}"
     response = requests.put(api_url, headers=headers, json=data)
 
@@ -148,7 +149,7 @@ def update_issue_body(issue_iid, issue_body):
         return None
 
 
-def get_gitlab_project_id():
+def get_project_id():
     try:
         result = subprocess_check_output(
             ["git", "remote", "get-url", "origin"], stderr=subprocess.STDOUT
@@ -175,7 +176,7 @@ def get_gitlab_project_id():
         print(f"Error executing git command: {e}", file=sys.stderr)
         return None
     except Exception as e:
-        print(f"Error in get_gitlab_project_id: {e}", file=sys.stderr)
+        print(f"Error in get_project_id: {e}", file=sys.stderr)
         return None
 
 
@@ -280,33 +281,12 @@ def read_issue_by_url(issue_url):
         return None
 
 
-def get_gitlab_repo(issue_repo=False):
-    try:
-        config_path = os.path.join(os.getcwd(), ".chat", ".workflow_config.json")
-        if os.path.exists(config_path) and issue_repo:
-            with open(config_path, "r", encoding="utf-8") as f:
-                config_data = json.load(f)
-
-                if "git_issue_repo" in config_data:
-                    issue_repo = requests.utils.quote(config_data["git_issue_repo"], safe="")
-                    print(
-                        "current issue repo:",
-                        config_data["git_issue_repo"],
-                        end="\n\n",
-                        file=sys.stderr,
-                        flush=True,
-                    )
-                    return config_data["git_issue_repo"]
-
-        return get_gitlab_project_id()
-    except subprocess.CalledProcessError as e:
-        print(e)
-        # 如果发生错误，打印错误信息
-        return None
-    except FileNotFoundError:
-        # 如果未找到git命令，可能是没有安装git或者不在PATH中
-        print("==> File not found...")
-        return None
+def get_repo(issue_repo=False):
+    if issue_repo:
+        git_issue_repo = read_config("git_issue_repo", is_global=False)
+        if git_issue_repo:
+            return git_issue_repo
+    return get_project_id()
 
 
 # 获取当前分支名称
@@ -360,7 +340,7 @@ def get_parent_branch():
 
 def get_issue_info(issue_id):
     # 获取 GitLab 项目 ID
-    project_id = get_gitlab_repo()
+    project_id = get_repo()
     # 构造 GitLab API 端点 URL
     api_url = f"{GITLAB_API_URL}/projects/{project_id}/issues/{issue_id}"
 
@@ -605,21 +585,33 @@ def save_last_base_branch(base_branch=None):
     save_config_item(project_config_path, "last_base_branch", base_branch)
 
 
-def get_gitlab_repo_issues(repo: str, assignee_username: str, state: str = "opened"):
+def get_repo_issues(
+    repo: str,
+    assignee_username: str,
+    state: str = "opened",
+    created_after=None,
+    created_before=None,
+):
     url = f"{GITLAB_API_URL}/projects/{repo}/issues"
     params = {
         "state": state,
         "assignee_username": assignee_username,
     }
+    if created_after:
+        params["created_after"] = created_after
+    if created_before:
+        params["created_before"] = created_before
     headers = {
         "Private-Token": GITLAB_ACCESS_TOKEN,
         "Content-Type": "application/json",
     }
+    print(f"url: {url}", file=sys.stderr)
+    print(f"params: {params}", file=sys.stderr)
     response = requests.get(url, headers=headers, params=params)
     return response.json()
 
 
-def get_gitlab_username():
+def get_username():
     url = f"{GITLAB_API_URL}/user"
     headers = {
         "Private-Token": GITLAB_ACCESS_TOKEN,
@@ -627,3 +619,25 @@ def get_gitlab_username():
     }
     response = requests.get(url, headers=headers)
     return response.json()["username"]
+
+
+def get_commit_author():
+    cmd = ["git", "config", "user.name"]
+    return subprocess_check_output(cmd).decode("utf-8").strip()
+
+
+def get_repo_commits(repo: str, author=None, since=None, until=None):
+    url = f"{GITLAB_API_URL}/projects/{repo}/repository/commits"
+    params = {}
+    if author:
+        params["author"] = author
+    if since:
+        params["since"] = since
+    if until:
+        params["until"] = until
+    headers = {
+        "Private-Token": GITLAB_ACCESS_TOKEN,
+        "Content-Type": "application/json",
+    }
+    response = requests.get(url, headers=headers, params=params)
+    return response.json()

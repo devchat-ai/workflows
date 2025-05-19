@@ -4,7 +4,7 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
-from common_util import editor  # noqa: E402
+from lib.workflow.common_util import editor  # noqa: E402
 
 
 def read_issue_url():
