@@ -1,4 +1,4 @@
-description: Automatically fix lint errors.
+description: Ask issue for lint errors.
 help:
   en: README.md
   zh: README.zh.md

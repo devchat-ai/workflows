@@ -1,1 +1,3 @@
-description: Root of gitlab commands.
+description: Workflow for gitlab.
+steps:
+  - run: $devchat_python $command_path/main.py

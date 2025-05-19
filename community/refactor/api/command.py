@@ -7,8 +7,8 @@ from typing import Dict
 from devchat.llm import chat_json
 
 from lib.chatmark import Button, Form, TextEditor
-from lib.ide_service import IDEService
 from lib.workflow import workflow_call
+from lib.workflow.decorators import check_select_code
 
 # 步骤3: 使用AI识别API路径和METHOD的提示词
 API_ANALYSIS_PROMPT = """
@@ -37,28 +37,23 @@ def analyze_api(code: str) -> Dict[str, str]:
     pass
 
 
-def main() -> None:
+@check_select_code("Please select code to refactor.")
+def main(code: dict) -> None:
     """API重构工作流主函数"""
     try:
         # 步骤1: 获取用户输入的重构目标
         if len(sys.argv) < 2:
-            print("错误: 请提供重构目标")
+            print("请提供重构目标", file=sys.stderr)
             sys.exit(1)
 
         refactor_target = sys.argv[1]
 
-        # 步骤2: 获取用户选中的代码
-        selected_code = IDEService().get_selected_range()
-        if not selected_code or not selected_code.text.strip():
-            print("错误: 请先选择需要重构的代码")
-            sys.exit(1)
-
         # 步骤3: 使用AI识别API路径和METHOD
         print("正在分析选中代码中的API信息...")
-        api_info = analyze_api(code=selected_code.text)
+        api_info = analyze_api(code=code["text"])
 
         if not api_info or "api_path" not in api_info or "method" not in api_info:
-            print("错误: 无法识别API信息")
+            print("无法识别API信息", file=sys.stderr)
             sys.exit(1)
 
         api_path = api_info["api_path"]
@@ -91,7 +86,7 @@ def main() -> None:
         refactor_result = workflow_call(f"/refactor {refactor_target}")
 
         if refactor_result != 0:
-            print("错误: API重构失败")
+            print("API重构失败")
             sys.exit(1)
 
         print("API重构成功!")
@@ -124,7 +119,7 @@ def main() -> None:
         print("API重构工作流执行完毕!")
 
     except Exception as e:
-        print(f"错误: 执行过程中发生异常: {str(e)}")
+        print(f"执行过程中发生异常: {str(e)}", file=sys.stderr)
         sys.exit(1)
 
 

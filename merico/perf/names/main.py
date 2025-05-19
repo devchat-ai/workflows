@@ -6,6 +6,7 @@ from devchat.llm import chat
 from devchat.memory import FixSizeChatMemory
 
 from lib.ide_service import IDEService
+from lib.workflow.decorators import check_select_code
 
 PROMPT = prompt = """
 file: {file_path}
@@ -221,9 +222,10 @@ def remove_unnecessary_escapes(code_a, code_b):
     return code_copy
 
 
-def main():
+@check_select_code("Please select code to refactor.")
+def main(code: dict):
     # prepare code
-    selected_text = get_selected_code()
+    selected_text = code["text"]
     selected_code = selected_text.get("text", "")
     selected_file = selected_text.get("abspath", "")
 

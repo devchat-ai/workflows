@@ -15,6 +15,7 @@ from devchat.llm import chat, chat_json
 
 from lib.chatmark import Form, Radio, Step, TextEditor
 from lib.ide_service import IDEService
+from lib.workflow.decorators import check_input
 
 ROOT_WORKFLOW_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(ROOT_WORKFLOW_DIR)
@@ -323,10 +324,8 @@ def create_workflow_files(command_dir, command_name, description, input_required
         f.write(readme_content)
 
 
-def main():
-    # 获取用户输入
-    user_input = sys.argv[1] if len(sys.argv) > 1 else ""
-
+@check_input("请输入工作流描述")
+def main(user_input):
     # 步骤1: 通过AI分析用户输入，提取必要信息
     with Step("分析用户输入，提取工作流信息..."):
         workflow_info = extract_workflow_info(user_input=user_input, contexts=CONTEXTS)

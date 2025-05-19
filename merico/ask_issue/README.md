@@ -1,6 +1,6 @@
 ### ask_issue
 
-Automatically fix lint errors in code.
+Ask issue for lint errors.
 
 #### Purpose
 

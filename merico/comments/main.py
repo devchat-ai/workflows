@@ -1,4 +1,3 @@
-import os
 import re
 import sys
 
@@ -6,6 +5,7 @@ from devchat.llm import chat
 from devchat.memory import FixSizeChatMemory
 
 from lib.ide_service import IDEService
+from lib.workflow.decorators import check_select_code
 
 PROMPT = """
 file: {file_path}
@@ -194,21 +194,6 @@ file: t2.ts
 ]
 
 
-def get_selected_code():
-    """Retrieves the selected lines of code from the user's selection."""
-    selected_data = IDEService().get_selected_range().dict()
-    if selected_data["range"]["start"] == selected_data["range"]["end"]:
-        readme_path = os.path.join(os.path.dirname(__file__), "README.md")
-        if os.path.exists(readme_path):
-            with open(readme_path, "r", encoding="utf-8") as f:
-                readme_text = f.read()
-                print(readme_text)
-                sys.exit(0)
-        print("Please select some text.", file=sys.stderr, flush=True)
-        sys.exit(-1)
-    return selected_data
-
-
 memory = FixSizeChatMemory(max_size=20, messages=MESSAGES_FEW_SHOT)
 
 
@@ -253,8 +238,8 @@ def remove_unnecessary_escapes(code_a, code_b):
     return code_copy
 
 
-def main():
-    selected_text = get_selected_code()
+@check_select_code("Please select code to add comments.")
+def main(selected_text: dict):
     file_path = selected_text.get("abspath", "")
     code_text = selected_text.get("text", "")
 
