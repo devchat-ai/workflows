@@ -5,7 +5,6 @@ import sys
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(ROOT_DIR)
 
-from common_util import assert_exit, ui_edit  # noqa: E402
 from devchat.llm import chat_json  # noqa: E402
 from git_api import (  # noqa: E402
     auto_push,
@@ -17,6 +16,8 @@ from git_api import (  # noqa: E402
     get_last_base_branch,
     save_last_base_branch,
 )
+
+from lib.workflow.common_util import assert_exit, ui_edit  # noqa: E402
 
 
 # 从分支名称中提取issue id

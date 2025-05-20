@@ -2,6 +2,7 @@ import functools
 import json
 import os
 import sys
+from typing import Callable, Optional
 
 from lib.ide_service import IDEService
 
@@ -51,7 +52,7 @@ def check_select_code(description: str):
     return decorator
 
 
-def check_input(description: str):
+def check_input(description: str, callback: Optional[Callable] = None):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -59,6 +60,8 @@ def check_input(description: str):
             if len(arg) == 0:
                 print(description, file=sys.stderr)
                 sys.exit(1)
+            if callback:
+                return callback(arg)
             return func(arg, *args, **kwargs)
 
         return wrapper

@@ -4,9 +4,10 @@ import sys
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(ROOT_DIR)
 
-from common_util import assert_exit, editor  # noqa: E402
 from devchat.llm import chat_json  # noqa: E402
 from git_api import create_issue  # noqa: E402
+
+from lib.workflow.common_util import assert_exit, editor  # noqa: E402
 
 # Function to generate issue title and body using LLM
 PROMPT = (
@@ -50,4 +51,5 @@ def main():
 
 
 if __name__ == "__main__":
+    main()
     main()

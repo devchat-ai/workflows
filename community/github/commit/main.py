@@ -11,7 +11,6 @@ from lib.ide_service import IDEService
 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
-from common_util import assert_exit  # noqa: E402
 from git_api import (
     get_github_repo,
     get_github_repo_issues,
@@ -20,6 +19,8 @@ from git_api import (
     subprocess_check_output,
     subprocess_run,
 )
+
+from lib.workflow.common_util import assert_exit  # noqa: E402
 
 diff_too_large_message_en = (
     "Commit failed. The modified content is too long "
@@ -536,4 +537,5 @@ def main():
 
 
 if __name__ == "__main__":
+    main()
     main()

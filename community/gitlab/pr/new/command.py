@@ -5,18 +5,19 @@ import sys
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(ROOT_DIR)
 
-from common_util import assert_exit, ui_edit  # noqa: E402
 from devchat.llm import chat_json  # noqa: E402
 from git_api import (  # noqa: E402
     auto_push,
     create_pull_request,
     get_commit_messages,
     get_current_branch,
-    get_gitlab_repo,
     get_issue_info,
     get_last_base_branch,
+    get_repo,
     save_last_base_branch,
 )
+
+from lib.workflow.common_util import assert_exit, ui_edit  # noqa: E402
 
 
 # 从分支名称中提取issue id
@@ -87,7 +88,7 @@ def main():
         base_branch = base_branch[0]
         save_last_base_branch(base_branch)
 
-    repo_name = get_gitlab_repo()
+    repo_name = get_repo()
     branch_name = get_current_branch()
     issue_id = extract_issue_id(branch_name)
 
