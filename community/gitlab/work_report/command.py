@@ -11,10 +11,9 @@ from community.gitlab.git_api import (
     get_repo_issues,
     get_username,
 )
-from lib.workflow.config import read_config
 
 PROMPT = """
-我希望你根据以下信息生成一份从 {start_time} 到 {end_time} 的 Gitlab 工作报告。
+我希望你根据以下信息生成一份从 {start_time} 到 {end_time} 的工作报告。
 
 问题列表:
 <issues>
@@ -26,7 +25,7 @@ PROMPT = """
 {commits}
 </commits>
 
-请参考以下模板内容：
+请参考以下模板内容的格式：
 <template>
 {template}
 </template>
@@ -34,11 +33,7 @@ PROMPT = """
 
 
 def get_template():
-    template_path = read_config(
-        "gitlab_work_report_template_path",
-        is_global=True,
-        default=os.path.join(os.path.dirname(__file__), "template.md"),
-    )
+    template_path = os.path.join(os.path.dirname(__file__), "template.md")
     with open(template_path, "r", encoding="utf-8") as f:
         return f.read()
 

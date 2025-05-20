@@ -44,4 +44,4 @@ The report includes:
 
 ## Configuration
 
-The report template can be customized by setting the `gitlab_work_report_template_path` in the global configuration.
+The report template can be customized by modifying the `template.md` file in the `~/.chat/scripts/community/gitlab/work_report` directory.
