@@ -44,4 +44,4 @@
 
 ## 配置说明
 
-可以通过全局配置中的 `gitlab_work_report_template_path` 来自定义报告模板。
+可以修改 `~/.chat/scripts/community/gitlab/work_report/template.md` 文件来修改报告模板。
