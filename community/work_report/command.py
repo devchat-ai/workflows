@@ -1,8 +1,7 @@
 import os
-import sys
-from datetime import datetime, timedelta
+from datetime import date
 
-from devchat.llm import chat
+from devchat.llm import chat, chat_json
 
 from community.gitlab.git_api import (
     get_commit_author,
@@ -11,25 +10,7 @@ from community.gitlab.git_api import (
     get_repo_issues,
     get_username,
 )
-
-PROMPT = """
-我希望你根据以下信息生成一份从 {start_time} 到 {end_time} 的工作报告。
-
-问题列表:
-<issues>
-{issues}
-</issues>
-
-提交列表:
-<commits>
-{commits}
-</commits>
-
-请参考以下模板内容的格式：
-<template>
-{template}
-</template>
-"""
+from lib.workflow.decorators import check_input
 
 
 def get_template():
@@ -54,20 +35,56 @@ def get_commits(start_time, end_time):
     return commits
 
 
-@chat(prompt=PROMPT, stream_out=True)
+@chat(
+    prompt="""
+我希望你根据以下信息生成一份从 {start_time} 到 {end_time} 的工作报告。
+
+问题列表:
+<issues>
+{issues}
+</issues>
+
+提交列表:
+<commits>
+{commits}
+</commits>
+
+请参考以下模板内容的格式：
+<template>
+{template}
+</template>
+""",
+    stream_out=True,
+)
 def generate_work_report(start_time, end_time, issues, commits, template):
     pass
 
 
-def main():
-    arg = sys.argv[1]
-    args = arg.split(" ")
-    if len(args) == 3:
-        start_time = args[1]
-        end_time = args[2]
-    else:
-        end_time = datetime.now().strftime("%Y-%m-%d")
-        start_time = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+@chat_json(
+    prompt="""
+今天是 {today}，我希望你根据输入信息获取开始时间和结束时间。
+如果无法获取，则获取昨天到今天的时间范围。
+
+<input>
+{input}
+</input>
+
+输出格式为 JSON 格式，如下所示：
+{{
+    "start_time": "2025-05-19",
+    "end_time": "2025-05-20"
+}}
+"""
+)
+def get_date_range(today, input):
+    pass
+
+
+@check_input("请输入需要生成工作报告的时间")
+def main(input):
+    result = get_date_range(today=date.today(), input=input)
+    start_time = result["start_time"]
+    end_time = result["end_time"]
     issues = get_issues(start_time, end_time)
     commits = get_commits(start_time, end_time)
     template = get_template()
