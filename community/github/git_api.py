@@ -589,6 +589,7 @@ def get_github_repo_issues(
     else:
         return None
 
+
 def get_repo_issues(
     repo: str,
     assignee_username: str = None,
@@ -598,47 +599,53 @@ def get_repo_issues(
 ):
     """
     Get issues from a GitHub repository with optional filtering.
-    
+
     Args:
         repo (str): Repository name in the format 'owner/repo'
         assignee_username (str, optional): Filter issues by assignee username.
                                           Special values: '*' (any assigned), 'none' (unassigned)
         state (str, optional): Filter issues by state ('open', 'closed', 'all'). Default is 'open'.
-        created_after (str, optional): ISO 8601 formatted timestamp to filter issues created after this date
-        created_before (str, optional): ISO 8601 formatted timestamp to filter issues created before this date
-        
+        created_after (str, optional): ISO 8601 formatted timestamp to filter issues created after
+           this date
+        created_before (str, optional): ISO 8601 formatted timestamp to filter issues created
+           before this date
+
     Returns:
         list: List of issue objects from the GitHub API
     """
     url = f"{GITHUB_API_URL}/repos/{repo}/issues"
-    
+
     params = {
         "state": state,
     }
-    
+
     # 处理assignee参数
     if assignee_username is not None:
         # 如果提供了assignee_username，则使用它
         params["assignee"] = assignee_username
-    
+
     # GitHub uses 'since' parameter for created_after
     if created_after:
         params["since"] = created_after
-    
+
     headers = {
         "Authorization": f"token {GITHUB_ACCESS_TOKEN}",
         "Accept": "application/vnd.github.v3+json",
     }
-    
+
     response = requests.get(url, headers=headers, params=params)
-    
+
     if response.status_code == 200:
         issues = response.json()
-        
+
         # Filter by created_before if specified
         if created_before:
-            issues = [issue for issue in issues if issue["created_at"][:len(created_before)] <= created_before]
-            
+            issues = [
+                issue
+                for issue in issues
+                if issue["created_at"][: len(created_before)] <= created_before
+            ]
+
         return issues
     else:
         print(f"Failed to get issues: {response.status_code}", file=sys.stderr)
@@ -650,21 +657,22 @@ def get_commit_author():
     cmd = ["git", "config", "user.email"]
     return subprocess_check_output(cmd).decode("utf-8").strip()
 
+
 def get_repo_commits(repo: str, author=None, since=None, until=None):
     """
     Get commits from a GitHub repository with optional filtering.
-    
+
     Args:
         repo (str): Repository name in the format 'owner/repo'
         author (str, optional): Filter commits by author
         since (str, optional): ISO 8601 formatted timestamp to filter commits after this date
         until (str, optional): ISO 8601 formatted timestamp to filter commits before this date
-        
+
     Returns:
         list: List of commit objects from the GitHub API
     """
     url = f"{GITHUB_API_URL}/repos/{repo}/commits"
-    
+
     params = {}
     if author:
         params["author"] = author
@@ -672,14 +680,14 @@ def get_repo_commits(repo: str, author=None, since=None, until=None):
         params["since"] = since
     if until:
         params["until"] = until
-    
+
     headers = {
         "Authorization": f"token {GITHUB_ACCESS_TOKEN}",
         "Accept": "application/vnd.github.v3+json",
     }
-    
+
     response = requests.get(url, headers=headers, params=params)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -687,13 +695,14 @@ def get_repo_commits(repo: str, author=None, since=None, until=None):
         print(response.text)
         return None
 
+
 def is_github_repo():
     """
     Check if the current repository is a GitHub repository.
-    
+
     Tries to determine if the current git repository is hosted on GitHub by
     examining the remote URL.
-    
+
     Returns:
         bool: True if the repository is hosted on GitHub, False otherwise.
     """
@@ -702,13 +711,13 @@ def is_github_repo():
         result = subprocess_check_output(
             ["git", "remote", "get-url", "origin"], stderr=subprocess.STDOUT
         ).strip()
-        
+
         # 将结果从bytes转换为str
         repo_url = result.decode("utf-8")
-        
+
         # 检查URL是否包含github.com
         is_github = "github.com" in repo_url.lower()
-        
+
         IDEService().ide_logging("debug", f"Repository is GitHub: {is_github}")
         return is_github
     except subprocess.CalledProcessError as e:

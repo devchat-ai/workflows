@@ -8,9 +8,13 @@ from community.github.git_api import is_github_repo
 if is_github_repo():
     from community.github.git_api import (
         get_commit_author,
-        get_github_repo as get_repo,
         get_repo_commits,
         get_repo_issues,
+    )
+    from community.github.git_api import (
+        get_github_repo as get_repo,
+    )
+    from community.github.git_api import (
         get_github_username as get_username,
     )
 else:
