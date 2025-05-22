@@ -3,13 +3,28 @@ from datetime import date
 
 from devchat.llm import chat, chat_json
 
-from community.gitlab.git_api import (
-    get_commit_author,
-    get_repo,
-    get_repo_commits,
-    get_repo_issues,
-    get_username,
-)
+from community.github.git_api import is_github_repo
+
+if is_github_repo():
+    from community.github.git_api import (
+        get_commit_author,
+        get_repo_commits,
+        get_repo_issues,
+    )
+    from community.github.git_api import (
+        get_github_repo as get_repo,
+    )
+    from community.github.git_api import (
+        get_github_username as get_username,
+    )
+else:
+    from community.gitlab.git_api import (
+        get_commit_author,
+        get_repo,
+        get_repo_commits,
+        get_repo_issues,
+        get_username,
+    )
 from lib.workflow.decorators import check_input
 
 
