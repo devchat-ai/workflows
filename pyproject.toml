@@ -11,3 +11,4 @@ select = [
 ]
 fixable = ["ALL"]
 extend-select = ["E501"]  # Line too long
+ignore = ["E501"]
