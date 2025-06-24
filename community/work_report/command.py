@@ -6,20 +6,25 @@ from requests.auth import HTTPBasicAuth
 
 from lib.chatmark.step import Step
 
+# TODO: 需要替换为实际的值
+USERS = ["xxx"]
+
 GITLAB_TOKEN = "xxx"
 GITLAB_URL = "xx"
 GITLAB_HEADERS = {"Authorization": f"Bearer {GITLAB_TOKEN}"}
-GITLAB_USERS = ["xxx"]
 
 JIRA_TOKEN = "xxx"
 JIRA_USERNAME = "xxx"
 JIRA_URL = "xxx"
-JIRA_DEV_USER = "xxx"
 JIRA_API_VERSION = "2"
 
 OPENAI_API_URL = "xxx"
 OPENAI_API_KEY = "xxx"
 LLM_MODEL = "xxx"
+
+CONFLUENCE_URL = "xxx"
+CONFLUENCE_USERNAME = "xxx"
+CONFLUENCE_TOKEN = "xxx"
 
 START_TIME = datetime.datetime.strptime("2025-06-01 00:00:00", "%Y-%m-%d %H:%M:%S")
 END_TIME = datetime.datetime.strptime("2025-06-11 23:59:59", "%Y-%m-%d %H:%M:%S")
@@ -258,7 +263,7 @@ def get_commits(projects, author_email):
     return commits
 
 
-def get_jira_projects():
+def get_jira_projects(user):
     # 获取当前用户信息
     # myself = requests.get(
     #     f"{JIRA_URL}/rest/api/{JIRA_API_VERSION}/myself",
@@ -267,7 +272,7 @@ def get_jira_projects():
 
     # 获取与当前用户相关的项目
     url = f"{JIRA_URL}/rest/api/{JIRA_API_VERSION}/search"
-    jql = f"assignee = '{JIRA_DEV_USER}' OR watcher = '{JIRA_DEV_USER}'"
+    jql = f"assignee = '{user}' OR watcher = '{user}'"
 
     response = requests.get(
         url,
@@ -296,7 +301,7 @@ def get_jira_projects():
     return {"values": list(projects.values())}
 
 
-def get_jira_issues(projects):
+def get_jira_issues(projects, user):
     """获取JIRA项目统计信息"""
     url = f"{JIRA_URL}/rest/api/{JIRA_API_VERSION}/search"
     result = {}
@@ -343,7 +348,7 @@ def get_jira_issues(projects):
             "jql": f"""project = {project_id} AND
             updated >= '{START_TIME.strftime("%Y-%m-%d %H:%M")}' AND
             updated <= '{END_TIME.strftime("%Y-%m-%d %H:%M")}' AND
-            assignee = '{JIRA_USERNAME}'""",
+            assignee = '{user}'""",
             "startAt": 0,
             "maxResults": 1000,
             "expand": "changelog",
@@ -362,7 +367,7 @@ def get_jira_issues(projects):
                 filtered_histories = []
                 for history in issue["changelog"].get("histories", []):
                     author = history.get("author", {})
-                    if "emailAddress" in author and author["emailAddress"] == JIRA_USERNAME:
+                    if "emailAddress" in author and author["emailAddress"] == user:
                         author.pop("avatarUrls", None)
                         filtered_histories.append(history)
                 issue["changelog"]["histories"] = filtered_histories
@@ -390,13 +395,15 @@ def get_jira_issues(projects):
     return result, user_updated_issues
 
 
-def gen_report(relations):
+def gen_report(relations, confluence_pages):
     prompt = f"""
     你是一个经验丰富的助手，请根据以下数据，分析我的工作情况，并给出我的工作总结。
     数据如下：
     - 数据启始结束时间: {str(START_TIME)} - {str(END_TIME)}
     - 用户相关数据：
     {json.dumps(relations, indent=2, ensure_ascii=False)}
+    - confluence 页面数据：
+    {json.dumps(confluence_pages, indent=2, ensure_ascii=False)}
 
     输出有以下要求：
     1. 如果 issue 没有和提交相互关联，需要给出警告
@@ -405,6 +412,7 @@ def gen_report(relations):
     4. 日报需要以 markdown 的形式输出
     5. 日报需要以中文输出
     6. 不要输入额外的解释，直接输出日报
+    7. 日报中包含confluence的数据，比如新增了哪些页面，修改了哪些页面
 
     具体输出格式内容如下：
 ```report
@@ -594,6 +602,57 @@ def mr_commits_to_issue(project_id, mr, commits, jira_issues):
             print(f"无法获取JIRA ISSUE {issue_id} 的详情: {response.status_code}")
 
     return issues_new
+
+
+def get_confluence_current_user(account_id):
+    url = f"https://{CONFLUENCE_URL}/wiki/rest/api/user"
+    response = requests.get(
+        url,
+        auth=HTTPBasicAuth(CONFLUENCE_USERNAME, CONFLUENCE_TOKEN),
+        headers={"Accept": "application/json"},
+        params={"accountId": account_id},
+    )
+    data = response.json()
+    return data
+
+
+def get_confluence_page_versions(page_id):
+    url = f"https://{CONFLUENCE_URL}/wiki/api/v2/pages/{page_id}/versions"
+    response = requests.get(
+        url,
+        auth=HTTPBasicAuth(CONFLUENCE_USERNAME, CONFLUENCE_TOKEN),
+        headers={"Accept": "application/json"},
+    )
+    data = response.json()
+    return data["results"]
+
+
+def get_confluence_pages(email):
+    url = f"https://{CONFLUENCE_URL}/wiki/api/v2/pages"
+    response = requests.get(
+        url,
+        auth=HTTPBasicAuth(CONFLUENCE_USERNAME, CONFLUENCE_TOKEN),
+        headers={"Accept": "application/json"},
+        params={"sort": "-modified-date", "limit": 250},
+    )
+    data = response.json()
+    results = data["results"]
+    ret = []
+    for result in results:
+        ownerId = result["ownerId"]
+        user = get_confluence_current_user(ownerId)
+        if user["email"] == email:
+            versions = get_confluence_page_versions(result["id"])
+            versions_ = []
+            for version in versions:
+                created_at = datetime.datetime.fromisoformat(version["createdAt"])
+                created_at = created_at.replace(tzinfo=None)
+                if START_TIME <= created_at <= END_TIME:
+                    versions_.append(version)
+            if versions_:
+                result["versions"] = versions_
+                ret.append(result)
+    return ret
 
 
 def get_relation(merge_requests, commits, jira_issues):
@@ -810,9 +869,9 @@ def update_description_by_commits(relations):
 
 def main():
     print("------", flush=True)
-    for GITLAB_USER in GITLAB_USERS:
-        with Step(f"正在生成用户{GITLAB_USER}的报告..."):
-            user_id, projects = get_projects_by_email(GITLAB_USER)
+    for user in USERS:
+        with Step(f"正在生成用户{user}的报告..."):
+            user_id, projects = get_projects_by_email(user)
             print(projects)
             print("获取到的GITLAB项目数量:", len(projects))
             if not projects:
@@ -826,17 +885,24 @@ def main():
                 json.dumps(merge_requests, indent=2, ensure_ascii=False),
                 flush=True,
             )
-            commits = get_commits(projects, GITLAB_USER)
+            commits = get_commits(projects, user)
             print(
                 "获取到的提交数量:", sum(len(project["commits"]) for project in commits), flush=True
             )
             print("提交详情:", json.dumps(commits, indent=2, ensure_ascii=False), flush=True)
-            jira_projects = get_jira_projects()
+            jira_projects = get_jira_projects(user)
             print("获取到的JIRA项目数量:", len(jira_projects["values"]), flush=True)
-            jira_issues, user_updated_issues = get_jira_issues(jira_projects["values"])
+            jira_issues, user_updated_issues = get_jira_issues(jira_projects["values"], user)
             print(
                 "获取到的JIRA ISSUE数量:",
                 sum(issue["user_updated_issues_count"] for issue in jira_issues.values()),
+                flush=True,
+            )
+            confluence_pages = get_confluence_pages(user)
+            print("获取到的confluence页面数量:", len(confluence_pages), flush=True)
+            print(
+                "confluence页面详情:",
+                json.dumps(confluence_pages, indent=2, ensure_ascii=False),
                 flush=True,
             )
             relations = get_relation(merge_requests, commits, user_updated_issues)
@@ -844,7 +910,7 @@ def main():
             print("获取到的关联关系数量:", len(relations), flush=True)
             print("关联关系详情:", json.dumps(relations, indent=2, ensure_ascii=False), flush=True)
             print("生成日报...", flush=True)
-            result = gen_report(relations)
+            result = gen_report(relations, confluence_pages)
             with open("result.md", "a") as f:
                 f.write(result)
     print("日报已生成，保存在 result.md 文件中。")
